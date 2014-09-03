@@ -3,7 +3,7 @@ Rainbow
 
 A fork of [Processing][1] for Android 
 
-![](http://s23.postimg.org/v33qh59mj/rainbow.png)
+![](http://s8.postimg.org/a0o3aew39/rainbow_307622_640.png)
 
 
 Guide
