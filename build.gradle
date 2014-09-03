@@ -1,0 +1,22 @@
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.12.+'
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    COMPILE_SDK = 20
+    TARGET_SDK = 20
+    MIN_SDK = 16
+    BUILD_TOOLS = '20.0.0'
+    VERSION_CODE =
+    VERSION_NAME = "0.9"
+}
