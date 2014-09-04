@@ -92,9 +92,9 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
 
         @Override
         protected Void doInBackground(Void... params) {
-            rainbowDrawer.getGraphics().beginDraw();
+            rainbowDrawer.beginDraw();
             Rainbow.this.onSketchSetup(rainbowDrawer, rainbowInputController);
-            rainbowDrawer.getGraphics().endDraw();
+            rainbowDrawer.endDraw();
             return null;
         }
 
@@ -183,7 +183,7 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
         }
 
         if (canDraw()) {
-            fireDrawStep(graphics);
+            fireDrawStep();
         }
     }
 
@@ -191,13 +191,13 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
     public void onDrawingStep(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
     }
 
-    private void fireDrawStep(RainbowGraphics graphics) {
+    private void fireDrawStep() {
         synchronized (this) {
             frameCount++;
-            graphics.beginDraw();
+            rainbowDrawer.beginDraw();
             onDrawingStep(rainbowDrawer, rainbowInputController);
             rainbowInputController.dequeueEvents(rainbowDrawer);
-            graphics.endDraw();
+            rainbowDrawer.endDraw();
         }
     }
 
