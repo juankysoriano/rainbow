@@ -23,7 +23,9 @@ public class RainbowInputController {
         if (!handlingEvent) {
             eventDispatcher.setEvent(motionEvent);
             if (!looping) {
+                rainbowDrawer.beginDraw();
                 dequeueEvents(rainbowDrawer);
+                rainbowDrawer.endDraw();
             }
         }
     }
