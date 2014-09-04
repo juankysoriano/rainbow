@@ -29,19 +29,16 @@ public class RainbowSketch extends Rainbow {
         super(parentView);
     }
 
-    public void onSketchSetup(RainbowDrawer rainbowDrawer, 
-                              RainbowInputController rainbowInputController) {
+    public void onSketchSetup(RainbowDrawer rainbowDrawer) {
       //Called when the rainbow is being setup.
       frameRate(FRAME_RATE);
     }
 
-    public void onDrawingStart(RainbowDrawer rainbowDrawer, 
-                              RainbowInputController rainbowInputController) {
+    public void onDrawingStart(RainbowInputController rainbowInputController) {
       //Called when the rainbow sketch is about to start.
     }
 
-    public void onDrawingResume(RainbowDrawer rainbowDrawer,
-                                RainbowInputController rainbowInputController) {
+    public void onDrawingResume() {
        //Called when the rainbow sketch is resumed
     }
 
@@ -54,18 +51,15 @@ public class RainbowSketch extends Rainbow {
        //GREAT and ASYNCHRONOUS!!
     }
 
-    public void onDrawingPause(RainbowDrawer rainbowDrawer,
-                                RainbowInputController rainbowInputController) {
+    public void onDrawingPause() {
        //Called when the rainbow sketch is about to pause
     }
 
-    public void onDrawingStop(RainbowDrawer rainbowDrawer,
-                                RainbowInputController rainbowInputController) {
+    public void onDrawingStop(RainbowInputController rainbowInputController) {
         //Called when the rainbow sketch is about to stop
     }
 
-    public void onSketchDestroy(RainbowDrawer rainbowDrawer,
-                                  RainbowInputController rainbowInputController) {
+    public void onSketchDestroy() {
         //Called when the rainbow sketch is about to be destroyed
     }
 }
