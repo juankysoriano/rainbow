@@ -7,30 +7,25 @@ public interface RainbowLifeCycleCallback {
     /**
      * Called when the rainbow is being setup.
      *
-     * @param rainbowDrawer          Used to draw into the rainbow sketch
-     * @param rainbowInputController Used to control the input events.
+     * @param rainbowDrawer Used to draw into the rainbow sketch
      */
-    void onSketchSetup(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController);
+    void onSketchSetup(RainbowDrawer rainbowDrawer);
 
     /**
      * Called when the rainbow sketch is about to start.
      *
-     * @param rainbowDrawer          Used to draw into the rainbow sketch
      * @param rainbowInputController Used to control the input events.
      */
-    void onDrawingStart(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController);
+    void onDrawingStart(RainbowInputController rainbowInputController);
 
     /**
      * Called when the rainbow sketch is resumed
-     *
-     * @param rainbowDrawer          Used to draw into the rainbow sketch
-     * @param rainbowInputController Used to control the input events.
      */
-    void onDrawingResume(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController);
+    void onDrawingResume();
 
     /**
      * Called when the rainbow sketch is about to perform a new step
-     * Here is where the animations should be done
+     * Here is where the animations should be done.
      *
      * @param rainbowDrawer          Used to draw into the rainbow sketch
      * @param rainbowInputController Used to control the input events.
@@ -39,26 +34,19 @@ public interface RainbowLifeCycleCallback {
 
     /**
      * Called when the rainbow sketch is about to pause
-     *
-     * @param rainbowDrawer          Used to draw into the rainbow sketch
-     * @param rainbowInputController Used to control the input events.
      */
-    void onDrawingPause(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController);
+    void onDrawingPause();
 
     /**
      * Called when the rainbow sketch is stopped
      *
-     * @param rainbowDrawer          Used to draw into the rainbow sketch
      * @param rainbowInputController Used to control the input events.
      */
-    void onDrawingStop(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController);
+    void onDrawingStop(RainbowInputController rainbowInputController);
 
     /**
      * Called when the rainbow sketch is about to be destroyed
-     * This will be the last chance to draw before the bitmaps are recycled and released
-     *
-     * @param rainbowDrawer          Used to draw into the rainbow sketch
-     * @param rainbowInputController Used to control the input events.
+     * After this is executed, all the bitmaps will be recycled
      */
-    void onSketchDestroy(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController);
+    void onSketchDestroy();
 }

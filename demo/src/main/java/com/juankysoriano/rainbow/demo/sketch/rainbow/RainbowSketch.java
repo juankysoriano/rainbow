@@ -51,14 +51,18 @@ public class RainbowSketch extends Rainbow implements RainbowInteractionListener
     }
 
     @Override
-    public void onSketchSetup(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
+    public void onSketchSetup(RainbowDrawer rainbowDrawer) {
         radius = MIN_RADIUS;
         color = RAINBOW[colorIndex];
+    }
+
+    @Override
+    public void onDrawingStart(RainbowInputController rainbowInputController) {
         rainbowInputController.setRainbowInteractionListener(this);
     }
 
     @Override
-    public void onSketchDestroy(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
+    public void onDrawingStop(RainbowInputController rainbowInputController) {
         pointDetectedListener = null;
         rainbowInputController.removeSketchInteractionListener();
     }

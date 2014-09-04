@@ -50,7 +50,6 @@ public class SketchActivity extends Activity {
     @Override
     public void onDestroy() {
         sketch.destroy();
-        sketch = null;
         super.onDestroy();
     }
 }
