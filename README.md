@@ -3,7 +3,7 @@ Rainbow
 
 A fork of [Processing][1] for Android 
 
-![](http://s23.postimg.org/v33qh59mj/rainbow.png)
+![](http://s8.postimg.org/a0o3aew39/rainbow_307622_640.png)
 
 
 Guide
@@ -114,10 +114,10 @@ With `RainbowInputController` you have access to the user interactions with your
        rainbowDrawer.stroke(Color.BLUE);
        
        //Let's paint something
-             rainbowDrawer.ellipse(rainbowInputController.getX(), 
-                                  rainbowInputController.getY(), 
-                                  100, 
-       	                          100);
+        rainbowDrawer.ellipse(rainbowInputController.getX(), 
+                            rainbowInputController.getY(), 
+                            100, 
+       	                    100);
     }
 ```
 
@@ -212,4 +212,4 @@ License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 [1]:https://github.com/processing
-[2]:
+[2]:https://github.com/juankysoriano/rainbow/tree/master/demo
