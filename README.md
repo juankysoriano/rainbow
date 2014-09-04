@@ -114,10 +114,10 @@ With `RainbowInputController` you have access to the user interactions with your
        rainbowDrawer.stroke(Color.BLUE);
        
        //Let's paint something
-             rainbowDrawer.ellipse(rainbowInputController.getX(), 
-                                  rainbowInputController.getY(), 
-                                  100, 
-       	                          100);
+        rainbowDrawer.ellipse(rainbowInputController.getX(), 
+                            rainbowInputController.getY(), 
+                            100, 
+       	                    100);
     }
 ```
 
