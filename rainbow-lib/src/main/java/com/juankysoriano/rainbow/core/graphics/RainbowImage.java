@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 
-
 /**
  * Storage class for pixel data. This is the base class for most image and pixel
  * information, such as PGraphics and the video library classes.
@@ -127,11 +126,25 @@ public class RainbowImage implements RainbowConstants, Cloneable {
         init(width, height, RGB);
     }
 
-    public RainbowImage(int width, int height, int format) {
-        init(width, height, format);
+    /**
+     * Function to be used by subclasses of PImage to init later than at the
+     * constructor, or re-init later when things changes. Used by Capture and
+     * Movie classes (and perhaps others), because the width/height will not be
+     * known when super() is called. (Leave this public so that other libraries
+     * can do the same.)
+     */
+    public void init(int width, int height, int format) { // ignore
+        this.width = width;
+        this.height = height;
+        this.pixels = new int[width * height];
+        this.format = format;
     }
 
     // ////////////////////////////////////////////////////////////
+
+    public RainbowImage(int width, int height, int format) {
+        init(width, height, format);
+    }
 
     /**
      * Construct a new PImage from an Android normalBitmap. The pixels[] array is not
@@ -253,22 +266,6 @@ public class RainbowImage implements RainbowConstants, Cloneable {
         return 0;
     }
 
-    private static int low(int a, int b) {
-        return (a < b) ? a : b;
-    }
-
-    private static int high(int a, int b) {
-        return (a > b) ? a : b;
-    }
-
-    private static int peg(int n) {
-        return (n < 0) ? 0 : ((n > 255) ? 255 : n);
-    }
-
-    private static int mix(int a, int b, int f) {
-        return a + (((b - a) * f) >> 8);
-    }
-
     private static int blend_blend(int a, int b) {
         int f = (b & ALPHA_MASK) >>> 24;
 
@@ -361,10 +358,6 @@ public class RainbowImage implements RainbowConstants, Cloneable {
         return (low(((a & ALPHA_MASK) >>> 24) + f, 0xff) << 24 | (peg(ar + (((cr - ar) * f) >> 8)) << 16) | (peg(ag + (((cg - ag) * f) >> 8)) << 8) | (peg(ab + (((cb - ab) * f) >> 8))));
     }
 
-    // ////////////////////////////////////////////////////////////
-
-    // COPYING IMAGE DATA
-
     /**
      * returns the product of the input colors C = A * B
      */
@@ -406,9 +399,52 @@ public class RainbowImage implements RainbowConstants, Cloneable {
         return (low(((a & ALPHA_MASK) >>> 24) + f, 0xff) << 24 | (peg(ar + (((cr - ar) * f) >> 8)) << 16) | (peg(ag + (((cg - ag) * f) >> 8)) << 8) | (peg(ab + (((cb - ab) * f) >> 8))));
     }
 
+    /**
+     * returns either multiply or screen for darker or lighter values of B (the
+     * inverse of overlay) C = B < 0.5 : 2 * A * B B >=0.5 : 1 - (2 * (255-A) *
+     * (255-B))
+     */
+    private static int blend_hard_light(int a, int b) {
+        // setup (this portion will always be the same)
+        int f = (b & ALPHA_MASK) >>> 24;
+        int ar = (a & RED_MASK) >> 16;
+        int ag = (a & GREEN_MASK) >> 8;
+        int ab = (a & BLUE_MASK);
+        int br = (b & RED_MASK) >> 16;
+        int bg = (b & GREEN_MASK) >> 8;
+        int bb = (b & BLUE_MASK);
+        // formula:
+        int cr = (br < 128) ? ((ar * br) >> 7) : (255 - (((255 - ar) * (255 - br)) >> 7));
+        int cg = (bg < 128) ? ((ag * bg) >> 7) : (255 - (((255 - ag) * (255 - bg)) >> 7));
+        int cb = (bb < 128) ? ((ab * bb) >> 7) : (255 - (((255 - ab) * (255 - bb)) >> 7));
+        // alpha blend (this portion will always be the same)
+        return (low(((a & ALPHA_MASK) >>> 24) + f, 0xff) << 24 | (peg(ar + (((cr - ar) * f) >> 8)) << 16) | (peg(ag + (((cg - ag) * f) >> 8)) << 8) | (peg(ab + (((cb - ab) * f) >> 8))));
+    }
+
     // ////////////////////////////////////////////////////////////
 
-    // MARKING IMAGE AS LOADED / FOR USE IN RENDERERS
+    // COPYING IMAGE DATA
+
+    /**
+     * returns the inverse multiply plus screen, which simplifies to C = 2AB +
+     * A^2 - 2A^2B
+     */
+    private static int blend_soft_light(int a, int b) {
+        // setup (this portion will always be the same)
+        int f = (b & ALPHA_MASK) >>> 24;
+        int ar = (a & RED_MASK) >> 16;
+        int ag = (a & GREEN_MASK) >> 8;
+        int ab = (a & BLUE_MASK);
+        int br = (b & RED_MASK) >> 16;
+        int bg = (b & GREEN_MASK) >> 8;
+        int bb = (b & BLUE_MASK);
+        // formula:
+        int cr = ((ar * br) >> 7) + ((ar * ar) >> 8) - ((ar * ar * br) >> 15);
+        int cg = ((ag * bg) >> 7) + ((ag * ag) >> 8) - ((ag * ag * bg) >> 15);
+        int cb = ((ab * bb) >> 7) + ((ab * ab) >> 8) - ((ab * ab * bb) >> 15);
+        // alpha blend (this portion will always be the same)
+        return (low(((a & ALPHA_MASK) >>> 24) + f, 0xff) << 24 | (peg(ar + (((cr - ar) * f) >> 8)) << 16) | (peg(ag + (((cg - ag) * f) >> 8)) << 8) | (peg(ab + (((cb - ab) * f) >> 8))));
+    }
 
     /**
      * returns either multiply or screen for darker or lighter values of A (the
@@ -432,52 +468,9 @@ public class RainbowImage implements RainbowConstants, Cloneable {
         return (low(((a & ALPHA_MASK) >>> 24) + f, 0xff) << 24 | (peg(ar + (((cr - ar) * f) >> 8)) << 16) | (peg(ag + (((cg - ag) * f) >> 8)) << 8) | (peg(ab + (((cb - ab) * f) >> 8))));
     }
 
-    /**
-     * returns either multiply or screen for darker or lighter values of B (the
-     * inverse of overlay) C = B < 0.5 : 2 * A * B B >=0.5 : 1 - (2 * (255-A) *
-     * (255-B))
-     */
-    private static int blend_hard_light(int a, int b) {
-        // setup (this portion will always be the same)
-        int f = (b & ALPHA_MASK) >>> 24;
-        int ar = (a & RED_MASK) >> 16;
-        int ag = (a & GREEN_MASK) >> 8;
-        int ab = (a & BLUE_MASK);
-        int br = (b & RED_MASK) >> 16;
-        int bg = (b & GREEN_MASK) >> 8;
-        int bb = (b & BLUE_MASK);
-        // formula:
-        int cr = (br < 128) ? ((ar * br) >> 7) : (255 - (((255 - ar) * (255 - br)) >> 7));
-        int cg = (bg < 128) ? ((ag * bg) >> 7) : (255 - (((255 - ag) * (255 - bg)) >> 7));
-        int cb = (bb < 128) ? ((ab * bb) >> 7) : (255 - (((255 - ab) * (255 - bb)) >> 7));
-        // alpha blend (this portion will always be the same)
-        return (low(((a & ALPHA_MASK) >>> 24) + f, 0xff) << 24 | (peg(ar + (((cr - ar) * f) >> 8)) << 16) | (peg(ag + (((cg - ag) * f) >> 8)) << 8) | (peg(ab + (((cb - ab) * f) >> 8))));
-    }
-
-    /**
-     * returns the inverse multiply plus screen, which simplifies to C = 2AB +
-     * A^2 - 2A^2B
-     */
-    private static int blend_soft_light(int a, int b) {
-        // setup (this portion will always be the same)
-        int f = (b & ALPHA_MASK) >>> 24;
-        int ar = (a & RED_MASK) >> 16;
-        int ag = (a & GREEN_MASK) >> 8;
-        int ab = (a & BLUE_MASK);
-        int br = (b & RED_MASK) >> 16;
-        int bg = (b & GREEN_MASK) >> 8;
-        int bb = (b & BLUE_MASK);
-        // formula:
-        int cr = ((ar * br) >> 7) + ((ar * ar) >> 8) - ((ar * ar * br) >> 15);
-        int cg = ((ag * bg) >> 7) + ((ag * ag) >> 8) - ((ag * ag * bg) >> 15);
-        int cb = ((ab * bb) >> 7) + ((ab * ab) >> 8) - ((ab * ab * bb) >> 15);
-        // alpha blend (this portion will always be the same)
-        return (low(((a & ALPHA_MASK) >>> 24) + f, 0xff) << 24 | (peg(ar + (((cr - ar) * f) >> 8)) << 16) | (peg(ag + (((cg - ag) * f) >> 8)) << 8) | (peg(ab + (((cb - ab) * f) >> 8))));
-    }
-
     // ////////////////////////////////////////////////////////////
 
-    // GET/SET PIXELS
+    // MARKING IMAGE AS LOADED / FOR USE IN RENDERERS
 
     /**
      * Returns the first (underlay) color divided by the inverse of the second
@@ -503,11 +496,6 @@ public class RainbowImage implements RainbowConstants, Cloneable {
     }
 
     /**
-     * Grab a subsection of a PImage, and copy it into a fresh PImage. As of
-     * release 0149, no longer honors imageMode() for the coordinates.
-     */
-
-    /**
      * returns the inverse of the inverse of the first (underlay) color divided
      * by the second (overlay) color. C = 255 - (255-A) / B
      */
@@ -530,18 +518,29 @@ public class RainbowImage implements RainbowConstants, Cloneable {
         return (low(((a & ALPHA_MASK) >>> 24) + f, 0xff) << 24 | (peg(ar + (((cr - ar) * f) >> 8)) << 16) | (peg(ag + (((cg - ag) * f) >> 8)) << 8) | (peg(ab + (((cb - ab) * f) >> 8))));
     }
 
+    private static int low(int a, int b) {
+        return (a < b) ? a : b;
+    }
+
+    // ////////////////////////////////////////////////////////////
+
+    // GET/SET PIXELS
+
+    private static int mix(int a, int b, int f) {
+        return a + (((b - a) * f) >> 8);
+    }
+
     /**
-     * Function to be used by subclasses of PImage to init later than at the
-     * constructor, or re-init later when things changes. Used by Capture and
-     * Movie classes (and perhaps others), because the width/height will not be
-     * known when super() is called. (Leave this public so that other libraries
-     * can do the same.)
+     * Grab a subsection of a PImage, and copy it into a fresh PImage. As of
+     * release 0149, no longer honors imageMode() for the coordinates.
      */
-    public void init(int width, int height, int format) { // ignore
-        this.width = width;
-        this.height = height;
-        this.pixels = new int[width * height];
-        this.format = format;
+
+    private static int high(int a, int b) {
+        return (a > b) ? a : b;
+    }
+
+    private static int peg(int n) {
+        return (n < 0) ? 0 : ((n > 255) ? 255 : n);
     }
 
     public void recycle() {
@@ -561,31 +560,6 @@ public class RainbowImage implements RainbowConstants, Cloneable {
 
     public void setModified() { // ignore
         modified = true;
-    }
-
-    /**
-     * Call this when you want to mess with the pixels[] array.
-     * <p/>
-     * For subclasses where the pixels[] buffer isn't set by default, this
-     * should copy all data into the pixels[] array
-     */
-    public void loadPixels() { // ignore
-        if (pixels == null || pixels.length != width * height) {
-            pixels = new int[width * height];
-        }
-        if (bitmap != null) {
-            bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
-        }
-        setLoaded();
-    }
-
-    /**
-     * Call this when finished messing with the pixels[] array.
-     * <p/>
-     * Mark all pixels as needing update.
-     */
-    public void updatePixels() { // ignore
-        updatePixelsImpl(0, 0, width, height);
     }
 
     /**
@@ -651,78 +625,10 @@ public class RainbowImage implements RainbowConstants, Cloneable {
     }
 
     /**
-     * Resize this image to a new width and height. Use 0 for wide or high to
-     * make that dimension scale proportionally.
+     * Returns a copy of this PImage. Equivalent to get(0, 0, width, height).
      */
-    public RainbowImage resize(int w, int h) { // ignore
-        if (w <= 0 && h <= 0) {
-            throw new IllegalArgumentException("width or height must be > 0 for resize");
-        }
-
-        if (w == 0) { // Use height to determine relative size
-            float diff = (float) h / (float) height;
-            w = (int) (width * diff);
-        } else if (h == 0) { // Use the width to determine relative size
-            float diff = (float) w / (float) width;
-            h = (int) (height * diff);
-        }
-        if (this.bitmap == null) {
-            this.bitmap = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888);
-        }
-        this.bitmap = Bitmap.createScaledBitmap(this.bitmap, w, h, false);
-        this.width = w;
-        this.height = h;
-
-        updatePixels();
-        return this;
-    }
-
-    public boolean isLoaded() { // ignore
-        return loaded;
-    }
-
-    public void setLoaded() { // ignore
-        loaded = true;
-    }
-
-    /**
-     * Returns an ARGB "color" type (a packed 32 bit int with the color. If the
-     * coordinate is outside the image, zero is returned (black, but completely
-     * transparent).
-     * <p/>
-     * If the image is in RGB format (i.e. on a PVideo object), the value will
-     * get its high bits set, just to avoid cases where they haven't been set
-     * already.
-     * <p/>
-     * If the image is in ALPHA format, this returns a white with its alpha
-     * value set.
-     * <p/>
-     * This function is included primarily for beginners. It is quite slow
-     * because it has to check to see if the x, y that was provided is inside
-     * the bounds, and then has to check to see what image type it is. If you
-     * want things to be more efficient, access the pixels[] array directly.
-     */
-    public int get(int x, int y) {
-        if ((x < 0) || (y < 0) || (x >= width) || (y >= height)) {
-            return 0;
-        }
-
-        if (pixels == null) {
-            return bitmap.getPixel(x, y);
-
-        } else {
-            switch (format) {
-                case RGB:
-                    return pixels[y * width + x] | 0xff000000;
-
-                case ARGB:
-                    return pixels[y * width + x];
-
-                case ALPHA:
-                    return (pixels[y * width + x] << 24) | 0xffffff;
-            }
-        }
-        return 0;
+    public RainbowImage get() {
+        return get(0, 0, width, height);
     }
 
     /**
@@ -799,10 +705,86 @@ public class RainbowImage implements RainbowConstants, Cloneable {
     }
 
     /**
-     * Returns a copy of this PImage. Equivalent to get(0, 0, width, height).
+     * Resize this image to a new width and height. Use 0 for wide or high to
+     * make that dimension scale proportionally.
      */
-    public RainbowImage get() {
-        return get(0, 0, width, height);
+    public RainbowImage resize(int w, int h) { // ignore
+        if (w <= 0 && h <= 0) {
+            throw new IllegalArgumentException("width or height must be > 0 for resize");
+        }
+
+        if (w == 0) { // Use height to determine relative size
+            float diff = (float) h / (float) height;
+            w = (int) (width * diff);
+        } else if (h == 0) { // Use the width to determine relative size
+            float diff = (float) w / (float) width;
+            h = (int) (height * diff);
+        }
+        if (this.bitmap == null) {
+            this.bitmap = Bitmap.createBitmap(pixels, w, w, Config.ARGB_4444);
+        } else {
+            Bitmap newBitmap = Bitmap.createScaledBitmap(this.bitmap, w, h, false);
+            this.bitmap.recycle();
+            this.bitmap = newBitmap;
+        }
+        this.width = w;
+        this.height = h;
+
+        updatePixels();
+        return this;
+    }
+
+    /**
+     * Call this when finished messing with the pixels[] array.
+     * <p/>
+     * Mark all pixels as needing update.
+     */
+    public void updatePixels() { // ignore
+        updatePixelsImpl(0, 0, width, height);
+    }
+
+    public boolean isLoaded() { // ignore
+        return loaded;
+    }
+
+    /**
+     * Returns an ARGB "color" type (a packed 32 bit int with the color. If the
+     * coordinate is outside the image, zero is returned (black, but completely
+     * transparent).
+     * <p/>
+     * If the image is in RGB format (i.e. on a PVideo object), the value will
+     * get its high bits set, just to avoid cases where they haven't been set
+     * already.
+     * <p/>
+     * If the image is in ALPHA format, this returns a white with its alpha
+     * value set.
+     * <p/>
+     * This function is included primarily for beginners. It is quite slow
+     * because it has to check to see if the x, y that was provided is inside
+     * the bounds, and then has to check to see what image type it is. If you
+     * want things to be more efficient, access the pixels[] array directly.
+     */
+    public int get(int x, int y) {
+        if ((x < 0) || (y < 0) || (x >= width) || (y >= height)) {
+            return 0;
+        }
+
+        if (pixels == null) {
+            return bitmap.getPixel(x, y);
+
+        } else {
+            switch (format) {
+                case RGB:
+                    return pixels[y * width + x] | 0xff000000;
+
+                case ARGB:
+                    return pixels[y * width + x];
+
+                case ALPHA:
+                    return (pixels[y * width + x] << 24) | 0xffffff;
+            }
+        }
+        return 0;
     }
 
     /**
@@ -871,7 +853,13 @@ public class RainbowImage implements RainbowConstants, Cloneable {
 
         if (pixels == null) {
             if (!bitmap.isMutable()) {
-                bitmap = bitmap.copy(Config.ARGB_8888, true);
+                if (bitmap != null) {
+                    bitmap = bitmap.copy(Config.ARGB_4444, true);
+                } else {
+                    Bitmap copy = bitmap.copy(Config.ARGB_4444, true);
+                    bitmap.recycle();
+                    bitmap = copy;
+                }
             }
 
             int offset = sourceY * sourceImage.width + sourceX;
@@ -886,6 +874,39 @@ public class RainbowImage implements RainbowConstants, Cloneable {
                 dstOffset += width;
             }
             updatePixelsImpl(targetX, targetY, sourceWidth, sourceHeight);
+        }
+    }
+
+    /**
+     * Call this when you want to mess with the pixels[] array.
+     * <p/>
+     * For subclasses where the pixels[] buffer isn't set by default, this
+     * should copy all data into the pixels[] array
+     */
+    public void loadPixels() { // ignore
+        if (pixels == null || pixels.length != width * height) {
+            pixels = new int[width * height];
+        }
+        if (bitmap != null) {
+            bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+        }
+        setLoaded();
+    }
+
+    public void setLoaded() { // ignore
+        loaded = true;
+    }
+
+    /**
+     * Set alpha channel for an image using another image as the source.
+     */
+    public void mask(RainbowImage alpha) {
+        if (alpha.pixels == null) {
+            alpha.loadPixels();
+            mask(alpha.pixels);
+            alpha.pixels = null;
+        } else {
+            mask(alpha.pixels);
         }
     }
 
@@ -910,19 +931,6 @@ public class RainbowImage implements RainbowConstants, Cloneable {
         }
         format = ARGB;
         updatePixels();
-    }
-
-    /**
-     * Set alpha channel for an image using another image as the source.
-     */
-    public void mask(RainbowImage alpha) {
-        if (alpha.pixels == null) {
-            alpha.loadPixels();
-            mask(alpha.pixels);
-            alpha.pixels = null;
-        } else {
-            mask(alpha.pixels);
-        }
     }
 
     /**
@@ -1477,22 +1485,6 @@ public class RainbowImage implements RainbowConstants, Cloneable {
 
     /**
      * Copies area of one image into another PImage object.
-     */
-    public void copy(RainbowImage src, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh) {
-        blend(src, sx, sy, sw, sh, dx, dy, dw, dh, REPLACE);
-    }
-
-    /**
-     * Blends one area of this image to another area.
-     *
-     * @see RainbowImage#blendColor(int, int, int)
-     */
-    public void blend(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mode) {
-        blend(this, sx, sy, sw, sh, dx, dy, dw, dh, mode);
-    }
-
-    /**
-     * Copies area of one image into another PImage object.
      *
      * @see RainbowImage#blendColor(int, int, int)
      */
@@ -2038,6 +2030,22 @@ public class RainbowImage implements RainbowConstants, Cloneable {
     }
 
     /**
+     * Copies area of one image into another PImage object.
+     */
+    public void copy(RainbowImage src, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh) {
+        blend(src, sx, sy, sw, sh, dx, dy, dw, dh, REPLACE);
+    }
+
+    /**
+     * Blends one area of this image to another area.
+     *
+     * @see RainbowImage#blendColor(int, int, int)
+     */
+    public void blend(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mode) {
+        blend(this, sx, sy, sw, sh, dx, dy, dw, dh, mode);
+    }
+
+    /**
      * Save this image to disk.
      * <p/>
      * As of revision 0100, this function requires an absolute path, in order to
@@ -2097,6 +2105,11 @@ public class RainbowImage implements RainbowConstants, Cloneable {
     }
 
     public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
+        if (this.bitmap == null || !this.bitmap.equals(bitmap)) {
+            this.bitmap = bitmap;
+        } else {
+            this.bitmap.recycle();
+            this.bitmap = bitmap;
+        }
     }
 }
