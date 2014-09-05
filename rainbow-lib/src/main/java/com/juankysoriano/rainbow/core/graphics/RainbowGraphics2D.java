@@ -48,8 +48,6 @@ import com.juankysoriano.rainbow.utils.RainbowMath;
  */
 public class RainbowGraphics2D extends RainbowGraphics {
 
-    private boolean breakShape;
-    private float[] screenPoint;
     /**
      * The temporary path object that does most of the drawing work. If there
      * are any points in the path (meaning that moveto has been called), then
@@ -58,6 +56,13 @@ public class RainbowGraphics2D extends RainbowGraphics {
      * incremented after, since the variable isn't used for POLYGON paths.
      */
     private final Path path;
+    private final float[] transform;
+    /**
+     * Temporary rectangle object.
+     */
+    private final RectF rect;
+    private boolean breakShape;
+    private float[] screenPoint;
     /**
      * coordinates for internal curve calculation
      */
@@ -65,11 +70,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
     private float[] curveCoordY;
     private float[] curveDrawX;
     private float[] curveDrawY;
-    private final float[] transform;
-    /**
-     * Temporary rectangle object.
-     */
-    private final RectF rect;
     private Rect imageImplSrcRect;
     private RectF imageImplDstRect;
     private Paint tintPaint;
@@ -79,10 +79,10 @@ public class RainbowGraphics2D extends RainbowGraphics {
     private boolean isFillClear = false;
 
     private Bitmap normalBitmap;
-    private Bitmap clearBitmap;
     private Bitmap backgroundBitmap;
     private Canvas canvas;
-    private Canvas clearingCanvas;
+    private Canvas backgroundCanvas;
+    private Shader bitmapShader;
 
     public RainbowGraphics2D() {
         transform = new float[9];
@@ -116,10 +116,8 @@ public class RainbowGraphics2D extends RainbowGraphics {
     private void initBitmaps() {
         normalBitmap = Bitmap.createBitmap(width, height, Config.ARGB_4444);
         backgroundBitmap = Bitmap.createBitmap(width, height, Config.ARGB_4444);
-        clearBitmap = Bitmap.createBitmap(width, height, Config.ARGB_4444);
-        Canvas backgroundCanvas = new Canvas(backgroundBitmap);
         canvas = new Canvas(normalBitmap);
-        clearingCanvas = new Canvas(clearBitmap);
+        backgroundCanvas = new Canvas(backgroundBitmap);
 
         Drawable parentBackground = parent.getDrawingView().getBackground();
         if (parentBackground != null) {
@@ -127,9 +125,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
             parentBackground.draw(canvas);
             parentBackground.draw(backgroundCanvas);
         }
-
-        backgroundCanvas.setBitmap(null);
-
+        backgroundCanvas.setBitmap(normalBitmap);
         super.setBitmap(normalBitmap);
     }
 
@@ -144,7 +140,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     private void initShaders() {
-        Shader bitmapShader = new BitmapShader(backgroundBitmap,
+        bitmapShader = new BitmapShader(backgroundBitmap,
                 BitmapShader.TileMode.CLAMP,
                 BitmapShader.TileMode.CLAMP);
         clearingFillPaint.setShader(bitmapShader);
@@ -153,12 +149,14 @@ public class RainbowGraphics2D extends RainbowGraphics {
     @Override
     public void dispose() {
         canvas.setBitmap(null);
-        clearingCanvas.setBitmap(null);
+        backgroundCanvas.setBitmap(null);
         normalBitmap.recycle();
-        clearBitmap.recycle();
         backgroundBitmap.recycle();
+        normalBitmap = null;
+        backgroundBitmap = null;
         canvas = null;
-        clearingCanvas = null;
+        backgroundCanvas = null;
+        bitmapShader = null;
     }
 
     @Override
@@ -179,7 +177,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     Canvas getCanvas() {
-        return isFillClear ? clearingCanvas : canvas;
+        return isFillClear ? backgroundCanvas : canvas;
     }
 
     @Override
@@ -190,8 +188,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
                 screen = parent.getDrawingView().lockCanvas(null);
                 if (screen != null) {
                     android.graphics.Matrix matrix = new android.graphics.Matrix();
-                    Bitmap bitmapToPaint = isFillClear ? clearBitmap : normalBitmap;
-                    screen.drawBitmap(bitmapToPaint, matrix, null);
+                    screen.drawBitmap(normalBitmap, matrix, null);
                 }
             } finally {
                 if (screen != null) {
@@ -807,13 +804,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     @Override
-    public void setMatrix(RMatrix2D source) {
-        android.graphics.Matrix matrix = new android.graphics.Matrix();
-        matrix.setValues(new float[]{source.m00, source.m01, source.m02, source.m10, source.m11, source.m12, 0, 0, 1});
-        getCanvas().setMatrix(matrix);
-    }
-
-    @Override
     public RMatrix2D getMatrix(RMatrix2D target) {
         if (target == null) {
             target = new RMatrix2D();
@@ -824,6 +814,13 @@ public class RainbowGraphics2D extends RainbowGraphics {
         m.getValues(transform);
         target.set(transform[0], transform[1], transform[2], transform[3], transform[4], transform[5]);
         return target;
+    }
+
+    @Override
+    public void setMatrix(RMatrix2D source) {
+        android.graphics.Matrix matrix = new android.graphics.Matrix();
+        matrix.setValues(new float[]{source.m00, source.m01, source.m02, source.m10, source.m11, source.m12, 0, 0, 1});
+        getCanvas().setMatrix(matrix);
     }
 
     @Override
@@ -903,34 +900,34 @@ public class RainbowGraphics2D extends RainbowGraphics {
     public void fill(int rgb) {
         if (rgb == CLEAR) {
             if (!isFillClear) {
-                paintCanvasWithBitmap(clearingCanvas, normalBitmap);
+                paintBitmapOn(backgroundCanvas);
             }
             isFillClear = true;
             clearingFillPaint.setAlpha(255);
         } else {
             if (isFillClear) {
-                paintCanvasWithBitmap(canvas, clearBitmap);
+                paintBitmapOn(canvas);
             }
             isFillClear = false;
             super.fill(rgb);
         }
     }
 
-    private void paintCanvasWithBitmap(Canvas canvas, Bitmap bitmap) {
+    private void paintBitmapOn(Canvas canvas) {
         android.graphics.Matrix matrix = new android.graphics.Matrix();
-        canvas.drawBitmap(bitmap, matrix, null);
+        canvas.drawBitmap(normalBitmap, matrix, null);
     }
 
     public void fill(int rgb, float alpha) {
         if (rgb == CLEAR) {
             if (!isFillClear) {
-                paintCanvasWithBitmap(clearingCanvas, normalBitmap);
+                paintBitmapOn(backgroundCanvas);
             }
             isFillClear = true;
             clearingFillPaint.setAlpha((int) alpha);
         } else {
             if (isFillClear) {
-                paintCanvasWithBitmap(canvas, clearBitmap);
+                paintBitmapOn(canvas);
             }
             isFillClear = false;
             super.fill(rgb, alpha);
