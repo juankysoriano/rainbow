@@ -63,8 +63,12 @@ public class RainbowSketch extends Rainbow implements RainbowInteractionListener
 
     @Override
     public void onDrawingStop(RainbowInputController rainbowInputController) {
-        pointDetectedListener = null;
         rainbowInputController.removeSketchInteractionListener();
+    }
+
+    @Override
+    public void onSketchDestroy() {
+        pointDetectedListener = null;
     }
 
     @Override
