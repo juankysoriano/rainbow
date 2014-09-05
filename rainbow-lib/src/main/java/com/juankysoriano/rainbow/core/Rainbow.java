@@ -121,8 +121,10 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
     public void resume() {
         onDrawingResume();
         paused = false;
-        drawingScheduler = Executors.newSingleThreadScheduledExecutor();
-        drawingScheduler.scheduleAtFixedRate(drawingTask, 0, drawingTask.getDelay(), TimeUnit.MILLISECONDS);
+        if(drawingScheduler == null || drawingScheduler.isTerminated()) {
+            drawingScheduler = Executors.newSingleThreadScheduledExecutor();
+            drawingScheduler.scheduleAtFixedRate(drawingTask, 0, drawingTask.getDelay(), TimeUnit.MILLISECONDS);
+        }
     }
 
     @Override
