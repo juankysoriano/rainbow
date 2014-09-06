@@ -18,9 +18,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
-    private boolean surfaceChanged;
     private boolean surfaceReady;
     private boolean paused;
+    private boolean isSetup;
     private int width;
     private int height;
     private int frameCount;
@@ -46,6 +46,7 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
     protected Rainbow(ViewGroup viewGroup) {
         frameRate = RainbowConstants.DEFAULT_FRAME_RATE;
         paused = true;
+        isSetup = false;
         rainbowInputController = new RainbowInputController();
         rainbowDrawer = new RainbowDrawer();
         drawingTask = new DrawingTask();
@@ -87,6 +88,7 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
 
         @Override
         protected void onPostExecute(Void param) {
+            isSetup = true;
             surfaceReady = true;
         }
 
@@ -132,11 +134,7 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
     }
 
 
-    private void handleDraw(RainbowGraphics graphics) {
-
-        if (surfaceChanged) {
-            setupDrawingSurface(graphics);
-        }
+    private void handleDraw() {
 
         if (canDraw()) {
             fireDrawStep();
@@ -151,14 +149,14 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
             height = newHeight;
             graphics.setSize(width, height);
         }
-        surfaceChanged = false;
         surfaceReady = true;
     }
 
     private boolean canDraw() {
         return rainbowDrawer != null
                 && rainbowDrawer.hasGraphics()
-                && surfaceReady;
+                && surfaceReady
+                && isSetup;
     }
 
     private void fireDrawStep() {
@@ -281,7 +279,7 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
     }
 
     public void invalidate() {
-        surfaceChanged = true;
+        setupDrawingSurface(rainbowDrawer.getGraphics());
     }
 
     class DrawingTask extends TimerTask {
@@ -291,7 +289,7 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
         @Override
         public void run() {
             if (!paused && !drawingScheduler.isShutdown()) {
-                handleDraw(rainbowDrawer.getGraphics());
+                handleDraw();
             }
         }
 
