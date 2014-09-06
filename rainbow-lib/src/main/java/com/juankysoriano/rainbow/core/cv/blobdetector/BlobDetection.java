@@ -1,59 +1,34 @@
 package com.juankysoriano.rainbow.core.cv.blobdetector;
 
-import java.lang.reflect.Method;
-
 //==================================================
 //class BlobDetection
 //==================================================
 public class BlobDetection extends EdgeDetection {
-    public int MAX_NBLINE = 4000;
-    public int MAX_NB = 1000;
-    // Temp
-    public int blobNumber;
-    public Blob[] blob;
-    public boolean[] gridVisited;
+    public static final float DEFAULT_BIG_BLOB_VALUE = 1000.0f;
+    private static final String THREAD_GROUP = "Blob";
+    private ThreadGroup mGroup = new ThreadGroup(THREAD_GROUP);
+    public static int MAX_NBLINE = 4000;
+    public static int MAX_NB = 1000;
+    private int blobNumber;
+    private Blob[] blob;
+    private boolean[] gridVisited;
 
-    public int blobWidthMin, blobHeightMin;
-    // Temp
-    Object parent;
-    Method filterBlobMethod;
-
-    // --------------------------------------------
-    // Constructor
-    // --------------------------------------------
     public BlobDetection(int imgWidth, int imgHeight) {
         super(imgWidth, imgHeight);
 
         gridVisited = new boolean[nbGridValue];
         blob = new Blob[MAX_NB];
         blobNumber = 0;
-        for (int i = 0; i < MAX_NB; i++)
+        for (int i = 0; i < MAX_NB; i++) {
             blob[i] = new Blob(this);
-
-        blobWidthMin = 0;
-        blobHeightMin = 0;
-
-        filterBlobMethod = null;
+        }
     }
 
-    // --------------------------------------------
-    // setBlobDimensionMin()
-    // --------------------------------------------
-    /*
-     * public void setBlobDimensionMin(int w, int h) { if (w<0) w=0; if (h<0)
-	 * h=0; if (w>imgWidth) w=imgWidth; if (h>imgHeight) h=imgHeight;
-	 * 
-	 * blobWidthMin = w; blobHeightMin = h; }
-	 */
-
-    public void setConstants(int maxBlobNb, int maxBlobNLine) {
+    public static void setConstants(int maxBlobNb, int maxBlobNLine) {
         MAX_NB = maxBlobNb;
         MAX_NBLINE = maxBlobNLine;
     }
 
-    // --------------------------------------------
-    // getBlob()
-    // --------------------------------------------
     public Blob getBlob(int n) {
         Blob b = null;
         if (n < blobNumber) {
@@ -62,123 +37,110 @@ public class BlobDetection extends EdgeDetection {
         return b;
     }
 
-    // --------------------------------------------
-    // getBlobNb()
-    // --------------------------------------------
     public int getBlobNb() {
         return blobNumber;
     }
 
-    // --------------------------------------------
-    // computeBlobs()
-    // --------------------------------------------
-    public void computeBlobs(int[] pixels) {
-        // Image
+    public void computeBlobs(int[] pixels, final OnBlobDetectedCallback onBlobDetectedCallback) {
         setImage(pixels);
-
-        // Clear gridVisited
-        for (int i = 0; i < nbGridValue; i++)
-            gridVisited[i] = false;
-
-        // Compute Isovalue
+        clearGridVisited();
         computeIsovalue();
-
-        // Get Lines indices
-        int x, y, squareIndex, n;
-        int offset;
-
         nbLineToDraw = 0;
         blobNumber = 0;
-        for (x = 0; x < resx - 1; x++) {
-            for (y = 0; y < resy - 1; y++) {
-                // > offset in the grid
-                offset = x + resx * y;
 
-                // > if we were already there, just go the next square!
-                if (gridVisited[offset] == true) {
-                    continue;
-                }
+        Thread t = new Thread(mGroup, new Runnable() {
+            @Override
+            public void run() {
 
-                // > squareIndex
-                squareIndex = getSquareIndex(x, y);
-
-                // >Found something
-                if (squareIndex > 0 && squareIndex < 15) {
-                    if (blobNumber >= 0 && blobNumber < MAX_NB) {
-                        findBlob(blobNumber, x, y);
-                        blobNumber++;
-
+                int x, y;
+                int offset;
+                for (x = 0; x < resx - 1; x++) {
+                    for (y = 0; y < resy - 1; y++) {
+                        offset = x + resx * y;
+                        if (gridVisited[offset] == true) {
+                            continue;
+                        }
+                        computeBlob(onBlobDetectedCallback, x, y);
                     }
                 }
-            } // for y
-        } // for x
-        nbLineToDraw /= 2;
-        // blobNumber+=1;
+                nbLineToDraw /= 2;
+                onBlobDetectedCallback.blobDetectionHasFinished();
+            }
+        }, "thread", 1000000);
+        t.start();
     }
 
-    // --------------------------------------------
-    // findBlob()
-    // --------------------------------------------
-    public void findBlob(int iBlob, int x, int y) {
-        // Reset Blob values
+    private void computeBlob(OnBlobDetectedCallback onBlobDetectedCallback, int x, int y) {
+        int squareIndex = getSquareIndex(x, y);
 
+        if (squareIndex > 0 && squareIndex < 15) {
+            if (blobNumber >= 0 && blobNumber < MAX_NB) {
+                findBlob(blobNumber, x, y, onBlobDetectedCallback);
+                blobNumber++;
+            }
+        }
+    }
+
+    private void clearGridVisited() {
+        for (int i = 0; i < nbGridValue; i++) {
+            gridVisited[i] = false;
+        }
+    }
+
+    public void findBlob(int iBlob, int x, int y, OnBlobDetectedCallback onBlobDetectedCallback) {
+
+        resetBlobValues(iBlob);
+
+        computeEdgeVertex(iBlob, x, y);
+
+        if (blobIsVeryBig(iBlob)) {
+            blobNumber--;
+        } else {
+            blob[iBlob].update();
+
+            if (onBlobDetectedCallback != null) {
+                boolean discardBlob = onBlobDetectedCallback.isToDiscardBlob(blob[iBlob]);
+                if (discardBlob) {
+                    blobNumber--;
+                } else {
+                    onBlobDetectedCallback.onBlobDetected(blob[iBlob]);
+                }
+            }
+        }
+
+    }
+
+    private boolean blobIsVeryBig(int iBlob) {
+        return blob[iBlob].xMin >= DEFAULT_BIG_BLOB_VALUE
+                || blob[iBlob].xMax <= -DEFAULT_BIG_BLOB_VALUE
+                || blob[iBlob].yMin >= DEFAULT_BIG_BLOB_VALUE
+                || blob[iBlob].yMax <= -DEFAULT_BIG_BLOB_VALUE;
+    }
+
+    private void resetBlobValues(int iBlob) {
         blob[iBlob].id = iBlob;
         blob[iBlob].xMin = 1000.0f;
         blob[iBlob].xMax = -1000.0f;
         blob[iBlob].yMin = 1000.0f;
         blob[iBlob].yMax = -1000.0f;
         blob[iBlob].nbLine = 0;
-
-        // Find it !!
-        computeEdgeVertex(iBlob, x, y);
-        {
-
-            // > This is just a temp patch (somtimes 'big' blobs are detected on
-            // the grid edges)
-
-            if (blob[iBlob].xMin >= 1000.0f || blob[iBlob].xMax <= -1000.0f || blob[iBlob].yMin >= 1000.0f || blob[iBlob].yMax <= -1000.0f) {
-                blobNumber--;
-            } else {
-                blob[iBlob].update();
-                // User Filter
-                if (filterBlobMethod != null) {
-                    try {
-                        Boolean returnObj = (Boolean) (filterBlobMethod.invoke(parent, blob[iBlob]));
-                        boolean returnValue = returnObj.booleanValue();
-                        if (returnValue == false) {
-                            blobNumber--;
-                        }
-                    } catch (Exception e) {
-                        System.out.println("Disabling filterBlobMethod() because of an error.");
-                        filterBlobMethod = null;
-                    }
-                }
-            }
-
-        }
-
     }
 
     // --------------------------------------------
     // computeEdgeVertex()
     // --------------------------------------------
     void computeEdgeVertex(int iBlob, int x, int y) {
-        // offset
         int offset = x + resx * y;
-        int index = (x * resy + y) * 2;
 
-        // Mark voxel as visited
         if (gridVisited[offset] == true) {
             return;
         }
+
         gridVisited[offset] = true;
 
-        //
         int iEdge, offx, offy, offAB;
         int[] edgeOffsetInfo;
         int squareIndex = getSquareIndex(x, y);
-        float vx = (float) x * stepx;
-        float vy = (float) y * stepy;
 
         int n = 0;
         while ((iEdge = MetaballsTable.edgeCut[squareIndex][n++]) != -1) {
@@ -195,12 +157,24 @@ public class BlobDetection extends EdgeDetection {
             }
         }
 
+        detectEdges(iBlob, x, y);
+
+        propagateToNeighbours(iBlob, x, y, squareIndex);
+
+    }
+
+    private void detectEdges(int iBlob, int x, int y) {
+        int offset = x + resx * y;
+        int squareIndex = getSquareIndex(x, y);
         int toCompute = MetaballsTable.edgeToCompute[squareIndex];
-        float t = 0.0f;
-        float value = 0.0f;
+        float t;
+        float value;
+        int index = (x * resy + y) * 2;
+
         if (toCompute > 0) {
             if ((toCompute & 1) > 0) // Edge 0
             {
+                float vx = (float) x * stepx;
                 t = (isovalue - gridValue[offset]) / (gridValue[offset + 1] - gridValue[offset]);
                 value = vx * (1.0f - t) + t * (vx + stepx);
                 edgeVrt[index].x = value;
@@ -211,10 +185,10 @@ public class BlobDetection extends EdgeDetection {
                 if (value > blob[iBlob].xMax) {
                     blob[iBlob].xMax = value;
                 }
-
             }
             if ((toCompute & 2) > 0) // Edge 3
             {
+                float vy = (float) y * stepy;
                 t = (isovalue - gridValue[offset]) / (gridValue[offset + resx] - gridValue[offset]);
                 value = vy * (1.0f - t) + t * (vy + stepy);
                 edgeVrt[index + 1].y = value;
@@ -227,10 +201,10 @@ public class BlobDetection extends EdgeDetection {
                 }
 
             }
+        }
+    }
 
-        } // toCompute
-
-        // Propagate to neightbors : use of Metaballs.neighborsTable
+    private void propagateToNeighbours(int iBlob, int x, int y, int squareIndex) {
         byte neighborVoxel = MetaballsTable.neightborVoxel[squareIndex];
         if (x < resx - 2 && (neighborVoxel & (1 << 0)) > 0) {
             computeEdgeVertex(iBlob, x + 1, y);
@@ -244,28 +218,5 @@ public class BlobDetection extends EdgeDetection {
         if (y > 0 && (neighborVoxel & (1 << 3)) > 0) {
             computeEdgeVertex(iBlob, x, y - 1);
         }
-
     }
-
-    // --------------------------------------------
-    // filterBlob()
-    // --------------------------------------------
-    /*
-     * public boolean acceptBlob(Blob b) { if ( (b.w*imgWidth>=blobWidthMin) ||
-	 * (b.h*imgHeight>=blobHeightMin) ) return true; return false; }
-	 */
-    // --------------------------------------------
-    // activeCustomFilter
-    // --------------------------------------------
-    public void activeCustomFilter(Object parent) {
-        this.parent = parent;
-        try {
-            filterBlobMethod = parent.getClass().getMethod("newBlobDetectedEvent", new Class[]{Blob.class});
-            // System.out.println("newBlobDetectedEvent found!");
-        } catch (Exception e) {
-            // System.out.println("no such metho or error");
-            // no such method, or an error.. which is fine, just ignore
-        }
-    }
-
-};
+}
