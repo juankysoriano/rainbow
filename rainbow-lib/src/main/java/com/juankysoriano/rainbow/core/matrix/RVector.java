@@ -985,6 +985,12 @@ public final class RVector implements Serializable {
         this.z = RainbowMath.lerp(this.z, z, amt);
     }
 
+    public void reset() {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+    }
+
     @Override
     public String toString() {
         return "[ " + x + ", " + y + ", " + z + " ]";
