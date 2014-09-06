@@ -10,7 +10,7 @@ import com.juankysoriano.rainbow.core.listeners.RainbowInteractionListener;
 import com.juankysoriano.rainbow.demo.R;
 import com.juankysoriano.rainbow.utils.RainbowMath;
 
-public class RainbowSketch extends Rainbow implements RainbowInteractionListener {
+public class RainbowLineCirclesSketch extends Rainbow implements RainbowInteractionListener {
 
     private static final int MAX_RADIUS = 200;
     private static final int MIN_RADIUS = 1;
@@ -46,7 +46,7 @@ public class RainbowSketch extends Rainbow implements RainbowInteractionListener
 
     };
 
-    public RainbowSketch(ViewGroup viewGroup) {
+    public RainbowLineCirclesSketch(ViewGroup viewGroup) {
         super(viewGroup);
     }
 

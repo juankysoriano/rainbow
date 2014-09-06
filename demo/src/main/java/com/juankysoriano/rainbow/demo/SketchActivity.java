@@ -4,19 +4,21 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.ViewGroup;
 
-import com.juankysoriano.rainbow.demo.sketch.rainbow.RainbowSketch;
+import com.juankysoriano.rainbow.demo.sketch.rainbow.LibraryApplication;
+import com.juankysoriano.rainbow.demo.sketch.rainbow.forces.RainbowParticleSystem;
 
 public class SketchActivity extends Activity {
 
-    private RainbowSketch sketch;
+    private RainbowParticleSystem sketch;
     private ViewGroup sketchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LibraryApplication.setContext(this);
         setContentView(R.layout.sketch);
         sketchView = getSketchView();
-        sketch = new RainbowSketch(sketchView);
+        sketch = new RainbowParticleSystem(sketchView);
     }
 
     private ViewGroup getSketchView() {
