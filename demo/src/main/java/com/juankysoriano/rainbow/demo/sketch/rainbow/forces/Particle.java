@@ -46,10 +46,10 @@ public class Particle {
     private void updateGravityWith(Nucleus nucleus) {
         RVector nucleusPosition = nucleus.getPosition();
         float distanceToNucleus = dist(location, nucleusPosition);
-        float G = (GRAVITY_CONSTANT * nucleus.getDiameter() / pow(distanceToNucleus, 2));
+        float gravityAmplitude = (GRAVITY_CONSTANT * nucleus.getDiameter() / pow(distanceToNucleus, 2));
 
         sub(nucleusPosition, location, gravity);
-        gravity.mult(G);
+        gravity.mult(gravityAmplitude);
         gravity.setMag(MAX_GRAVITY_AMPLITUDE);
     }
 
@@ -65,7 +65,7 @@ public class Particle {
         rainbowDrawer.point(location.x, location.y);
     }
 
-    public void reset(Nucleus nucleus) {
+    public void resetTo(Nucleus nucleus) {
         RVector nucleusPosition = nucleus.getPosition();
         float alpha = random(RainbowConstants.TWO_PI);
         location.set(nucleusPosition.x + (cos(alpha)), nucleusPosition.y + (sin(alpha)), nucleusPosition.z + (random(-1, 1)));

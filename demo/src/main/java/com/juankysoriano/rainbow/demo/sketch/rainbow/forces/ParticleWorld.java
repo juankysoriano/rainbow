@@ -32,7 +32,7 @@ public class ParticleWorld {
         Set<Particle> particles = new HashSet<Particle>(numberOfParticles);
         for (int i = 0; i < numberOfParticles; i++) {
             Particle particle = Particle.newInstance();
-            particle.reset(nucleus);
+            particle.resetTo(nucleus);
             particles.add(particle);
         }
         return particles;
