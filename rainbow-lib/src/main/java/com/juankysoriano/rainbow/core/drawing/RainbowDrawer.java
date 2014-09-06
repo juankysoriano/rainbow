@@ -28,6 +28,10 @@ public class RainbowDrawer {
     public RainbowDrawer() {
     }
 
+    public Context getContext() {
+        return graphics.parent.getContext();
+    }
+
     /**
      * Interpolate between two colors. Like lerp(), but for the individual color
      * components of a color supplied as an int value.
