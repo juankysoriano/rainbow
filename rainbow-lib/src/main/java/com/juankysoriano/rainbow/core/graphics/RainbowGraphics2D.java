@@ -519,9 +519,9 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void point(float x, float y) {
-        beginShape(POINTS);
-        vertex(x, y);
-        endShape();
+        if (stroke) {
+            getCanvas().drawPoint(x, y, getStrokePaint());
+        }
     }
 
     @Override
