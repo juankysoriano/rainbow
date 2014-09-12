@@ -25,6 +25,18 @@ public abstract class RainbowMath {
     static final int PERLIN_ZWRAP = 1 << RainbowMath.PERLIN_ZWRAPB;
     static final int PERLIN_SIZE = 4095;
     protected static HashMap<String, Pattern> matchPatterns;
+    static Random internalRandom;
+    static int perlin_octaves = 4; // default to medium smooth
+    static float perlin_amp_falloff = 0.5f; // 50% reduction/octave
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    // [toxi 031112]
+    // new vars needed due to recent change of cos table in PGraphics
+    static int perlin_TWOPI;
+    static int perlin_PI;
+    static float[] perlin_cosTable;
+    static float[] perlin;
+    // ////////////////////////////////////////////////////////////
+    static Random perlinRandom;
     /**
      * Integer number formatter.
      */
@@ -34,20 +46,6 @@ public abstract class RainbowMath {
     private static NumberFormat float_nf;
     private static int float_nf_left, float_nf_right;
     private static boolean float_nf_commas;
-    static Random internalRandom;
-    static int perlin_octaves = 4; // default to medium smooth
-    static float perlin_amp_falloff = 0.5f; // 50% reduction/octave
-
-    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-    // [toxi 031112]
-    // new vars needed due to recent change of cos table in PGraphics
-    static int perlin_TWOPI;
-    static int perlin_PI;
-    static float[] perlin_cosTable;
-    static float[] perlin;
-
-    // ////////////////////////////////////////////////////////////
-    static Random perlinRandom;
 
     public static final float abs(final float n) {
         return (n < 0) ? -n : n;
@@ -55,14 +53,6 @@ public abstract class RainbowMath {
 
     public static final int abs(final int n) {
         return (n < 0) ? -n : n;
-    }
-
-    public static final float sq(final float a) {
-        return a * a;
-    }
-
-    public static final float sqrt(final float a) {
-        return (float) Math.sqrt(a);
     }
 
     public static final float log(final float a) {
@@ -169,8 +159,6 @@ public abstract class RainbowMath {
         return min;
     }
 
-    // ////////////////////////////////////////////////////////////
-
     /**
      * Find the minimum value in an array. Throws an
      * ArrayIndexOutOfBoundsException if the array is length 0.
@@ -196,7 +184,6 @@ public abstract class RainbowMath {
     }
 
     // ////////////////////////////////////////////////////////////
-    // getting the time
 
     public static final float constrain(final float amt, final float low, final float high) {
         return (amt < low) ? low : ((amt > high) ? high : amt);
@@ -205,6 +192,9 @@ public abstract class RainbowMath {
     public static final float sin(final float angle) {
         return (float) Math.sin(angle);
     }
+
+    // ////////////////////////////////////////////////////////////
+    // getting the time
 
     public static final float cos(final float angle) {
         return (float) Math.cos(angle);
@@ -230,10 +220,6 @@ public abstract class RainbowMath {
         return (float) Math.atan2(a, b);
     }
 
-    // ////////////////////////////////////////////////////////////
-
-    // controlling time (playing god)
-
     public static final float degrees(final float radians) {
         return radians * RainbowConstants.RAD_TO_DEG;
     }
@@ -244,6 +230,8 @@ public abstract class RainbowMath {
 
     // ////////////////////////////////////////////////////////////
 
+    // controlling time (playing god)
+
     public static final int ceil(final float what) {
         return (int) Math.ceil(what);
     }
@@ -251,6 +239,8 @@ public abstract class RainbowMath {
     public static final int floor(final float what) {
         return (int) Math.floor(what);
     }
+
+    // ////////////////////////////////////////////////////////////
 
     public static final int round(final float what) {
         return Math.round(what);
@@ -264,10 +254,18 @@ public abstract class RainbowMath {
         return (float) Math.sqrt((a * a) + (b * b) + (c * c));
     }
 
-    // ////////////////////////////////////////////////////////////
-
     public static final float dist(final float x1, final float y1, final float x2, final float y2) {
         return RainbowMath.sqrt(RainbowMath.sq(x2 - x1) + RainbowMath.sq(y2 - y1));
+    }
+
+    public static final float sqrt(final float a) {
+        return (float) Math.sqrt(a);
+    }
+
+    // ////////////////////////////////////////////////////////////
+
+    public static final float sq(final float a) {
+        return a * a;
     }
 
     public static final float dist(final float x1, final float y1, final float z1, final float x2, final float y2, final float z2) {
@@ -493,29 +491,72 @@ public abstract class RainbowMath {
         return RainbowMath.subset(list, 0, list.length - 1);
     }
 
+    public static boolean[] subset(final boolean list[], final int start, final int count) {
+        final boolean output[] = new boolean[count];
+        System.arraycopy(list, start, output, 0, count);
+        return output;
+    }
+
     public static byte[] shorten(final byte list[]) {
         return RainbowMath.subset(list, 0, list.length - 1);
+    }
+
+    public static byte[] subset(final byte list[], final int start, final int count) {
+        final byte output[] = new byte[count];
+        System.arraycopy(list, start, output, 0, count);
+        return output;
     }
 
     public static char[] shorten(final char list[]) {
         return RainbowMath.subset(list, 0, list.length - 1);
     }
 
+    public static char[] subset(final char list[], final int start, final int count) {
+        final char output[] = new char[count];
+        System.arraycopy(list, start, output, 0, count);
+        return output;
+    }
+
     public static int[] shorten(final int list[]) {
         return RainbowMath.subset(list, 0, list.length - 1);
+    }
+
+    public static int[] subset(final int list[], final int start, final int count) {
+        final int output[] = new int[count];
+        System.arraycopy(list, start, output, 0, count);
+        return output;
     }
 
     public static float[] shorten(final float list[]) {
         return RainbowMath.subset(list, 0, list.length - 1);
     }
 
+    public static float[] subset(final float list[], final int start, final int count) {
+        final float output[] = new float[count];
+        System.arraycopy(list, start, output, 0, count);
+        return output;
+    }
+
     public static String[] shorten(final String list[]) {
         return RainbowMath.subset(list, 0, list.length - 1);
+    }
+
+    public static String[] subset(final String list[], final int start, final int count) {
+        final String output[] = new String[count];
+        System.arraycopy(list, start, output, 0, count);
+        return output;
     }
 
     public static Object shorten(final Object list) {
         final int length = Array.getLength(list);
         return RainbowMath.subset(list, 0, length - 1);
+    }
+
+    public static Object subset(final Object list, final int start, final int count) {
+        final Class<?> type = list.getClass().getComponentType();
+        final Object outgoing = Array.newInstance(type, count);
+        System.arraycopy(list, start, outgoing, 0, count);
+        return outgoing;
     }
 
     static final public boolean[] splice(final boolean list[], final boolean v, final int index) {
@@ -566,6 +607,10 @@ public abstract class RainbowMath {
         return outgoing;
     }
 
+    // ////////////////////////////////////////////////////////////
+
+    // RANDOM NUMBERS
+
     static final public int[] splice(final int list[], final int v, final int index) {
         final int outgoing[] = new int[list.length + 1];
         System.arraycopy(list, 0, outgoing, 0, index);
@@ -597,6 +642,21 @@ public abstract class RainbowMath {
         System.arraycopy(list, index, outgoing, index + v.length, list.length - index);
         return outgoing;
     }
+
+    // ////////////////////////////////////////////////////////////
+
+    // PERLIN NOISE
+
+    // [toxi 040903]
+    // octaves and amplitude amount per octave are now user controlled
+    // via the noiseDetail() function.
+
+    // [toxi 030902]
+    // cleaned up code and now using bagel's cosine table to speed up
+
+    // [toxi 030901]
+    // implementation by the german demo group farbrausch
+    // as used in their demo "art": http://www.farb-rausch.de/fr010src.zip
 
     static final public String[] splice(final String list[], final String v, final int index) {
         final String outgoing[] = new String[list.length + 1];
@@ -635,95 +695,33 @@ public abstract class RainbowMath {
         return outgoing;
     }
 
-    // ////////////////////////////////////////////////////////////
-
-    // RANDOM NUMBERS
-
     public static boolean[] subset(final boolean list[], final int start) {
         return RainbowMath.subset(list, start, list.length - start);
-    }
-
-    public static boolean[] subset(final boolean list[], final int start, final int count) {
-        final boolean output[] = new boolean[count];
-        System.arraycopy(list, start, output, 0, count);
-        return output;
     }
 
     public static byte[] subset(final byte list[], final int start) {
         return RainbowMath.subset(list, start, list.length - start);
     }
 
-    public static byte[] subset(final byte list[], final int start, final int count) {
-        final byte output[] = new byte[count];
-        System.arraycopy(list, start, output, 0, count);
-        return output;
-    }
-
-    // ////////////////////////////////////////////////////////////
-
-    // PERLIN NOISE
-
-    // [toxi 040903]
-    // octaves and amplitude amount per octave are now user controlled
-    // via the noiseDetail() function.
-
-    // [toxi 030902]
-    // cleaned up code and now using bagel's cosine table to speed up
-
-    // [toxi 030901]
-    // implementation by the german demo group farbrausch
-    // as used in their demo "art": http://www.farb-rausch.de/fr010src.zip
-
     public static char[] subset(final char list[], final int start) {
         return RainbowMath.subset(list, start, list.length - start);
-    }
-
-    public static char[] subset(final char list[], final int start, final int count) {
-        final char output[] = new char[count];
-        System.arraycopy(list, start, output, 0, count);
-        return output;
     }
 
     public static int[] subset(final int list[], final int start) {
         return RainbowMath.subset(list, start, list.length - start);
     }
 
-    public static int[] subset(final int list[], final int start, final int count) {
-        final int output[] = new int[count];
-        System.arraycopy(list, start, output, 0, count);
-        return output;
-    }
-
     public static float[] subset(final float list[], final int start) {
         return RainbowMath.subset(list, start, list.length - start);
-    }
-
-    public static float[] subset(final float list[], final int start, final int count) {
-        final float output[] = new float[count];
-        System.arraycopy(list, start, output, 0, count);
-        return output;
     }
 
     public static String[] subset(final String list[], final int start) {
         return RainbowMath.subset(list, start, list.length - start);
     }
 
-    public static String[] subset(final String list[], final int start, final int count) {
-        final String output[] = new String[count];
-        System.arraycopy(list, start, output, 0, count);
-        return output;
-    }
-
     public static Object subset(final Object list, final int start) {
         final int length = Array.getLength(list);
         return RainbowMath.subset(list, start, length - start);
-    }
-
-    public static Object subset(final Object list, final int start, final int count) {
-        final Class<?> type = list.getClass().getComponentType();
-        final Object outgoing = Array.newInstance(type, count);
-        System.arraycopy(list, start, outgoing, 0, count);
-        return outgoing;
     }
 
     public static boolean[] concat(final boolean a[], final boolean b[]) {
@@ -1028,6 +1026,30 @@ public abstract class RainbowMath {
         return outgoing;
     }
 
+    /**
+     * Match a string with a regular expression, and returns the match as an
+     * array. The first index is the matching expression, and array elements [1]
+     * and higher represent each of the groups (sequences found in parens).
+     * <p/>
+     * This uses multiline matching (Pattern.MULTILINE) and dotall mode
+     * (Pattern.DOTALL) by default, so that ^ and $ match the beginning and end
+     * of any lines found in the source, and the . operator will also pick up
+     * newline characters.
+     */
+    public static String[] match(final String what, final String regexp) {
+        final Pattern p = RainbowMath.matchPattern(regexp);
+        final Matcher m = p.matcher(what);
+        if (m.find()) {
+            final int count = m.groupCount() + 1;
+            final String[] groups = new String[count];
+            for (int i = 0; i < count; i++) {
+                groups[i] = m.group(i);
+            }
+            return groups;
+        }
+        return null;
+    }
+
     static Pattern matchPattern(final String regexp) {
         Pattern p = null;
         if (RainbowMath.matchPatterns == null) {
@@ -1055,30 +1077,6 @@ public abstract class RainbowMath {
             RainbowMath.matchPatterns.put(regexp, p);
         }
         return p;
-    }
-
-    /**
-     * Match a string with a regular expression, and returns the match as an
-     * array. The first index is the matching expression, and array elements [1]
-     * and higher represent each of the groups (sequences found in parens).
-     * <p/>
-     * This uses multiline matching (Pattern.MULTILINE) and dotall mode
-     * (Pattern.DOTALL) by default, so that ^ and $ match the beginning and end
-     * of any lines found in the source, and the . operator will also pick up
-     * newline characters.
-     */
-    public static String[] match(final String what, final String regexp) {
-        final Pattern p = RainbowMath.matchPattern(regexp);
-        final Matcher m = p.matcher(what);
-        if (m.find()) {
-            final int count = m.groupCount() + 1;
-            final String[] groups = new String[count];
-            for (int i = 0; i < count; i++) {
-                groups[i] = m.group(i);
-            }
-            return groups;
-        }
-        return null;
     }
 
     /**
@@ -1538,6 +1536,14 @@ public abstract class RainbowMath {
         return RainbowMath.int_nf.format(num);
     }
 
+    public static String[] nfs(final int num[], final int digits) {
+        final String formatted[] = new String[num.length];
+        for (int i = 0; i < formatted.length; i++) {
+            formatted[i] = RainbowMath.nfs(num[i], digits);
+        }
+        return formatted;
+    }
+
     /**
      * number format signed (or space) Formats a number but leaves a blank space
      * in the front when it's positive so that it can be properly aligned with
@@ -1547,10 +1553,10 @@ public abstract class RainbowMath {
         return (num < 0) ? RainbowMath.nf(num, digits) : (' ' + RainbowMath.nf(num, digits));
     }
 
-    public static String[] nfs(final int num[], final int digits) {
+    public static String[] nfp(final int num[], final int digits) {
         final String formatted[] = new String[num.length];
         for (int i = 0; i < formatted.length; i++) {
-            formatted[i] = RainbowMath.nfs(num[i], digits);
+            formatted[i] = RainbowMath.nfp(num[i], digits);
         }
         return formatted;
     }
@@ -1561,14 +1567,6 @@ public abstract class RainbowMath {
      */
     public static String nfp(final int num, final int digits) {
         return (num < 0) ? RainbowMath.nf(num, digits) : ('+' + RainbowMath.nf(num, digits));
-    }
-
-    public static String[] nfp(final int num[], final int digits) {
-        final String formatted[] = new String[num.length];
-        for (int i = 0; i < formatted.length; i++) {
-            formatted[i] = RainbowMath.nfp(num[i], digits);
-        }
-        return formatted;
     }
 
     public static String[] nf(final float num[], final int left, final int right) {
@@ -1667,20 +1665,6 @@ public abstract class RainbowMath {
     }
 
     /**
-     * Convert a Unicode character into a four digit hex string.
-     */
-    static final public String hex(final char what) {
-        return RainbowMath.hex(what, 4);
-    }
-
-    /**
-     * Convert an integer into an eight digit hex string.
-     */
-    static final public String hex(final int what) {
-        return RainbowMath.hex(what, 8);
-    }
-
-    /**
      * Format an integer as a hex string using the specified number of digits.
      *
      * @param what   the value to format
@@ -1703,6 +1687,20 @@ public abstract class RainbowMath {
         return stuff;
     }
 
+    /**
+     * Convert a Unicode character into a four digit hex string.
+     */
+    static final public String hex(final char what) {
+        return RainbowMath.hex(what, 4);
+    }
+
+    /**
+     * Convert an integer into an eight digit hex string.
+     */
+    static final public String hex(final int what) {
+        return RainbowMath.hex(what, 8);
+    }
+
     static final public int unhex(final String what) {
         // has to parse as a Long so that it'll work for numbers bigger than
         // 2^31
@@ -1715,23 +1713,6 @@ public abstract class RainbowMath {
      */
     static final public String binary(final byte what) {
         return RainbowMath.binary(what, 8);
-    }
-
-    /**
-     * Returns a String that contains the binary value of a char. The returned
-     * value will always have 16 digits because chars are two bytes long.
-     */
-    static final public String binary(final char what) {
-        return RainbowMath.binary(what, 16);
-    }
-
-    /**
-     * Returns a String that contains the binary value of an int. The length
-     * depends on the size of the number itself. If you want a specific number
-     * of digits use binary(int what, int digits) to specify how many.
-     */
-    static final public String binary(final int what) {
-        return RainbowMath.binary(what, 32);
     }
 
     /**
@@ -1756,11 +1737,46 @@ public abstract class RainbowMath {
     }
 
     /**
+     * Returns a String that contains the binary value of a char. The returned
+     * value will always have 16 digits because chars are two bytes long.
+     */
+    static final public String binary(final char what) {
+        return RainbowMath.binary(what, 16);
+    }
+
+    /**
+     * Returns a String that contains the binary value of an int. The length
+     * depends on the size of the number itself. If you want a specific number
+     * of digits use binary(int what, int digits) to specify how many.
+     */
+    static final public String binary(final int what) {
+        return RainbowMath.binary(what, 32);
+    }
+
+    /**
      * Unpack a binary String into an int. i.e. unbinary("00001000") would
      * return 8.
      */
     static final public int unbinary(final String what) {
         return Integer.parseInt(what, 2);
+    }
+
+    /**
+     * Return a random number in the range [howsmall, howbig).
+     * <p/>
+     * The number returned will range from 'howsmall' up to (but not including
+     * 'howbig'.
+     * <p/>
+     * If howsmall is >= howbig, howsmall will be returned, meaning that
+     * random(5, 5) will return 5 (useful) and random(7, 4) will return 7 (not
+     * useful.. better idea?)
+     */
+    public static final float random(final float howsmall, final float howbig) {
+        if (howsmall >= howbig) {
+            return howsmall;
+        }
+        final float diff = howbig - howsmall;
+        return random(diff) + howsmall;
     }
 
     /**
@@ -1792,24 +1808,6 @@ public abstract class RainbowMath {
         return value;
     }
 
-    /**
-     * Return a random number in the range [howsmall, howbig).
-     * <p/>
-     * The number returned will range from 'howsmall' up to (but not including
-     * 'howbig'.
-     * <p/>
-     * If howsmall is >= howbig, howsmall will be returned, meaning that
-     * random(5, 5) will return 5 (useful) and random(7, 4) will return 7 (not
-     * useful.. better idea?)
-     */
-    public static final float random(final float howsmall, final float howbig) {
-        if (howsmall >= howbig) {
-            return howsmall;
-        }
-        final float diff = howbig - howsmall;
-        return random(diff) + howsmall;
-    }
-
     public static final void randomSeed(final long what) {
         // internal random number object
         if (internalRandom == null) {
@@ -1827,13 +1825,6 @@ public abstract class RainbowMath {
     }
 
     // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-    /**
-     * Computes the Perlin noise function value at the point x, y.
-     */
-    public static float noise(final float x, final float y) {
-        return noise(x, y, 0f);
-    }
 
     /**
      * Computes the Perlin noise function value at x, y, z.
@@ -1930,24 +1921,12 @@ public abstract class RainbowMath {
         return 0.5f * (1.0f - perlin_cosTable[(int) (i * perlin_PI) % perlin_TWOPI]);
     }
 
-    public void noiseDetail(final int lod) {
-        if (lod > 0) {
-            perlin_octaves = lod;
-        }
+    /**
+     * Computes the Perlin noise function value at the point x, y.
+     */
+    public static float noise(final float x, final float y) {
+        return noise(x, y, 0f);
     }
-
-    public void noiseDetail(final int lod, final float falloff) {
-        if (lod > 0) {
-            perlin_octaves = lod;
-        }
-        if (falloff > 0) {
-            perlin_amp_falloff = falloff;
-        }
-    }
-
-    // ////////////////////////////////////////////////////////////
-
-    // INT NUMBER FORMATTING
 
     public static void noiseSeed(final long what) {
         if (perlinRandom == null) {
@@ -1956,5 +1935,24 @@ public abstract class RainbowMath {
         perlinRandom.setSeed(what);
         // force table reset after changing the random number seed [0122]
         perlin = null;
+    }
+
+    public void noiseDetail(final int lod) {
+        if (lod > 0) {
+            perlin_octaves = lod;
+        }
+    }
+
+    // ////////////////////////////////////////////////////////////
+
+    // INT NUMBER FORMATTING
+
+    public void noiseDetail(final int lod, final float falloff) {
+        if (lod > 0) {
+            perlin_octaves = lod;
+        }
+        if (falloff > 0) {
+            perlin_amp_falloff = falloff;
+        }
     }
 }
