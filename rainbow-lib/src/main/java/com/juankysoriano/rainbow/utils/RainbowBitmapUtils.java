@@ -2,20 +2,45 @@ package com.juankysoriano.rainbow.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.media.ExifInterface;
 import android.net.Uri;
 
+import com.juankysoriano.rainbow.core.Rainbow;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
 
-import com.juankysoriano.rainbow.core.Rainbow;
-
 public class RainbowBitmapUtils {
 
     private static final String TAG = "PROCESSING";
+
+    public static Bitmap getBitmap(Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) drawable).getBitmap();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.RGB_565);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
+    }
+
+    public static Bitmap getMutableBitmap(Drawable drawable) {
+
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.RGB_565);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
+    }
 
     public static Bitmap getBitmap(Context context, int resId, int reqWidth, int reqHeight) {
         try {

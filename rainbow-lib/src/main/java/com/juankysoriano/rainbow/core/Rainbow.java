@@ -208,6 +208,7 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
         if (graphics != null) {
             graphics.dispose();
         }
+        rainbowDrawer.setGraphics(null);
         rainbowDrawer = null;
         rainbowInputController = null;
         drawingTask = null;
