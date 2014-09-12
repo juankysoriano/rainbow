@@ -66,6 +66,22 @@ public class Metaballs2D {
 
     }
 
+    // computeIsovalue()
+    // ------------------
+    public void computeIsovalue() {
+
+        // A simple test : put a metaball on center of the screen
+        /*
+         * float ballx = 0.5f; float bally = 0.5f; float vx,vy; float dist;
+		 * 
+		 * int x,y; vx = 0.0f; for (x=0 ; x<resx; x++) { vy = 0.0f; for (y=0 ;
+		 * y<resy; y++) { dist = (float)sqrt((vx-ballx)*(vx-ballx) +
+		 * (vy-bally)*(vy-bally)); gridValue[x+resx*y] =
+		 * 10.0f/(dist*dist+0.001f); vy+=stepy; } vx+=stepx; }
+		 */
+
+    }
+
     // computeMesh()
     // ------------------
     public void computeMesh() {
@@ -122,22 +138,6 @@ public class Metaballs2D {
         } // for x
 
         nbLineToDraw /= 2;
-
-    }
-
-    // computeIsovalue()
-    // ------------------
-    public void computeIsovalue() {
-
-        // A simple test : put a metaball on center of the screen
-        /*
-         * float ballx = 0.5f; float bally = 0.5f; float vx,vy; float dist;
-		 *
-		 * int x,y; vx = 0.0f; for (x=0 ; x<resx; x++) { vy = 0.0f; for (y=0 ;
-		 * y<resy; y++) { dist = (float)sqrt((vx-ballx)*(vx-ballx) +
-		 * (vy-bally)*(vy-bally)); gridValue[x+resx*y] =
-		 * 10.0f/(dist*dist+0.001f); vy+=stepy; } vx+=stepx; }
-		 */
 
     }
 

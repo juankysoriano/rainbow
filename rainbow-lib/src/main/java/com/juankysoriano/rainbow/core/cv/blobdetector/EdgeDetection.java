@@ -4,17 +4,17 @@ package com.juankysoriano.rainbow.core.cv.blobdetector;
 //class EdgeDetection
 //==================================================
 public class EdgeDetection extends Metaballs2D {
-    private final static byte C_R = 0x01;
-    private final static byte C_G = 0x02;
-    private final static byte C_B = 0x04;
+    public final static byte C_R = 0x01;
+    public final static byte C_G = 0x02;
+    public final static byte C_B = 0x04;
     // public final static byte C_ALL = C_R|C_G|C_B;
 
     // public byte colorFlag;
-    private int imgWidth, imgHeight;
-    private int[] pixels;
-    private boolean posDiscrimination;
+    public int imgWidth, imgHeight;
+    public int[] pixels;
+    public boolean posDiscrimination;
 
-    private float m_coeff = 3.0f * 255.0f;
+    public float m_coeff = 3.0f * 255.0f;
 
     // --------------------------------------------
     // Constructor
@@ -57,20 +57,20 @@ public class EdgeDetection extends Metaballs2D {
 	 */
 
     // --------------------------------------------
-    // computeEdges()
-    // --------------------------------------------
-    public void computeEdges(int[] pixels) {
-        setImage(pixels);
-        computeMesh();
-    }
-
-    // --------------------------------------------
     // setImage()
     // --------------------------------------------
     public void setImage(int[] pixels) {
         if (pixels != this.pixels) {
             this.pixels = pixels;
         }
+    }
+
+    // --------------------------------------------
+    // computeEdges()
+    // --------------------------------------------
+    public void computeEdges(int[] pixels) {
+        setImage(pixels);
+        computeMesh();
     }
 
     // --------------------------------------------
