@@ -28,10 +28,6 @@ public class RainbowDrawer {
     public RainbowDrawer() {
     }
 
-    public Context getContext() {
-        return graphics.parent.getContext();
-    }
-
     /**
      * Interpolate between two colors. Like lerp(), but for the individual color
      * components of a color supplied as an int value.
@@ -52,6 +48,10 @@ public class RainbowDrawer {
         return RainbowImage.blendColor(c1, c2, mode);
     }
 
+    public Context getContext() {
+        return graphics.parent.getContext();
+    }
+
     public int[] getPixels() {
         return pixels;
     }
@@ -62,7 +62,7 @@ public class RainbowDrawer {
 
     public void setGraphics(RainbowGraphics graphics) {
         this.graphics = graphics;
-        this.width = graphics == null ? 0: graphics.width;
+        this.width = graphics == null ? 0 : graphics.width;
         this.height = graphics == null ? 0 : graphics.height;
     }
 
@@ -127,6 +127,11 @@ public class RainbowDrawer {
 
     public void loadImage(Context context, int resID, int width, int height, LoadPictureListener listener) {
         final Bitmap bitmap = RainbowBitmapUtils.getBitmap(context, resID, width, height);
+        loadImage(bitmap, listener);
+    }
+
+    public void loadImage(Context context, int resID, int width, int height, int mode, LoadPictureListener listener) {
+        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(context, resID, width, height, mode);
         loadImage(bitmap, listener);
     }
 
@@ -1065,6 +1070,13 @@ public class RainbowDrawer {
     /**
      * Set the current transformation to the contents of the specified source.
      */
+    public void setMatrix(final RMatrix2D source) {
+        graphics.setMatrix(source);
+    }
+
+    /**
+     * Set the current transformation to the contents of the specified source.
+     */
     public void setMatrix(final RMatrix3D source) {
         graphics.setMatrix(source);
     }
@@ -1073,13 +1085,6 @@ public class RainbowDrawer {
      * Set the current transformation matrix to the contents of another.
      */
     public void setMatrix(final RMatrix source) {
-        graphics.setMatrix(source);
-    }
-
-    /**
-     * Set the current transformation to the contents of the specified source.
-     */
-    public void setMatrix(final RMatrix2D source) {
         graphics.setMatrix(source);
     }
 
