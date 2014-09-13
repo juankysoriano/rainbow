@@ -2100,6 +2100,14 @@ public class RainbowImage implements RainbowConstants, Cloneable {
         return success;
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
     public Bitmap getBitmap() {
         return bitmap;
     }
