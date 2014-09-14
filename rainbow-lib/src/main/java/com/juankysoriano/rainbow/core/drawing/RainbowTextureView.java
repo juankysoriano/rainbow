@@ -17,6 +17,7 @@ public class RainbowTextureView extends TextureView implements SurfaceTextureLis
     public RainbowTextureView(ViewGroup parent, Rainbow rainbow) {
         super(parent.getContext().getApplicationContext());
         setBackground(parent.getBackground());
+        setMeasuredDimension(parent.getMeasuredWidth(), parent.getMeasuredHeight());
         mRainbow = rainbow;
 
         setFocusable(true);

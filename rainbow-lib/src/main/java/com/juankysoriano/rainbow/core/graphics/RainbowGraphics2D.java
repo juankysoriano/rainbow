@@ -115,7 +115,10 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     private void initBitmaps() {
         normalBitmap = Bitmap.createBitmap(width, height, Config.ARGB_4444);
-        backgroundBitmap = RainbowBitmapUtils.getMutableBitmap(parent.getDrawingView().getBackground());
+        backgroundBitmap = RainbowBitmapUtils.getBitmap(parent.getDrawingView().getBackground());
+        if(backgroundBitmap == null) {
+            backgroundBitmap = Bitmap.createBitmap(width, height, Config.ARGB_4444);
+        }
         canvas = new Canvas(normalBitmap);
 
         Drawable parentBackground = parent.getDrawingView().getBackground();

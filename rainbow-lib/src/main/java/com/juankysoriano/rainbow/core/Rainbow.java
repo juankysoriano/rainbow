@@ -96,8 +96,10 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
             RainbowGraphics graphics = new RainbowGraphics2D();
             graphics.setParent(Rainbow.this);
             graphics.setPrimary(true);
-            graphics.setSize(width, height);
-            rainbowDrawer.setGraphics(graphics);
+            if(width > 0 && height > 0) {
+                graphics.setSize(width, height);
+                rainbowDrawer.setGraphics(graphics);
+            }
         }
     };
 
