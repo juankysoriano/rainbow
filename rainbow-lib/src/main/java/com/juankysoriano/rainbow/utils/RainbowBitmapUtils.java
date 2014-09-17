@@ -29,7 +29,7 @@ public class RainbowBitmapUtils {
 
     public static Bitmap getMutableBitmap(Drawable drawable) {
 
-        if(drawable.getIntrinsicHeight() > 0 && drawable.getIntrinsicWidth() > 0) {
+        if (drawable.getIntrinsicHeight() > 0 && drawable.getIntrinsicWidth() > 0) {
             Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.RGB_565);
             Canvas canvas = new Canvas(bitmap);
             drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());

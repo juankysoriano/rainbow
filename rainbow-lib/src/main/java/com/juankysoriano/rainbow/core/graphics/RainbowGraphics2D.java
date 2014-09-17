@@ -88,6 +88,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
         transform = new float[9];
         path = new Path();
         rect = new RectF();
+        initPaints();
     }
 
     /**
@@ -110,22 +111,32 @@ public class RainbowGraphics2D extends RainbowGraphics {
     protected void allocate() {
         initBitmaps();
         initPaints();
-        initShaders();
+        if(primarySurface) {
+            initShaders();
+        }
     }
 
     private void initBitmaps() {
         normalBitmap = Bitmap.createBitmap(width, height, Config.ARGB_4444);
-        backgroundBitmap = RainbowBitmapUtils.getBitmap(parent.getDrawingView().getBackground());
-        if(backgroundBitmap == null) {
-            backgroundBitmap = Bitmap.createBitmap(width, height, Config.ARGB_4444);
+
+        if(primarySurface) {
+            backgroundBitmap = RainbowBitmapUtils.getBitmap(parent.getDrawingView().getBackground());
+            if (backgroundBitmap == null) {
+                backgroundBitmap = Bitmap.createBitmap(width, height, Config.ARGB_4444);
+            }
         }
+
+
         canvas = new Canvas(normalBitmap);
 
-        Drawable parentBackground = parent.getDrawingView().getBackground();
-        if (parentBackground != null) {
-            parentBackground.setBounds(0, 0, width, height);
-            parentBackground.draw(canvas);
+        if(primarySurface) {
+            Drawable parentBackground = parent.getDrawingView().getBackground();
+            if (parentBackground != null) {
+                parentBackground.setBounds(0, 0, width, height);
+                parentBackground.draw(canvas);
+            }
         }
+
         super.setBitmap(normalBitmap);
     }
 

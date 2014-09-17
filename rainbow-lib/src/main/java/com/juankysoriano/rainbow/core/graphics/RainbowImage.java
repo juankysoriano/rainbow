@@ -159,6 +159,15 @@ public class RainbowImage implements RainbowConstants, Cloneable {
         this.format = bitmap.hasAlpha() ? ARGB : RGB;
     }
 
+    public RainbowImage(RainbowImage rainbowImage) {
+        Bitmap bitmap = Bitmap.createBitmap(rainbowImage.getBitmap(), 0, 0, rainbowImage.width, rainbowImage.height);
+        this.bitmap = bitmap;
+        this.width = bitmap.getWidth();
+        this.height = bitmap.getHeight();
+        this.pixels = null;
+        this.format = bitmap.hasAlpha() ? ARGB : RGB;
+    }
+
     /**
      * Blend two colors based on a particular mode.
      * <UL>

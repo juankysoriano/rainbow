@@ -87,6 +87,15 @@ public class RainbowDrawer {
         return pg;
     }
 
+    public static RainbowGraphics createStandaloneGraphics(final int width, final int height) {
+        RainbowGraphics pg = new RainbowGraphics2D();
+        pg.setParent(null);
+        pg.setPrimary(false);
+        pg.setSize(width, height);
+
+        return pg;
+    }
+
     public RainbowImage createImage(final int wide, final int high, final int format) {
         final RainbowImage image = new RainbowImage(wide, high, format);
         image.parent = graphics.parent;
@@ -117,6 +126,11 @@ public class RainbowDrawer {
 
     public void loadImage(String path, int width, int height, LoadPictureListener listener) {
         Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), path, width, height);
+        loadImage(bitmap, listener);
+    }
+
+    public void loadImage(String path, int width, int height, int mode, LoadPictureListener listener) {
+        Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), path, width, height, mode);
         loadImage(bitmap, listener);
     }
 
