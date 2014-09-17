@@ -48,6 +48,7 @@ public class EdgeDetection extends Metaballs2D {
         setIsovalue(value * m_coeff);
     }
 
+
     // --------------------------------------------
     // setComponent()
     // --------------------------------------------

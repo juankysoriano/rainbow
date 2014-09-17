@@ -49,32 +49,4 @@ public class MetaballsTable {
 // bit 3 : Y-1
     public static byte neightborVoxel[] = {0, 10, 9, 3, 5, 15, 12, 6, 6, 12, 12, 5, 3, 9, 10, 0};
 
-    public static void computeNeighborTable() {
-        int iEdge;
-        int n;
-        for (int i = 0; i < 16; i++) {
-            neightborVoxel[i] = 0;
-
-            n = 0;
-            while ((iEdge = MetaballsTable.edgeCut[i][n++]) != -1) {
-                switch (iEdge) {
-                    case 0:
-                        neightborVoxel[i] |= (1 << 3);
-                        break;
-                    case 1:
-                        neightborVoxel[i] |= (1 << 0);
-                        break;
-                    case 2:
-                        neightborVoxel[i] |= (1 << 2);
-                        break;
-                    case 3:
-                        neightborVoxel[i] |= (1 << 1);
-                        break;
-                }
-            }
-
-        } // end for i
-
-    }
-
 }
