@@ -150,8 +150,7 @@ public class RainbowImage implements RainbowConstants, Cloneable {
      * Construct a new PImage from an Android normalBitmap. The pixels[] array is not
      * initialized, nor is data copied to it, until loadPixels() is called.
      */
-    public RainbowImage(Object nativeObject) {
-        Bitmap bitmap = (Bitmap) nativeObject;
+    public RainbowImage(Bitmap bitmap) {
         this.bitmap = bitmap;
         this.width = bitmap.getWidth();
         this.height = bitmap.getHeight();
@@ -730,7 +729,7 @@ public class RainbowImage implements RainbowConstants, Cloneable {
             h = (int) (height * diff);
         }
         if (this.bitmap == null) {
-            this.bitmap = Bitmap.createBitmap(pixels, w, w, Config.ARGB_4444);
+            this.bitmap = Bitmap.createBitmap(pixels, w, h, Config.ARGB_4444);
         } else {
             Bitmap newBitmap = Bitmap.createScaledBitmap(this.bitmap, w, h, false);
             this.bitmap.recycle();
