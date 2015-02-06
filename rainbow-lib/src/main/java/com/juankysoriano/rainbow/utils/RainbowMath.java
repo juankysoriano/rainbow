@@ -1,6 +1,5 @@
 package com.juankysoriano.rainbow.utils;
 
-import com.juankysoriano.rainbow.core.RainbowConstants;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;
 
@@ -18,6 +17,15 @@ import java.util.regex.Pattern;
  * Created by juankysoriano on 08/04/2014.
  */
 public abstract class RainbowMath {
+    public static final float PI = (float) Math.PI;
+    public static final float RAD_TO_DEG = 180.0f / PI;
+    public static final float DEG_TO_RAD = PI / 180.0f;
+    public static final float TAU = PI * 2.0f;
+    public static final float TWO_PI = PI * 2.0f;
+    public static final float QUARTER_PI = PI / 4.0f;
+    public static final float HALF_PI = PI / 2.0f;
+    public static final float THIRD_PI = PI / 3.0f;
+    public static final float EPSILON = 0.0001f;
     static final String ERROR_MIN_MAX = "Cannot use min() or max() on an empty array.";
     static final int PERLIN_YWRAPB = 4;
     static final int PERLIN_YWRAP = 1 << RainbowMath.PERLIN_YWRAPB;
@@ -221,11 +229,11 @@ public abstract class RainbowMath {
     }
 
     public static final float degrees(final float radians) {
-        return radians * RainbowConstants.RAD_TO_DEG;
+        return radians * RAD_TO_DEG;
     }
 
     public static final float radians(final float degrees) {
-        return degrees * RainbowConstants.DEG_TO_RAD;
+        return degrees * DEG_TO_RAD;
     }
 
     // ////////////////////////////////////////////////////////////
@@ -897,30 +905,6 @@ public abstract class RainbowMath {
             buffer.append(str[i]);
         }
         return buffer.toString();
-    }
-
-    // ////////////////////////////////////////////////////////////
-    // EXTENSIONS
-
-    /**
-     * Split the provided String at wherever whitespace occurs. Multiple
-     * whitespace (extra spaces or tabs or whatever) between items will count as
-     * a single break.
-     * <p/>
-     * The whitespace characters are "\t\n\r\f", which are the defaults for
-     * java.util.StringTokenizer, plus the unicode non-breaking space character,
-     * which is found commonly on files created by or used in conjunction with
-     * Mac OS X (character 160, or 0x00A0 in hex).
-     * <p/>
-     * <PRE>
-     * i.e. splitTokens("a b") -> { "a", "b" }
-     * splitTokens("a    b") -> { "a", "b" }
-     * splitTokens("a\tb") -> { "a", "b" }
-     * splitTokens("a \t  b  ") -> { "a", "b" }
-     * </PRE>
-     */
-    public static String[] splitTokens(final String what) {
-        return RainbowMath.splitTokens(what, RainbowConstants.WHITESPACE);
     }
 
     // ////////////////////////////////////////////////////////////

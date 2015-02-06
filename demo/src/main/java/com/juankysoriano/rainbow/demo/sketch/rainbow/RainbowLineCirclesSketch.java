@@ -6,11 +6,11 @@ import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.event.RainbowEvent;
 import com.juankysoriano.rainbow.core.event.RainbowInputController;
-import com.juankysoriano.rainbow.core.listeners.RainbowInteractionListener;
+import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
 import com.juankysoriano.rainbow.demo.R;
 import com.juankysoriano.rainbow.utils.RainbowMath;
 
-public class RainbowLineCirclesSketch extends Rainbow implements RainbowInteractionListener {
+public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputController.RainbowInteractionListener {
 
     private static final int MAX_RADIUS = 200;
     private static final int MIN_RADIUS = 1;
@@ -40,7 +40,7 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInteract
         private void drawEllipse(float x, float y, float radius, int color, RainbowDrawer rainbowDrawer) {
             rainbowDrawer.stroke(0, 60);
             rainbowDrawer.fill(color, 190);
-            rainbowDrawer.ellipseMode(CENTER);
+            rainbowDrawer.ellipseMode(RainbowGraphics.CENTER);
             rainbowDrawer.ellipse(x, y, radius, radius);
         }
 
@@ -51,19 +51,19 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInteract
     }
 
     @Override
-    public void onSketchSetup(RainbowDrawer rainbowDrawer) {
+    public void onSketchSetup() {
         radius = MIN_RADIUS;
         color = RAINBOW[colorIndex];
     }
 
     @Override
-    public void onDrawingStart(RainbowInputController rainbowInputController) {
-        rainbowInputController.setRainbowInteractionListener(this);
+    public void onDrawingStart() {
+        getRainbowInputController().setRainbowInteractionListener(this);
     }
 
     @Override
-    public void onDrawingStop(RainbowInputController rainbowInputController) {
-        rainbowInputController.removeSketchInteractionListener();
+    public void onDrawingStop() {
+        getRainbowInputController().removeSketchInteractionListener();
     }
 
     @Override

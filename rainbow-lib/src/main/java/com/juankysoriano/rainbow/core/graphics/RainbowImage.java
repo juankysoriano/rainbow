@@ -29,7 +29,6 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
 
 import com.juankysoriano.rainbow.core.Rainbow;
-import com.juankysoriano.rainbow.core.RainbowConstants;
 import com.juankysoriano.rainbow.utils.RainbowIO;
 import com.juankysoriano.rainbow.utils.RainbowMath;
 
@@ -37,6 +36,8 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
+
+import static com.juankysoriano.rainbow.core.graphics.RainbowGraphics.*;
 
 /**
  * Storage class for pixel data. This is the base class for most image and pixel
@@ -46,21 +47,47 @@ import java.util.HashMap;
  * HREF="http://www.toxi.co.uk">toxi</A>.
  * <p/>
  */
-public class RainbowImage implements RainbowConstants, Cloneable {
+public class RainbowImage implements Cloneable {
 
     public static final int ALPHA_MASK = 0xff000000;
     public static final int RED_MASK = 0x00ff0000;
     public static final int GREEN_MASK = 0x0000ff00;
     public static final int BLUE_MASK = 0x000000ff;
-    static final int PRECISIONB = 15;
-    static final int PRECISIONF = 1 << PRECISIONB;
-    static final int PREC_MAXVAL = PRECISIONF - 1;
-    static final int PREC_ALPHA_SHIFT = 24 - PRECISIONB;
-    static final int PREC_RED_SHIFT = 16 - PRECISIONB;
-    static final String TIFF_ERROR = "Error: Processing can only read its own TIFF files.";
-    static byte TIFF_HEADER[] = {77, 77, 0, 42, 0, 0, 0, 8, 0, 9, 0, -2, 0, 4, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 3, 0, 0, 0, 1, 0, 0, 0, 0, 1, 2, 0, 3, 0, 0, 0, 3,
-            0, 0, 0, 122, 1, 6, 0, 3, 0, 0, 0, 1, 0, 2, 0, 0, 1, 17, 0, 4, 0, 0, 0, 1, 0, 0, 3, 0, 1, 21, 0, 3, 0, 0, 0, 1, 0, 3, 0, 0, 1, 22, 0, 3, 0, 0, 0, 1, 0, 0, 0, 0, 1, 23, 0, 4, 0, 0, 0, 1,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 8, 0, 8};
+    public static final int LOAD_CENTER_INSIDE = 0;
+    public static final int LOAD_CENTER_CROP = 1;
+    public static final int LOAD_ORIGINAL_SIZE = 2;
+    // blend mode keyword definitions
+    // @see imagine.core.PImage#blendColor(int,int,int)
+    static final int BLUR = 11;
+    static final int GRAY = 12;
+    static final int INVERT = 13;
+    static final int OPAQUE = 14;
+    static final int POSTERIZE = 15;
+    static final int THRESHOLD = 16;
+    static final int ERODE = 17;
+    static final int DILATE = 18;
+    private final static int REPLACE = 0;
+    private final static int BLEND = 1 << 0;
+    private final static int ADD = 1 << 1;
+    private final static int SUBTRACT = 1 << 2;
+    private final static int LIGHTEST = 1 << 3;
+    private final static int DARKEST = 1 << 4;
+    private final static int DIFFERENCE = 1 << 5;
+
+    // filter/convert types
+    private final static int EXCLUSION = 1 << 6;
+    private final static int MULTIPLY = 1 << 7;
+    private final static int SCREEN = 1 << 8;
+    private final static int OVERLAY = 1 << 9;
+    private final static int HARD_LIGHT = 1 << 10;
+    private final static int SOFT_LIGHT = 1 << 11;
+    private final static int DODGE = 1 << 12;
+    private final static int BURN = 1 << 13;
+    private static final int PRECISIONB = 15;
+    private static final int PRECISIONF = 1 << PRECISIONB;
+    private static final int PREC_MAXVAL = PRECISIONF - 1;
+    private static final int PREC_ALPHA_SHIFT = 24 - PRECISIONB;
+    private static final int PREC_RED_SHIFT = 16 - PRECISIONB;
     /**
      * Format for this image, one of RGB, ARGB or ALPHA. note that RGB images
      * still require 0xff in the high byte because of how they'll be manipulated
@@ -165,6 +192,19 @@ public class RainbowImage implements RainbowConstants, Cloneable {
         this.height = bitmap.getHeight();
         this.pixels = null;
         this.format = bitmap.hasAlpha() ? ARGB : RGB;
+    }
+
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        if (this.bitmap == null || !this.bitmap.equals(bitmap)) {
+            this.bitmap = bitmap;
+        } else {
+            this.bitmap.recycle();
+            this.bitmap = bitmap;
+        }
     }
 
     /**
@@ -386,6 +426,10 @@ public class RainbowImage implements RainbowConstants, Cloneable {
         return (low(((a & ALPHA_MASK) >>> 24) + f, 0xff) << 24 | (peg(ar + (((cr - ar) * f) >> 8)) << 16) | (peg(ag + (((cg - ag) * f) >> 8)) << 8) | (peg(ab + (((cb - ab) * f) >> 8))));
     }
 
+    // ////////////////////////////////////////////////////////////
+
+    // COPYING IMAGE DATA
+
     /**
      * returns the inverse of the product of the inverses of the input colors
      * (the inverse of multiply). C = 1 - (1-A) * (1-B)
@@ -431,7 +475,7 @@ public class RainbowImage implements RainbowConstants, Cloneable {
 
     // ////////////////////////////////////////////////////////////
 
-    // COPYING IMAGE DATA
+    // MARKING IMAGE AS LOADED / FOR USE IN RENDERERS
 
     /**
      * returns the inverse multiply plus screen, which simplifies to C = 2AB +
@@ -476,10 +520,6 @@ public class RainbowImage implements RainbowConstants, Cloneable {
         return (low(((a & ALPHA_MASK) >>> 24) + f, 0xff) << 24 | (peg(ar + (((cr - ar) * f) >> 8)) << 16) | (peg(ag + (((cg - ag) * f) >> 8)) << 8) | (peg(ab + (((cb - ab) * f) >> 8))));
     }
 
-    // ////////////////////////////////////////////////////////////
-
-    // MARKING IMAGE AS LOADED / FOR USE IN RENDERERS
-
     /**
      * Returns the first (underlay) color divided by the inverse of the second
      * (overlay) color. C = A / (255-B)
@@ -502,6 +542,10 @@ public class RainbowImage implements RainbowConstants, Cloneable {
         // alpha blend (this portion will always be the same)
         return (low(((a & ALPHA_MASK) >>> 24) + f, 0xff) << 24 | (peg(ar + (((cr - ar) * f) >> 8)) << 16) | (peg(ag + (((cg - ag) * f) >> 8)) << 8) | (peg(ab + (((cb - ab) * f) >> 8))));
     }
+
+    // ////////////////////////////////////////////////////////////
+
+    // GET/SET PIXELS
 
     /**
      * returns the inverse of the inverse of the first (underlay) color divided
@@ -529,10 +573,6 @@ public class RainbowImage implements RainbowConstants, Cloneable {
     private static int low(int a, int b) {
         return (a < b) ? a : b;
     }
-
-    // ////////////////////////////////////////////////////////////
-
-    // GET/SET PIXELS
 
     private static int mix(int a, int b, int f) {
         return a + (((b - a) * f) >> 8);
@@ -2116,16 +2156,9 @@ public class RainbowImage implements RainbowConstants, Cloneable {
         return height;
     }
 
-    public Bitmap getBitmap() {
-        return bitmap;
-    }
+    public static interface LoadPictureListener {
+        public void onLoadSucceed(RainbowImage image);
 
-    public void setBitmap(Bitmap bitmap) {
-        if (this.bitmap == null || !this.bitmap.equals(bitmap)) {
-            this.bitmap = bitmap;
-        } else {
-            this.bitmap.recycle();
-            this.bitmap = bitmap;
-        }
+        public void onLoadFail();
     }
 }

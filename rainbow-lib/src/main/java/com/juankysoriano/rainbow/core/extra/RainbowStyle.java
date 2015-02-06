@@ -22,9 +22,7 @@
 
 package com.juankysoriano.rainbow.core.extra;
 
-import com.juankysoriano.rainbow.core.RainbowConstants;
-
-public class RainbowStyle implements RainbowConstants {
+public class RainbowStyle {
     public int imageMode;
     public int rectMode;
     public int ellipseMode;

@@ -8,11 +8,8 @@ import com.juankysoriano.rainbow.core.cv.blobdetector.BlobDetection;
 import com.juankysoriano.rainbow.core.cv.blobdetector.EdgeVertex;
 import com.juankysoriano.rainbow.core.cv.blobdetector.OnBlobDetectedCallback;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
-import com.juankysoriano.rainbow.core.event.RainbowInputController;
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;
-import com.juankysoriano.rainbow.core.listeners.LoadPictureListener;
 import com.juankysoriano.rainbow.demo.R;
-import com.juankysoriano.rainbow.demo.sketch.rainbow.LibraryApplication;
 import com.juankysoriano.rainbow.utils.RainbowMath;
 
 public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallback {
@@ -33,14 +30,10 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     }
 
     @Override
-    public void onDrawingStart(RainbowInputController rainbowInputController) {
-    }
-
-    @Override
-    public void onSketchSetup(final RainbowDrawer rainbowDrawer) {
+    public void onSketchSetup() {
         frameRate(30);
-        rainbowDrawer.noFill();
-        rainbowDrawer.loadImage(LibraryApplication.getContext(), R.drawable.rainbow2, getWidth() / RESIZE_FACTOR, getHeight() / RESIZE_FACTOR, Rainbow.LOAD_CENTER_CROP, new LoadPictureListener() {
+        getRainbowDrawer().noFill();
+        getRainbowDrawer().loadImage(R.drawable.rainbow_picture, getWidth() / RESIZE_FACTOR, getHeight() / RESIZE_FACTOR, RainbowImage.LOAD_CENTER_CROP, new RainbowImage.LoadPictureListener() {
 
             @Override
             public void onLoadSucceed(RainbowImage image) {
@@ -57,19 +50,11 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     }
 
     private void startNextBunchDetection() {
-        if(blobDetection == null) {
+        if (blobDetection == null) {
             blobDetection = new BlobDetection(rainbowImage.width, rainbowImage.height);
         }
         blobDetection.setThreshold(detectThreshold);
         blobDetection.computeBlobs(rainbowImage.pixels, this);
-    }
-
-    @Override
-    public void onDrawingStep(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
-    }
-
-    @Override
-    public void onDrawingStop(RainbowInputController rainbowInputController) {
     }
 
     @Override
@@ -104,7 +89,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         if (detectThreshold < 1.0f) {
             detectThreshold += THRESHOLD_STEP;
             startNextBunchDetection();
-        } else if (iteration < TOTAL_ITERATIONS-1) {
+        } else if (iteration < TOTAL_ITERATIONS - 1) {
             iteration++;
             detectThreshold = 0.0f;
             startNextBunchDetection();

@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class ParticleWorld {
 
-    private static final int NUMBER_PARTICLES = 250;
+    private static final int NUMBER_PARTICLES = 50;
     private static final int NUCLEUS_DIAMETER = 40;
     private static final float HALF = 0.5f;
 
