@@ -6,12 +6,14 @@ import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 
 public class RainbowInputController {
     private final EventDispatcher eventDispatcher;
+    private final FingerPositionPredictor fingerPositionPredictor;
     private RainbowInteractionListener rainbowInteractionListener;
     private float x, y;
     private float px, py;
     private boolean screenTouched;
 
     public RainbowInputController() {
+        fingerPositionPredictor = new FingerPositionPredictor();
         eventDispatcher = new EventDispatcher();
         x = y = px = py = -1;
     }
@@ -39,6 +41,7 @@ public class RainbowInputController {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 screenTouched = true;
+                fingerPositionPredictor.resetTo(event.getX(), event.getY());
                 if (hasInteractionListener()) {
                     rainbowInteractionListener.onSketchTouched(event, rainbowDrawer);
                 }
@@ -51,6 +54,7 @@ public class RainbowInputController {
                 break;
             case MotionEvent.ACTION_MOVE:
                 screenTouched = true;
+                fingerPositionPredictor.moveTo(event.getX(), event.getY());
                 if (hasInteractionListener()) {
                     rainbowInteractionListener.onFingerDragged(event, rainbowDrawer);
                 }
@@ -123,6 +127,22 @@ public class RainbowInputController {
         } else {
             return py;
         }
+    }
+
+    public float getPredictiveX() {
+        return fingerPositionPredictor.getX();
+    }
+
+    public float getPredictiveY() {
+        return fingerPositionPredictor.getY();
+    }
+
+    public float getPreviousPredictiveX() {
+        return fingerPositionPredictor.getOldX();
+    }
+
+    public float getPreviousPredictiveY() {
+        return fingerPositionPredictor.getOldY();
     }
 
     public boolean isScreenTouched() {
