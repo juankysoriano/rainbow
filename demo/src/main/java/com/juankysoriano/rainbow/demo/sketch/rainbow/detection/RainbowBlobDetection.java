@@ -12,7 +12,6 @@ import com.juankysoriano.rainbow.core.event.RainbowInputController;
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;
 import com.juankysoriano.rainbow.core.listeners.LoadPictureListener;
 import com.juankysoriano.rainbow.demo.R;
-import com.juankysoriano.rainbow.demo.sketch.rainbow.LibraryApplication;
 import com.juankysoriano.rainbow.utils.RainbowMath;
 
 public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallback {
@@ -40,7 +39,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     public void onSketchSetup(final RainbowDrawer rainbowDrawer) {
         frameRate(30);
         rainbowDrawer.noFill();
-        rainbowDrawer.loadImage(LibraryApplication.getContext(), R.drawable.rainbow2, getWidth() / RESIZE_FACTOR, getHeight() / RESIZE_FACTOR, Rainbow.LOAD_CENTER_CROP, new LoadPictureListener() {
+        rainbowDrawer.loadImage(R.drawable.rainbowlandscape, getWidth() / RESIZE_FACTOR, getHeight() / RESIZE_FACTOR, Rainbow.LOAD_CENTER_CROP, new LoadPictureListener() {
 
             @Override
             public void onLoadSucceed(RainbowImage image) {
