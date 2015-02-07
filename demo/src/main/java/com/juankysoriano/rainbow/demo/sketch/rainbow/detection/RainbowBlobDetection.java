@@ -72,16 +72,12 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
 
     @Override
     public boolean isToDiscardBlob(Blob b) {
-        float blobPseudoArea = getBlobPseudoArea(b);
+        float blobPseudoArea = getBlobArea(b);
         return blobPseudoArea < MIN_DISCARD_BLOB_THRESHOLD[iteration];
     }
 
-    private float getBlobPseudoArea(Blob b) {
+    private float getBlobArea(Blob b) {
         return RainbowMath.abs(b.xMax - b.xMin) * getWidth() * RainbowMath.abs(b.yMax - b.yMin) * getHeight();
-    }
-
-    private float getRainbowSketchArea() {
-        return getWidth() * getHeight();
     }
 
     @Override
