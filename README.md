@@ -21,7 +21,7 @@ Something like this:
 
 1 ) _Creating a `Rainbow` object_:
 
-```js
+```java
 public class RainbowSketch extends Rainbow {
 
     private static final int FRAME_RATE = 60;
@@ -29,12 +29,12 @@ public class RainbowSketch extends Rainbow {
         super(parentView);
     }
 
-    public void onSketchSetup(RainbowDrawer rainbowDrawer) {
+    public void onSketchSetup() {
       //Called when the rainbow is being setup.
       frameRate(FRAME_RATE);
     }
 
-    public void onDrawingStart(RainbowInputController rainbowInputController) {
+    public void onDrawingStart() {
       //Called when the rainbow sketch is about to start.
     }
 
@@ -42,8 +42,7 @@ public class RainbowSketch extends Rainbow {
        //Called when the rainbow sketch is resumed
     }
 
-    public void onDrawingStep(RainbowDrawer rainbowDrawer,
-                                RainbowInputController rainbowInputController) {
+    public void onDrawingStep() {
        //Called when the rainbow sketch is about to perform a new step
        //Here is where the animations should be done.
        
@@ -55,7 +54,7 @@ public class RainbowSketch extends Rainbow {
        //Called when the rainbow sketch is about to pause
     }
 
-    public void onDrawingStop(RainbowInputController rainbowInputController) {
+    public void onDrawingStop() {
         //Called when the rainbow sketch is about to stop
     }
 
@@ -69,9 +68,11 @@ public class RainbowSketch extends Rainbow {
 
 A `RainbowDrawer` exposes to you all the methods you will need in order to do amazing drawings. Following one example.
 
-```js
-    public void onDrawingStep(RainbowDrawer rainbowDrawer,
-                                  RainbowInputController rainbowInputController) {
+```java
+    public void onDrawingStep() {
+       //Let's retrieve a RainbowDrawer object (for painting).
+       RainbowDrawer rainbowDrawer = getRainbowDrawer();
+        
        //Let's setup our paint-style
        rainbowDrawer.fill(Color.RED);
        rainbowDrawer.strokeWeight(2);
@@ -99,15 +100,18 @@ Try to compilate it a bit!
 
 With `RainbowInputController` you have access to the user interactions with your `Rainbow`
 
-```js
-    public void onDrawingStep(RainbowDrawer rainbowDrawer,
-                                  RainbowInputController rainbowInputController) {
-       //Let's setup our paint-style
-       rainbowDrawer.fill(Color.RED);
-       rainbowDrawer.strokeWeight(2);
-       rainbowDrawer.stroke(Color.BLUE);
+```java
+    public void onDrawingStep() {
+        //Let's retrieve a RainbowDrawer object (for painting).
+        RainbowDrawer rainbowDrawer = getRainbowDrawer();
+        //Let's setup our paint-style
+        rainbowDrawer.fill(Color.RED);
+        rainbowDrawer.strokeWeight(2);
+        rainbowDrawer.stroke(Color.BLUE);
        
-       //Let's paint something
+        //Lets's retrieve a RainbowInputController (for controlling). 
+        RainbowInputController rainbowInputController = getRainbowInputController();
+        //Let's paint something
         rainbowDrawer.ellipse(rainbowInputController.getX(), 
                             rainbowInputController.getY(), 
                             100, 
@@ -117,7 +121,7 @@ With `RainbowInputController` you have access to the user interactions with your
 
 You can also register to it a `RainbowInteractionListener` for more fine grained control over the user interactions.
 
-```js
+```java
 public interface RainbowInteractionListener {
     void onSketchTouched(final RainbowEvent event, 
                         final RainbowDrawer rainbowDrawer);
@@ -135,7 +139,7 @@ public interface RainbowInteractionListener {
 
 4 . _Let's inject a `Rainbow` into your `ViewGroup`_
 
-```js
+```java
 public class SketchActivity extends Activity {
 
     private RainbowSketch sketch;
