@@ -17,14 +17,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
+public class Rainbow {
+    private static final int DEFAULT_FRAME_RATE = 120;
     private boolean surfaceReady;
-    private boolean paused;
-    private boolean isSetup;
     private int width;
     private int height;
     private int frameCount;
-    private float frameRate;
+    private float frameRate = DEFAULT_FRAME_RATE;
+    private boolean paused = true;
+    private boolean isSetup = false;
     private ScheduledExecutorService drawingScheduler;
     private RainbowInputController rainbowInputController;
     private DrawingTask drawingTask;
@@ -44,18 +45,16 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
     };
 
     protected Rainbow(ViewGroup viewGroup) {
-        frameRate = RainbowConstants.DEFAULT_FRAME_RATE;
-        paused = true;
-        isSetup = false;
-        rainbowInputController = new RainbowInputController();
-        rainbowDrawer = new RainbowDrawer();
-        drawingTask = new DrawingTask();
-        injectSketchInto(viewGroup);
-        addOnPreDrawListener();
+        this(viewGroup, new RainbowDrawer(), new RainbowInputController());
     }
 
-    private void injectSketchInto(ViewGroup viewGroup) {
-        drawingView = new RainbowTextureView(viewGroup, this);
+    protected Rainbow(ViewGroup viewGroup, RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
+        this.rainbowInputController = rainbowInputController;
+        this.rainbowDrawer = rainbowDrawer;
+        this.drawingView = new RainbowTextureView(viewGroup, this);
+        this.drawingTask = new DrawingTask();
+
+        addOnPreDrawListener();
     }
 
     private void addOnPreDrawListener() {
@@ -81,7 +80,7 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
         @Override
         protected Void doInBackground(Void... params) {
             rainbowDrawer.beginDraw();
-            Rainbow.this.onSketchSetup(rainbowDrawer);
+            Rainbow.this.onSketchSetup();
             rainbowDrawer.endDraw();
             return null;
         }
@@ -96,20 +95,20 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
             RainbowGraphics graphics = new RainbowGraphics2D();
             graphics.setParent(Rainbow.this);
             graphics.setPrimary(true);
-            if(width > 0 && height > 0) {
+            if (width > 0 && height > 0) {
                 graphics.setSize(width, height);
                 rainbowDrawer.setGraphics(graphics);
             }
         }
     };
 
-    @Override
-    public void onSketchSetup(RainbowDrawer rainbowDrawer) {
+    public void onSketchSetup() {
+        //no-op
     }
 
     public void start() {
         if (!isRunning() || drawingScheduler.isTerminated()) {
-            onDrawingStart(rainbowInputController);
+            onDrawingStart();
             resume();
         }
     }
@@ -118,23 +117,22 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
         return !paused || drawingScheduler != null;
     }
 
-    @Override
-    public void onDrawingStart(RainbowInputController rainbowInputController) {
+    public void onDrawingStart() {
+        //no-op
     }
 
     public void resume() {
         onDrawingResume();
         paused = false;
-        if(drawingScheduler == null || drawingScheduler.isTerminated()) {
+        if (drawingScheduler == null || drawingScheduler.isTerminated()) {
             drawingScheduler = Executors.newSingleThreadScheduledExecutor();
             drawingScheduler.scheduleAtFixedRate(drawingTask, 0, drawingTask.getDelay(), TimeUnit.MILLISECONDS);
         }
     }
 
-    @Override
     public void onDrawingResume() {
+        //no-op
     }
-
 
     private void handleDraw() {
 
@@ -165,14 +163,14 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
         synchronized (this) {
             frameCount++;
             rainbowDrawer.beginDraw();
-            onDrawingStep(rainbowDrawer, rainbowInputController);
+            onDrawingStep();
             rainbowInputController.dequeueEvents(rainbowDrawer);
             rainbowDrawer.endDraw();
         }
     }
 
-    @Override
-    public void onDrawingStep(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
+    public void onDrawingStep() {
+        //no-op
     }
 
     public void pause() {
@@ -180,14 +178,14 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
         onDrawingPause();
     }
 
-    @Override
     public void onDrawingPause() {
+        //no-op
     }
 
     public void stop() {
         pause();
         shutDownExecutioner();
-        onDrawingStop(rainbowInputController);
+        onDrawingStop();
     }
 
     private void shutDownExecutioner() {
@@ -199,8 +197,8 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
         }
     }
 
-    @Override
-    public void onDrawingStop(RainbowInputController rainbowInputController) {
+    public void onDrawingStop() {
+        //no-op
     }
 
     public void destroy() {
@@ -210,14 +208,15 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
         if (graphics != null) {
             graphics.dispose();
         }
+        drawingView = null;
         rainbowDrawer.setGraphics(null);
         rainbowDrawer = null;
         rainbowInputController = null;
         drawingTask = null;
     }
 
-    @Override
     public void onSketchDestroy() {
+        //no-op
     }
 
     /**
@@ -236,13 +235,12 @@ public class Rainbow implements RainbowConstants, RainbowLifeCycleCallback {
 
     /**
      * Used to retrieve a RainbowDrawer object.
-     *
+     * <p/>
      * If you need to call this manually, probably you will also need need to call
      * rainbowDrawer.beginDraw() and rainbowDrawer.endDraw() to make your drawing effective.
-     *
+     * <p/>
      * Also, be aware of drawing offline. Drawing outside of the UI thread is allowed here,
      * and long running drawings will block the UI thread.
-     *
      *
      * @return RainbowDrawer, used to draw into the rainbow sketch
      */

@@ -31,9 +31,13 @@ public class RainbowTextureView extends TextureView implements SurfaceTextureLis
     @Override
     public boolean onTouchEvent(final MotionEvent event) {
         RainbowInputController rainbowInputController = mRainbow.getRainbowInputController();
-        float px = rainbowInputController.getPreviousX();
-        float py = rainbowInputController.getPreviousY();
-        rainbowInputController.postEvent(RainbowEvent.from(event, px, py), mRainbow.getRainbowDrawer(), mRainbow.isRunning());
+
+        if (rainbowInputController != null) {
+            float px = rainbowInputController.getPreviousX();
+            float py = rainbowInputController.getPreviousY();
+            rainbowInputController.postEvent(RainbowEvent.from(event, px, py), mRainbow.getRainbowDrawer(), mRainbow.isRunning());
+        }
+
         return true;
     }
 

@@ -9,7 +9,6 @@ import com.juankysoriano.rainbow.core.extra.RainbowStyle;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics2D;
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;
-import com.juankysoriano.rainbow.core.listeners.LoadPictureListener;
 import com.juankysoriano.rainbow.core.matrix.RMatrix;
 import com.juankysoriano.rainbow.core.matrix.RMatrix2D;
 import com.juankysoriano.rainbow.core.matrix.RMatrix3D;
@@ -48,8 +47,13 @@ public class RainbowDrawer {
         return RainbowImage.blendColor(c1, c2, mode);
     }
 
-    public Context getContext() {
-        return graphics.parent.getContext();
+    public static RainbowGraphics createStandaloneGraphics(final int width, final int height) {
+        RainbowGraphics pg = new RainbowGraphics2D();
+        pg.setParent(null);
+        pg.setPrimary(false);
+        pg.setSize(width, height);
+
+        return pg;
     }
 
     public int[] getPixels() {
@@ -87,15 +91,6 @@ public class RainbowDrawer {
         return pg;
     }
 
-    public static RainbowGraphics createStandaloneGraphics(final int width, final int height) {
-        RainbowGraphics pg = new RainbowGraphics2D();
-        pg.setParent(null);
-        pg.setPrimary(false);
-        pg.setSize(width, height);
-
-        return pg;
-    }
-
     public RainbowImage createImage(final int wide, final int high, final int format) {
         final RainbowImage image = new RainbowImage(wide, high, format);
         image.parent = graphics.parent;
@@ -110,12 +105,16 @@ public class RainbowDrawer {
         graphics.save(getContext(), RainbowIO.savePath(getContext(), filename));
     }
 
-    public void loadImage(String path, int mode, LoadPictureListener listener) {
+    public Context getContext() {
+        return graphics.parent.getContext();
+    }
+
+    public void loadImage(String path, int mode, RainbowImage.LoadPictureListener listener) {
         Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), path, width, height, mode);
         loadImage(bitmap, listener);
     }
 
-    public void loadImage(Bitmap bitmap, LoadPictureListener listener) {
+    public void loadImage(Bitmap bitmap, RainbowImage.LoadPictureListener listener) {
         if (bitmap == null) {
             listener.onLoadFail();
         }
@@ -124,47 +123,47 @@ public class RainbowDrawer {
         listener.onLoadSucceed(image);
     }
 
-    public void loadImage(String path, int width, int height, LoadPictureListener listener) {
+    public void loadImage(String path, int width, int height, RainbowImage.LoadPictureListener listener) {
         Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), path, width, height);
         loadImage(bitmap, listener);
     }
 
-    public void loadImage(String path, int width, int height, int mode, LoadPictureListener listener) {
+    public void loadImage(String path, int width, int height, int mode, RainbowImage.LoadPictureListener listener) {
         Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), path, width, height, mode);
         loadImage(bitmap, listener);
     }
 
-    public void loadImage(int resID, int mode, LoadPictureListener listener) {
+    public void loadImage(int resID, int mode, RainbowImage.LoadPictureListener listener) {
         final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), resID, width, height, mode);
         loadImage(bitmap, listener);
     }
 
-    public void loadImage( int resID, int width, int height, LoadPictureListener listener) {
+    public void loadImage(int resID, int width, int height, RainbowImage.LoadPictureListener listener) {
         final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), resID, width, height);
         loadImage(bitmap, listener);
     }
 
-    public void loadImage(int resID, int width, int height, int mode, LoadPictureListener listener) {
+    public void loadImage(int resID, int width, int height, int mode, RainbowImage.LoadPictureListener listener) {
         final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), resID, width, height, mode);
         loadImage(bitmap, listener);
     }
 
-    public void loadImage(File file, int mode, LoadPictureListener listener) {
+    public void loadImage(File file, int mode, RainbowImage.LoadPictureListener listener) {
         final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), file, width, height, mode);
         loadImage(bitmap, listener);
     }
 
-    public void loadImage(File file, int width, int height, LoadPictureListener listener) {
+    public void loadImage(File file, int width, int height, RainbowImage.LoadPictureListener listener) {
         final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), file, width, height);
         loadImage(bitmap, listener);
     }
 
-    public void loadImage(Uri uri, int mode, LoadPictureListener listener) {
+    public void loadImage(Uri uri, int mode, RainbowImage.LoadPictureListener listener) {
         final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), uri, width, height, mode);
         loadImage(bitmap, listener);
     }
 
-    public void loadImage(Uri uri, int width, int height, LoadPictureListener listener) {
+    public void loadImage(Uri uri, int width, int height, RainbowImage.LoadPictureListener listener) {
         final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), uri, width, height);
         loadImage(bitmap, listener);
     }
@@ -1084,13 +1083,6 @@ public class RainbowDrawer {
     /**
      * Set the current transformation to the contents of the specified source.
      */
-    public void setMatrix(final RMatrix2D source) {
-        graphics.setMatrix(source);
-    }
-
-    /**
-     * Set the current transformation to the contents of the specified source.
-     */
     public void setMatrix(final RMatrix3D source) {
         graphics.setMatrix(source);
     }
@@ -1099,6 +1091,13 @@ public class RainbowDrawer {
      * Set the current transformation matrix to the contents of another.
      */
     public void setMatrix(final RMatrix source) {
+        graphics.setMatrix(source);
+    }
+
+    /**
+     * Set the current transformation to the contents of the specified source.
+     */
+    public void setMatrix(final RMatrix2D source) {
         graphics.setMatrix(source);
     }
 

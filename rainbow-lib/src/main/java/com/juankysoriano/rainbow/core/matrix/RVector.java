@@ -24,7 +24,6 @@
 package com.juankysoriano.rainbow.core.matrix;
 
 import com.juankysoriano.rainbow.core.Rainbow;
-import com.juankysoriano.rainbow.core.RainbowConstants;
 import com.juankysoriano.rainbow.utils.RainbowMath;
 
 import java.io.Serializable;
@@ -198,7 +197,7 @@ public final class RVector implements Serializable {
         if (parent == null) {
             return fromAngle((float) (Math.random() * Math.PI * 2), target);
         } else {
-            return fromAngle(RainbowMath.random(RainbowConstants.TWO_PI), target);
+            return fromAngle(RainbowMath.random(RainbowMath.TWO_PI), target);
         }
     }
 
@@ -253,7 +252,7 @@ public final class RVector implements Serializable {
             angle = (float) (Math.random() * Math.PI * 2);
             vz = (float) (Math.random() * 2 - 1);
         } else {
-            angle = RainbowMath.random(RainbowConstants.TWO_PI);
+            angle = RainbowMath.random(RainbowMath.TWO_PI);
             vz = RainbowMath.random(-1, 1);
         }
         float vx = (float) (Math.sqrt(1 - vz * vz) * Math.cos(angle));
@@ -509,7 +508,7 @@ public final class RVector implements Serializable {
         // Otherwise if outside the range, acos() will return NaN
         // http://www.cppreference.com/wiki/c/math/acos
         if (amt <= -1) {
-            return RainbowConstants.PI;
+            return RainbowMath.PI;
         } else if (amt >= 1) {
             // http://code.google.com/p/processing/issues/detail?id=435
             return 0;

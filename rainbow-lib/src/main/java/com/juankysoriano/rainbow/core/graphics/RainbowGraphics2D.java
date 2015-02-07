@@ -122,10 +122,9 @@ public class RainbowGraphics2D extends RainbowGraphics {
         if(primarySurface) {
             backgroundBitmap = RainbowBitmapUtils.getBitmap(parent.getDrawingView().getBackground());
             if (backgroundBitmap == null) {
-                backgroundBitmap = Bitmap.createBitmap(width, height, Config.ARGB_4444);
+                backgroundBitmap = Bitmap.createBitmap(width, height, Config.RGB_565);
             }
         }
-
 
         canvas = new Canvas(normalBitmap);
 
@@ -159,9 +158,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void dispose() {
-        canvas.setBitmap(null);
-        normalBitmap.recycle();
-        backgroundBitmap.recycle();
         normalBitmap = null;
         backgroundBitmap = null;
         canvas = null;
@@ -192,12 +188,11 @@ public class RainbowGraphics2D extends RainbowGraphics {
     @Override
     public synchronized void endDraw() {
         if (primarySurface) {
-            Canvas screen = parent.getDrawingView().lockCanvas(null);
+            Canvas screen = parent.getDrawingView().lockCanvas();
             if(screen != null) {
                 android.graphics.Matrix matrix = new android.graphics.Matrix();
                 screen.drawBitmap(normalBitmap, matrix, null);
                 parent.getDrawingView().unlockCanvasAndPost(screen);
-                screen.setBitmap(null);
             }
         } else {
             loadPixels();
@@ -568,13 +563,13 @@ public class RainbowGraphics2D extends RainbowGraphics {
     @Override
     protected void arcImpl(float x, float y, float w, float h, float start, float stop, int mode) {
 
-        if (stop - start >= TWO_PI) {
+        if (stop - start >= RainbowMath.TWO_PI) {
             ellipseImpl(x, y, w, h);
 
         } else {
 
-            start = start * RAD_TO_DEG;
-            stop = stop * RAD_TO_DEG;
+            start = start * RainbowMath.RAD_TO_DEG;
+            stop = stop * RainbowMath.RAD_TO_DEG;
 
             while (start < 0) {
                 start += 360;
@@ -726,7 +721,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void rotate(float angle) {
-        getCanvas().rotate(angle * RAD_TO_DEG);
+        getCanvas().rotate(angle * RainbowMath.RAD_TO_DEG);
     }
 
     @Override

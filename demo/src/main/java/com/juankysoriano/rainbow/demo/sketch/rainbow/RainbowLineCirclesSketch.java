@@ -6,41 +6,22 @@ import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.event.RainbowEvent;
 import com.juankysoriano.rainbow.core.event.RainbowInputController;
-import com.juankysoriano.rainbow.core.listeners.RainbowInteractionListener;
-import com.juankysoriano.rainbow.demo.R;
-import com.juankysoriano.rainbow.utils.RainbowMath;
+import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
 
-public class RainbowLineCirclesSketch extends Rainbow implements RainbowInteractionListener {
+public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputController.RainbowInteractionListener {
 
-    private static final int MAX_RADIUS = 200;
-    private static final int MIN_RADIUS = 1;
-    private static final int[] RAINBOW = {R.color.red, R.color.orange, R.color.yellow, R.color.green, R.color.blue, R.color.purple, R.color.white};
-    private int radius;
-    private int color;
-    private int colorIndex;
     private RainbowDrawer.PointDetectedListener pointDetectedListener = new RainbowDrawer.PointDetectedListener() {
 
         @Override
         public void onPointDetected(float x, float y, RainbowDrawer rainbowDrawer) {
-            int decodedColor = getContext().getResources().getColor(color);
 
-            updateRadiusAndColor();
-            drawEllipse(x, y, radius, decodedColor, rainbowDrawer);
-        }
-
-        private void updateRadiusAndColor() {
-            radius = RainbowMath.constrain(++radius, MIN_RADIUS, MAX_RADIUS);
-            if (radius == MAX_RADIUS) {
-                radius = MIN_RADIUS;
-                colorIndex++;
-                color = RAINBOW[colorIndex % RAINBOW.length];
-            }
+            drawEllipse(x, y, 250, 0, rainbowDrawer);
         }
 
         private void drawEllipse(float x, float y, float radius, int color, RainbowDrawer rainbowDrawer) {
-            rainbowDrawer.stroke(0, 60);
-            rainbowDrawer.fill(color, 190);
-            rainbowDrawer.ellipseMode(CENTER);
+            rainbowDrawer.stroke(0, 30);
+            rainbowDrawer.fill(0, 0);
+            rainbowDrawer.ellipseMode(RainbowGraphics.CENTER);
             rainbowDrawer.ellipse(x, y, radius, radius);
         }
 
@@ -51,19 +32,13 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInteract
     }
 
     @Override
-    public void onSketchSetup(RainbowDrawer rainbowDrawer) {
-        radius = MIN_RADIUS;
-        color = RAINBOW[colorIndex];
+    public void onDrawingStart() {
+        getRainbowInputController().setRainbowInteractionListener(this);
     }
 
     @Override
-    public void onDrawingStart(RainbowInputController rainbowInputController) {
-        rainbowInputController.setRainbowInteractionListener(this);
-    }
-
-    @Override
-    public void onDrawingStop(RainbowInputController rainbowInputController) {
-        rainbowInputController.removeSketchInteractionListener();
+    public void onDrawingStop() {
+        getRainbowInputController().removeSketchInteractionListener();
     }
 
     @Override
@@ -83,7 +58,13 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInteract
 
     @Override
     public void onFingerDragged(RainbowEvent event, RainbowDrawer rainbowDrawer) {
-        //no-op
+        RainbowInputController rainbowInputController = getRainbowInputController();
+        float x = rainbowInputController.getSmoothX();
+        float y = rainbowInputController.getSmoothY();
+        float oldX = rainbowInputController.getPreviousSmoothX();
+        float oldY = rainbowInputController.getPreviousSmoothY();
+
+        drawEllipsedLine(oldX, oldY, x, y);
     }
 
     private void drawEllipsedLine(float x1, float y1, float x2, float y2) {
@@ -93,6 +74,6 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInteract
 
     @Override
     public void onMotionEvent(RainbowEvent event, RainbowDrawer rainbowDrawer) {
-        drawEllipsedLine(event.getPreviousX(), event.getPreviousY(), event.getX(), event.getY());
+
     }
 }

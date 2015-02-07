@@ -6,10 +6,8 @@ import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.event.RainbowEvent;
 import com.juankysoriano.rainbow.core.event.RainbowInputController;
-import com.juankysoriano.rainbow.core.listeners.RainbowInteractionListener;
 
-public class RainbowParticleSystem extends Rainbow implements RainbowInteractionListener {
-    public static final int DEFAULT_FRAMERATE = 120;
+public class RainbowParticleSystem extends Rainbow implements RainbowInputController.RainbowInteractionListener {
     private ParticleWorld particleWorld;
 
     public RainbowParticleSystem(ViewGroup viewGroup) {
@@ -17,28 +15,28 @@ public class RainbowParticleSystem extends Rainbow implements RainbowInteraction
     }
 
     @Override
-    public void onSketchSetup(RainbowDrawer rainbowDrawer) {
-        rainbowDrawer.noSmooth();
-        rainbowDrawer.noFill();
-        frameRate(DEFAULT_FRAMERATE);
+    public void onSketchSetup() {
+        getRainbowDrawer().smooth();
+        getRainbowDrawer().noFill();
 
-        particleWorld = ParticleWorld.newInstance(rainbowDrawer.getWidth(), rainbowDrawer.getHeight());
-        particleWorld.displayNucleus(rainbowDrawer);
+        frameRate(200);
+        particleWorld = ParticleWorld.newInstance(getRainbowDrawer().getWidth(), getRainbowDrawer().getHeight());
+        particleWorld.displayNucleus(getRainbowDrawer());
     }
 
     @Override
-    public void onDrawingStart(RainbowInputController rainbowInputController) {
-        rainbowInputController.setRainbowInteractionListener(this);
+    public void onDrawingStart() {
+        getRainbowInputController().setRainbowInteractionListener(this);
     }
 
     @Override
-    public void onDrawingStep(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
-        particleWorld.updateAndDisplay(rainbowDrawer);
+    public void onDrawingStep() {
+        particleWorld.updateAndDisplay(getRainbowDrawer());
     }
 
     @Override
-    public void onDrawingStop(RainbowInputController rainbowInputController) {
-        rainbowInputController.removeSketchInteractionListener();
+    public void onDrawingStop() {
+        getRainbowInputController().removeSketchInteractionListener();
     }
 
     @Override

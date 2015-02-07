@@ -9,7 +9,7 @@ import android.hardware.Camera;
 import android.media.ExifInterface;
 import android.net.Uri;
 
-import com.juankysoriano.rainbow.core.Rainbow;
+import com.juankysoriano.rainbow.core.graphics.RainbowImage;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -28,13 +28,15 @@ public class RainbowBitmapUtils {
     }
 
     public static Bitmap getMutableBitmap(Drawable drawable) {
+        if(drawable == null) {
+            return null;
+        }
 
         if (drawable.getIntrinsicHeight() > 0 && drawable.getIntrinsicWidth() > 0) {
-            Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.RGB_565);
+            Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_4444);
             Canvas canvas = new Canvas(bitmap);
             drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
             drawable.draw(canvas);
-
             return bitmap;
         }
 
@@ -83,11 +85,11 @@ public class RainbowBitmapUtils {
 
     public static Bitmap getBitmap(Context context, int resId, int reqWidth, int reqHeight, int mode) {
         try {
-            if (mode == Rainbow.LOAD_CENTER_CROP) {
+            if (mode == RainbowImage.LOAD_CENTER_CROP) {
                 return Picasso.with(context).load(resId).resize(reqWidth, reqHeight).centerCrop().get();
-            } else if (mode == Rainbow.LOAD_CENTER_INSIDE) {
+            } else if (mode == RainbowImage.LOAD_CENTER_INSIDE) {
                 return Picasso.with(context).load(resId).resize(reqWidth, reqHeight).centerInside().get();
-            } else if (mode == Rainbow.LOAD_ORIGINAL_SIZE) {
+            } else if (mode == RainbowImage.LOAD_ORIGINAL_SIZE) {
                 return Picasso.with(context).load(resId).get();
             }
         } catch (IOException e) {
@@ -99,19 +101,19 @@ public class RainbowBitmapUtils {
     public static Bitmap getBitmap(Context context, String path, int reqWidth, int reqHeight, int mode) {
         try {
             if (path.startsWith("http")) {
-                if (mode == Rainbow.LOAD_CENTER_CROP) {
+                if (mode == RainbowImage.LOAD_CENTER_CROP) {
                     return Picasso.with(context).load(path).resize(reqWidth, reqHeight).centerCrop().get();
-                } else if (mode == Rainbow.LOAD_CENTER_INSIDE) {
+                } else if (mode == RainbowImage.LOAD_CENTER_INSIDE) {
                     return Picasso.with(context).load(path).resize(reqWidth, reqHeight).centerInside().get();
-                } else if (mode == Rainbow.LOAD_ORIGINAL_SIZE) {
+                } else if (mode == RainbowImage.LOAD_ORIGINAL_SIZE) {
                     return Picasso.with(context).load(path).get();
                 }
             } else {
-                if (mode == Rainbow.LOAD_CENTER_CROP) {
+                if (mode == RainbowImage.LOAD_CENTER_CROP) {
                     return Picasso.with(context).load("file:" + path).resize(reqWidth, reqHeight).centerCrop().get();
-                } else if (mode == Rainbow.LOAD_CENTER_INSIDE) {
+                } else if (mode == RainbowImage.LOAD_CENTER_INSIDE) {
                     return Picasso.with(context).load("file:" + path).resize(reqWidth, reqHeight).centerInside().get();
-                } else if (mode == Rainbow.LOAD_ORIGINAL_SIZE) {
+                } else if (mode == RainbowImage.LOAD_ORIGINAL_SIZE) {
                     return Picasso.with(context).load("file:" + path).get();
                 }
             }
@@ -123,11 +125,11 @@ public class RainbowBitmapUtils {
 
     public static Bitmap getBitmap(Context context, File file, int reqWidth, int reqHeight, int mode) {
         try {
-            if (mode == Rainbow.LOAD_CENTER_CROP) {
+            if (mode == RainbowImage.LOAD_CENTER_CROP) {
                 return Picasso.with(context).load(file).resize(reqWidth, reqHeight).centerCrop().get();
-            } else if (mode == Rainbow.LOAD_CENTER_INSIDE) {
+            } else if (mode == RainbowImage.LOAD_CENTER_INSIDE) {
                 return Picasso.with(context).load(file).resize(reqWidth, reqHeight).centerInside().get();
-            } else if (mode == Rainbow.LOAD_ORIGINAL_SIZE) {
+            } else if (mode == RainbowImage.LOAD_ORIGINAL_SIZE) {
                 return Picasso.with(context).load(file).get();
             }
         } catch (IOException e) {
@@ -138,11 +140,11 @@ public class RainbowBitmapUtils {
 
     public static Bitmap getBitmap(Context context, Uri uri, int reqWidth, int reqHeight, int mode) {
         try {
-            if (mode == Rainbow.LOAD_CENTER_CROP) {
+            if (mode == RainbowImage.LOAD_CENTER_CROP) {
                 return Picasso.with(context).load(uri).resize(reqWidth, reqHeight).centerCrop().get();
-            } else if (mode == Rainbow.LOAD_CENTER_INSIDE) {
+            } else if (mode == RainbowImage.LOAD_CENTER_INSIDE) {
                 return Picasso.with(context).load(uri).resize(reqWidth, reqHeight).centerInside().get();
-            } else if (mode == Rainbow.LOAD_ORIGINAL_SIZE) {
+            } else if (mode == RainbowImage.LOAD_ORIGINAL_SIZE) {
                 return Picasso.with(context).load(uri).get();
             }
         } catch (IOException e) {

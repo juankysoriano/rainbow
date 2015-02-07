@@ -26,7 +26,6 @@ package com.juankysoriano.rainbow.core.graphics;
 import android.graphics.Color;
 
 import com.juankysoriano.rainbow.core.Rainbow;
-import com.juankysoriano.rainbow.core.RainbowConstants;
 import com.juankysoriano.rainbow.core.extra.RainbowStyle;
 import com.juankysoriano.rainbow.core.matrix.RMatrix;
 import com.juankysoriano.rainbow.core.matrix.RMatrix2D;
@@ -115,45 +114,119 @@ import java.util.WeakHashMap;
  * translation issues), while targeting them for their separate audiences. Ouch.
  */
 
-public abstract class RainbowGraphics extends RainbowImage implements RainbowConstants {
+public abstract class RainbowGraphics extends RainbowImage {
 
     public static final int VERTEX_FIELD_COUNT = 37;
     public static final float cosLUT[];
-    private static final int R = 3;
-    private static final int G = 4;
-    private static final int B = 5;
-    private static final int A = 6;
-    private static final int U = 7;
-    private static final int V = 8;
-    private static final int NX = 9;
-    private static final int NY = 10;
-    private static final int NZ = 11;
-    private static final int EDGE = 12;
-    private static final int SR = 13;
-    private static final int SG = 14;
-    private static final int SB = 15;
-    private static final int SA = 16;
-    private static final int SW = 17;
-    private static final int HAS_NORMAL = 36;
-    private static final float DEFAULT_STROKE_WEIGHT = 1;
-    public float strokeWeight = DEFAULT_STROKE_WEIGHT;
-    private static final int DEFAULT_STROKE_JOIN = MITER;
-    public int strokeJoin = DEFAULT_STROKE_JOIN;
-    private static final int DEFAULT_STROKE_CAP = ROUND;
+    public static final int R = 3;
+    public static final int G = 4;
+    public static final int B = 5;
+    public static final int A = 6;
+    public static final int U = 7;
+    public static final int V = 8;
+    public static final int NX = 9;
+    public static final int NY = 10;
+    public static final int NZ = 11;
+    public static final int EDGE = 12;
+    public static final int SR = 13;
+    public static final int SG = 14;
+    public static final int SB = 15;
+    public static final int SA = 16;
+    public static final int SW = 17;
+    public static final int HAS_NORMAL = 36;
+    public static final int ROUND = 1 << 1;
+    public static final int DEFAULT_STROKE_CAP = ROUND;
     public int strokeCap = DEFAULT_STROKE_CAP;
-    private static final float[] sinLUT;
-    private static final float SINCOS_PRECISION = 0.5f;
+    public static final int PROJECT = 1 << 2;  // called 'square' in the svg spec
+    public static final int MITER = 1 << 3;
+    public static final int DEFAULT_STROKE_JOIN = MITER;
+    public int strokeJoin = DEFAULT_STROKE_JOIN;
+    public static final float DEFAULT_STROKE_WEIGHT = 1;
+    public float strokeWeight = DEFAULT_STROKE_WEIGHT;
+    public static final float[] sinLUT;
+    public static final float SINCOS_PRECISION = 0.5f;
     public static final int SINCOS_LENGTH = (int) (360f / SINCOS_PRECISION);
+    public static final int X = 0;  // model coords xyz (formerly MX/MY/MZ)
+    public static final int Y = 1;
+    public static final int Z = 2;
+    /**
+     * Draw mode convention to use (x, y) to (width, height)
+     */
+    public static final int CORNER = 0;
+    /**
+     * The current image alignment (read-only)
+     */
+    private int imageMode = CORNER;
+    /**
+     * Draw mode convention to use (x1, y1) to (x2, y2) coordinates
+     */
+    public static final int CORNERS = 1;
+    /**
+     * Draw mode from the center, and using the radius
+     */
+    public static final int RADIUS = 2;
+    /**
+     * Draw from the center, using second pair of values as the diameter.
+     * Formerly called CENTER_DIAMETER in alpha releases.
+     */
+    public static final int CENTER = 3;
+
+    // arc drawing modes
+    /**
+     * Synonym for the CENTER constant. Draw from the center,
+     * using second pair of values as the diameter.
+     */
+    public static final int DIAMETER = 3;
+    public static final int CHORD = 2;
+
+    // vertically alignment modes for text
+    public static final int PIE = 3;
+
+    // error messages
+    /**
+     * texture coordinates based on image width/height
+     */
+    public static final int IMAGE = 2;
+    /**
+     * Sets whether texture coordinates passed to vertex() calls will be based
+     * on coordinates that are based on the IMAGE or NORMALIZED.
+     */
+    private int textureMode = IMAGE;
+    public static final int RGB = 1;  // image & color
+    public static final int ARGB = 2;  // image
+    public static final int HSB = 3;  // color
+    public static final int ALPHA = 4;  // image
+    public static final int CLEAR = -200;
+
+    public static final int POINTS = 3;   // vertices
+
+    public static final int LINES = 5;   // beginShape(), createShape()
+    public static final int TRIANGLES = 9;   // vertices
+    public static final int TRIANGLE_STRIP = 10;  // vertices
+    public static final int TRIANGLE_FAN = 11;  // vertices
+    public static final int QUAD = 16;  // primitive
+    public static final int QUADS = 17;  // vertices
+    public static final int QUAD_STRIP = 18;  // vertices
+    public static final int POLYGON = 20;  // in the end, probably cannot
+
+    // shape closing modes
+
+    public static final int OPEN = 1;
+    public static final int CLOSE = 2;
 
     static {
         sinLUT = new float[SINCOS_LENGTH];
         cosLUT = new float[SINCOS_LENGTH];
         for (int i = 0; i < SINCOS_LENGTH; i++) {
-            sinLUT[i] = (float) Math.sin(i * DEG_TO_RAD * SINCOS_PRECISION);
-            cosLUT[i] = (float) Math.cos(i * DEG_TO_RAD * SINCOS_PRECISION);
+            sinLUT[i] = (float) Math.sin(i * RainbowMath.DEG_TO_RAD * SINCOS_PRECISION);
+            cosLUT[i] = (float) Math.cos(i * RainbowMath.DEG_TO_RAD * SINCOS_PRECISION);
         }
     }
 
+    private static final String ERROR_BACKGROUND_IMAGE_SIZE =
+            "background image must be the same size as your application";
+    private static final String ERROR_BACKGROUND_IMAGE_FORMAT =
+            "background images should be RGB or ARGB";
     private static final int NORMAL_MODE_AUTO = 0;
     private static final int NORMAL_MODE_SHAPE = 1;
     private static final int NORMAL_MODE_VERTEX = 2;
@@ -165,15 +238,11 @@ public abstract class RainbowGraphics extends RainbowImage implements RainbowCon
     private static float[] lerpColorHSB1;
     private static float[] lerpColorHSB2;
     private static float[] lerpColorHSB3;
-
     private final WeakHashMap<RainbowImage, Object> cacheMap = new WeakHashMap<RainbowImage, Object>();
-
     private final RMatrix3D bezierBasisMatrix = new RMatrix3D(-1, 3, -3, 1, 3, -6, 3, 0, -3, 3, 0, 0, 1, 0, 0, 0);
-
     private final float[] cacheHsbValue = new float[3];
     public int pixelCount;
     public boolean smooth = false;
-
     /**
      * True if tint() is enabled (read-only).
      * <p/>
@@ -191,6 +260,10 @@ public abstract class RainbowGraphics extends RainbowImage implements RainbowCon
      * true if fill() is enabled, (read-only)
      */
     public boolean fill;
+
+    // ........................................................
+
+    // Additional stroke properties
     /**
      * fill that was last set (read-only)
      */
@@ -199,10 +272,6 @@ public abstract class RainbowGraphics extends RainbowImage implements RainbowCon
      * true if stroke() is enabled, (read-only)
      */
     public boolean stroke;
-
-    // ........................................................
-
-    // Additional stroke properties
     /**
      * stroke that was last set (read-only)
      */
@@ -211,9 +280,7 @@ public abstract class RainbowGraphics extends RainbowImage implements RainbowCon
      * Last background color that was set, zero if an image
      */
     public int backgroundColor = 0xffCCCCCC;
-
     protected int quality;
-
     /**
      * true if this is the main drawing surface for a particular sketch. This
      * would be set to false for an offscreen buffer or if it were created any
@@ -229,7 +296,6 @@ public abstract class RainbowGraphics extends RainbowImage implements RainbowCon
     protected int vertexCount; // total number of vertices
     protected RMatrix3D curveToBezierMatrix;
     protected int curveVertexCount;
-
     /**
      * The current colorMode
      */
@@ -262,10 +328,6 @@ public abstract class RainbowGraphics extends RainbowImage implements RainbowCon
      * The current shape alignment mode (read-only)
      */
     private int shapeMode;
-    /**
-     * The current image alignment (read-only)
-     */
-    private int imageMode = CORNER;
     private float ambientR;
     private float ambientG;
     private float ambientB;
@@ -279,7 +341,6 @@ public abstract class RainbowGraphics extends RainbowImage implements RainbowCon
     private int bezierDetail = 20;
     private int curveDetail = 20;
     private float curveTightness = 0;
-    private boolean edge = true;
 
     /**
      * Array of hint[] items. These are hacks to get around various temporary
@@ -293,17 +354,13 @@ public abstract class RainbowGraphics extends RainbowImage implements RainbowCon
      * The hints[] array is allocated early on because it might be used inside
      * beginDraw(), allocate(), etc.
      */
+    private boolean edge = true;
     /**
      * Current normal vector.
      */
     private float normalX;
     private float normalY;
     private float normalZ;
-    /**
-     * Sets whether texture coordinates passed to vertex() calls will be based
-     * on coordinates that are based on the IMAGE or NORMALIZED.
-     */
-    private int textureMode = IMAGE;
     /**
      * Current horizontal coordinate for texture, will always be between 0 and
      * 1, even if using textureMode(IMAGE).
@@ -698,7 +755,7 @@ public abstract class RainbowGraphics extends RainbowImage implements RainbowCon
         if (shape == POLYGON) {
             if (vertexCount > 0) {
                 float pvertex[] = vertices[vertexCount - 1];
-                if ((Math.abs(pvertex[X] - x) < EPSILON) && (Math.abs(pvertex[Y] - y) < EPSILON) && (Math.abs(pvertex[Z] - z) < EPSILON)) {
+                if ((Math.abs(pvertex[X] - x) < RainbowMath.EPSILON) && (Math.abs(pvertex[Y] - y) < RainbowMath.EPSILON) && (Math.abs(pvertex[Z] - z) < RainbowMath.EPSILON)) {
                     return;
                 }
             }
@@ -747,10 +804,10 @@ public abstract class RainbowGraphics extends RainbowImage implements RainbowCon
 
         if (autoNormal) {
             float norm2 = normalX * normalX + normalY * normalY + normalZ * normalZ;
-            if (norm2 < EPSILON) {
+            if (norm2 < RainbowMath.EPSILON) {
                 vertex[HAS_NORMAL] = 0;
             } else {
-                if (Math.abs(norm2 - 1) > EPSILON) {
+                if (Math.abs(norm2 - 1) > RainbowMath.EPSILON) {
                     float norm = RainbowMath.sqrt(norm2);
                     normalX /= norm;
                     normalY /= norm;
@@ -1024,10 +1081,10 @@ public abstract class RainbowGraphics extends RainbowImage implements RainbowCon
 
         if (autoNormal) {
             float norm2 = normalX * normalX + normalY * normalY + normalZ * normalZ;
-            if (norm2 < EPSILON) {
+            if (norm2 < RainbowMath.EPSILON) {
                 vertex[HAS_NORMAL] = 0;
             } else {
-                if (Math.abs(norm2 - 1) > EPSILON) {
+                if (Math.abs(norm2 - 1) > RainbowMath.EPSILON) {
                     // The normal vector is not normalized.
                     float norm = RainbowMath.sqrt(norm2);
                     normalX /= norm;
@@ -1359,13 +1416,13 @@ public abstract class RainbowGraphics extends RainbowImage implements RainbowCon
             if (stop > start) {
                 // make sure that we're starting at a useful point
                 while (start < 0) {
-                    start += TWO_PI;
-                    stop += TWO_PI;
+                    start += RainbowMath.TWO_PI;
+                    stop += RainbowMath.TWO_PI;
                 }
 
-                if (stop - start > TWO_PI) {
+                if (stop - start > RainbowMath.TWO_PI) {
                     start = 0;
-                    stop = TWO_PI;
+                    stop = RainbowMath.TWO_PI;
                 }
                 arcImpl(x, y, w, h, start, stop, mode);
             }
@@ -2377,13 +2434,6 @@ public abstract class RainbowGraphics extends RainbowImage implements RainbowCon
     }
 
     /**
-     * Set the current transformation to the contents of the specified source.
-     */
-    public void setMatrix(RMatrix3D source) {
-        showMissingWarning("setMatrix");
-    }
-
-    /**
      * Set the current transformation matrix to the contents of another.
      */
     public void setMatrix(RMatrix source) {
@@ -2398,6 +2448,13 @@ public abstract class RainbowGraphics extends RainbowImage implements RainbowCon
      * Set the current transformation to the contents of the specified source.
      */
     public void setMatrix(RMatrix2D source) {
+        showMissingWarning("setMatrix");
+    }
+
+    /**
+     * Set the current transformation to the contents of the specified source.
+     */
+    public void setMatrix(RMatrix3D source) {
         showMissingWarning("setMatrix");
     }
 
@@ -3593,4 +3650,5 @@ public abstract class RainbowGraphics extends RainbowImage implements RainbowCon
     public boolean isGL() {
         return false;
     }
+
 }

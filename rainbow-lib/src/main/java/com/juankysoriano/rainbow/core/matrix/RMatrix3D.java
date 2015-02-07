@@ -22,7 +22,6 @@
 
 package com.juankysoriano.rainbow.core.matrix;
 
-import com.juankysoriano.rainbow.core.RainbowConstants;
 import com.juankysoriano.rainbow.utils.RainbowMath;
 
 /**
@@ -253,12 +252,12 @@ public final class RMatrix3D implements RMatrix /* , PConstants */ {
 
     public void rotate(float angle, float v0, float v1, float v2) {
         float norm2 = v0 * v0 + v1 * v1 + v2 * v2;
-        if (norm2 < RainbowConstants.EPSILON) {
+        if (norm2 < RainbowMath.EPSILON) {
             // The vector is zero, cannot apply rotation.
             return;
         }
 
-        if (Math.abs(norm2 - 1) > RainbowConstants.EPSILON) {
+        if (Math.abs(norm2 - 1) > RainbowMath.EPSILON) {
             // The rotation vector is not normalized.
             float norm = RainbowMath.sqrt(norm2);
             v0 /= norm;

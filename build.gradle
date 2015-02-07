@@ -15,8 +15,8 @@ repositories {
 }
 
 ext {
-    COMPILE_SDK = 20
-    TARGET_SDK = 20
+    COMPILE_SDK = 21
+    TARGET_SDK = 17
     MIN_SDK = 16
     BUILD_TOOLS = '20.0.0'
     VERSION_CODE =

@@ -18,8 +18,8 @@ android {
     buildToolsVersion '20.0.0'
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 20
+        minSdkVersion rootProject.ext.MIN_SDK
+        targetSdkVersion rootProject.ext.TARGET_SDK
         versionCode 1914090
         versionName "0.8.0"
     }
