@@ -129,19 +129,19 @@ public class RainbowInputController {
         }
     }
 
-    public float getPredictiveX() {
+    public float getSmoothX() {
         return fingerPositionPredictor.getX();
     }
 
-    public float getPredictiveY() {
+    public float getSmoothY() {
         return fingerPositionPredictor.getY();
     }
 
-    public float getPreviousPredictiveX() {
+    public float getPreviousSmoothX() {
         return fingerPositionPredictor.getOldX();
     }
 
-    public float getPreviousPredictiveY() {
+    public float getPreviousSmoothY() {
         return fingerPositionPredictor.getOldY();
     }
 
