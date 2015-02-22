@@ -39,7 +39,6 @@ import android.graphics.drawable.Drawable;
 import com.juankysoriano.rainbow.core.matrix.RMatrix;
 import com.juankysoriano.rainbow.core.matrix.RMatrix2D;
 import com.juankysoriano.rainbow.core.matrix.RMatrix3D;
-import com.juankysoriano.rainbow.utils.RainbowBitmapUtils;
 import com.juankysoriano.rainbow.utils.RainbowMath;
 
 /**
@@ -111,7 +110,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     protected void allocate() {
         initBitmaps();
         initPaints();
-        if(primarySurface) {
+        if (primarySurface) {
             initShaders();
         }
     }
@@ -119,16 +118,9 @@ public class RainbowGraphics2D extends RainbowGraphics {
     private void initBitmaps() {
         normalBitmap = Bitmap.createBitmap(width, height, Config.ARGB_4444);
 
-        if(primarySurface) {
-            backgroundBitmap = RainbowBitmapUtils.getBitmap(parent.getDrawingView().getBackground());
-            if (backgroundBitmap == null) {
-                backgroundBitmap = Bitmap.createBitmap(width, height, Config.RGB_565);
-            }
-        }
-
         canvas = new Canvas(normalBitmap);
 
-        if(primarySurface) {
+        if (primarySurface) {
             Drawable parentBackground = parent.getDrawingView().getBackground();
             if (parentBackground != null) {
                 parentBackground.setBounds(0, 0, width, height);
@@ -150,7 +142,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     private void initShaders() {
-        backgroundBitmapShader = new BitmapShader(backgroundBitmap,
+        backgroundBitmapShader = new BitmapShader(Bitmap.createBitmap(normalBitmap),
                 BitmapShader.TileMode.REPEAT,
                 BitmapShader.TileMode.REPEAT);
         clearingFillPaint.setShader(backgroundBitmapShader);
@@ -189,7 +181,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     public synchronized void endDraw() {
         if (primarySurface) {
             Canvas screen = parent.getDrawingView().lockCanvas();
-            if(screen != null) {
+            if (screen != null) {
                 android.graphics.Matrix matrix = new android.graphics.Matrix();
                 screen.drawBitmap(normalBitmap, matrix, null);
                 parent.getDrawingView().unlockCanvasAndPost(screen);
