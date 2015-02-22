@@ -2,7 +2,6 @@ package com.juankysoriano.rainbow.demo.sketch.rainbow.forces;
 
 import android.content.res.Resources;
 
-import com.juankysoriano.rainbow.core.RainbowConstants;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.matrix.RVector;
 import com.juankysoriano.rainbow.demo.R;
@@ -67,7 +66,7 @@ public class Particle {
 
     public void resetTo(Nucleus nucleus) {
         RVector nucleusPosition = nucleus.getPosition();
-        float alpha = random(RainbowConstants.TWO_PI);
+        float alpha = random(RainbowMath.TWO_PI);
         location.set(nucleusPosition.x + (cos(alpha)), nucleusPosition.y + (sin(alpha)), nucleusPosition.z + (random(-1, 1)));
         speed.set(random(-1, 1), random(-1, 1), random(-1, 1));
         diameter = location.z * RADIUS_FACTOR;
