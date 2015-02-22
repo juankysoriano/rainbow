@@ -4,7 +4,6 @@ import android.graphics.SurfaceTexture;
 import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.TextureView.SurfaceTextureListener;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.core.Rainbow;
@@ -15,17 +14,12 @@ public class RainbowTextureView extends TextureView implements SurfaceTextureLis
     Rainbow mRainbow;
 
     public RainbowTextureView(ViewGroup parent, Rainbow rainbow) {
-        super(parent.getContext().getApplicationContext());
-        setBackground(parent.getBackground());
-        setMeasuredDimension(parent.getMeasuredWidth(), parent.getMeasuredHeight());
+        super(parent.getContext());
         mRainbow = rainbow;
 
-        setFocusable(true);
-        setFocusableInTouchMode(true);
-        requestFocus();
         setSurfaceTextureListener(this);
-        parent.addView(this);
-        setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        parent.addView(this, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        setBackground(parent.getBackground());
     }
 
     @Override
@@ -35,7 +29,7 @@ public class RainbowTextureView extends TextureView implements SurfaceTextureLis
         if (rainbowInputController != null) {
             float px = rainbowInputController.getPreviousX();
             float py = rainbowInputController.getPreviousY();
-            rainbowInputController.postEvent(RainbowEvent.from(event, px, py), mRainbow.getRainbowDrawer(), mRainbow.isRunning());
+            rainbowInputController.postEvent(RainbowEvent.from(event, px, py), mRainbow.getRainbowDrawer());
         }
 
         return true;
