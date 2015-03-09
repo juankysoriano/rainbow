@@ -5,21 +5,17 @@ import com.juankysoriano.rainbow.utils.RainbowMath;
 public class LineExplorer {
     private static final float STEP = 3;
 
-    public void exploreLine(final float px,
-                            final float py,
-                            final float x,
-                            final float y,
-                            final RainbowDrawer rainbowDrawer,
-                            final RainbowDrawer.PointDetectedListener listener) {
-        if (x == px && y == py) {
-            doProcessOnPoint(x, y, rainbowDrawer, listener);
-        }
+    public void exploreLine(float px,
+                            float py,
+                            float x,
+                            float y,
+                            RainbowDrawer rainbowDrawer,
+                            RainbowDrawer.PointDetectedListener listener) {
 
         float dx = x - px;
         float dy = y - py;
         if (isVerticalLine(x, px)) {
             processVerticalLine(x, y, py, rainbowDrawer, listener);
-            return;
         } else {
             float k = dy / dx;
             float m = y - x * k;
@@ -37,7 +33,7 @@ public class LineExplorer {
     }
 
     private boolean isVerticalLine(float x, float px) {
-        return x - px == 0;
+        return x == px;
     }
 
     private void processVerticalLine(float x, float y, float py, RainbowDrawer rainbowDrawer, RainbowDrawer.PointDetectedListener listener) {

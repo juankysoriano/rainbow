@@ -7,7 +7,6 @@ import android.view.TextureView.SurfaceTextureListener;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.core.Rainbow;
-import com.juankysoriano.rainbow.core.event.RainbowEvent;
 import com.juankysoriano.rainbow.core.event.RainbowInputController;
 
 public class RainbowTextureView extends TextureView implements SurfaceTextureListener {
@@ -27,9 +26,7 @@ public class RainbowTextureView extends TextureView implements SurfaceTextureLis
         RainbowInputController rainbowInputController = mRainbow.getRainbowInputController();
 
         if (rainbowInputController != null) {
-            float px = rainbowInputController.getPreviousX();
-            float py = rainbowInputController.getPreviousY();
-            rainbowInputController.postEvent(RainbowEvent.from(event, px, py), mRainbow.getRainbowDrawer());
+            rainbowInputController.postEvent(event, mRainbow.getRainbowDrawer());
         }
 
         return true;
@@ -37,12 +34,12 @@ public class RainbowTextureView extends TextureView implements SurfaceTextureLis
 
     @Override
     public void onSurfaceTextureAvailable(final SurfaceTexture surface, final int width, final int height) {
-        onSurfaceTextureSizeChanged(surface, width, height);
+        //no-op
     }
 
     @Override
     public void onSurfaceTextureSizeChanged(final SurfaceTexture surface, final int width, final int height) {
-        mRainbow.invalidate();
+        //no-op
     }
 
     @Override
@@ -52,5 +49,6 @@ public class RainbowTextureView extends TextureView implements SurfaceTextureLis
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+        //no-op
     }
 }

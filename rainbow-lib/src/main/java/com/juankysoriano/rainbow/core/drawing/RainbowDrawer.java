@@ -818,7 +818,6 @@ public class RainbowDrawer {
                        final float z4) {
         graphics.bezier(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4);
     }
-
     /**
      * Get a location along a catmull-rom curve segment.
      *
