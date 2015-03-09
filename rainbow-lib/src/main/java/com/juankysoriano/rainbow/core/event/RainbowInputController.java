@@ -19,7 +19,7 @@ public class RainbowInputController {
         x = y = px = py = -1;
     }
 
-    public void postEvent(final RainbowEvent motionEvent, final RainbowDrawer rainbowDrawer) {
+    public void postEvent(final MotionEvent motionEvent, final RainbowDrawer rainbowDrawer) {
         AsyncTask<Void, Void, Void> postTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -34,10 +34,9 @@ public class RainbowInputController {
         };
 
         postTask.execute();
-
     }
 
-    private void preHandleEvent(RainbowEvent event) {
+    private void preHandleEvent(MotionEvent event) {
         if ((event.getAction() == MotionEvent.ACTION_DOWN)
                 || (event.getAction() == MotionEvent.ACTION_UP)
                 || event.getAction() == MotionEvent.ACTION_MOVE) {
@@ -48,12 +47,12 @@ public class RainbowInputController {
         }
     }
 
-    private void handleSketchEvent(final RainbowEvent event, final RainbowDrawer rainbowDrawer) {
+    private void handleSketchEvent(final MotionEvent event, final RainbowDrawer rainbowDrawer) {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 screenTouched = true;
-                fingerPositionPredictor.resetTo(event.getX(), event.getY());
+                fingerPositionPredictor.resetTo(x, y);
                 if (hasInteractionListener()) {
                     rainbowInteractionListener.onSketchTouched(event, rainbowDrawer);
                 }
@@ -66,10 +65,20 @@ public class RainbowInputController {
                 break;
             case MotionEvent.ACTION_MOVE:
                 screenTouched = true;
-                fingerPositionPredictor.moveTo(event.getX(), event.getY());
-                if (hasInteractionListener()) {
-                    rainbowInteractionListener.onFingerDragged(event, rainbowDrawer);
-                }
+
+                float startX = px;
+                float startY = py;
+                float lowMiddleX = px + (x - px) / 3;
+                float lowMiddleY = py + (y - py) / 3;
+                float highMiddleX = px + 2 * (x - px) / 3;
+                float highMiddleY = py + 2 * (y - py) / 3;
+                float endX = x;
+                float endY = y;
+
+                notifyFingerDraggedFor(startX, startY, lowMiddleX, lowMiddleY, event, rainbowDrawer);
+                notifyFingerDraggedFor(lowMiddleX, lowMiddleY, highMiddleX, highMiddleY, event, rainbowDrawer);
+                notifyFingerDraggedFor(highMiddleX, highMiddleY, endX, endY, event, rainbowDrawer);
+
                 break;
         }
 
@@ -78,11 +87,23 @@ public class RainbowInputController {
         }
     }
 
+    private void notifyFingerDraggedFor(float px, float py, float x, float y, MotionEvent event, RainbowDrawer rainbowDrawer) {
+        this.px = px;
+        this.py = py;
+        this.x = x;
+        this.y = y;
+        fingerPositionPredictor.moveTo(x, y);
+        if (hasInteractionListener()) {
+            event.setLocation(x, y);
+            rainbowInteractionListener.onFingerDragged(event, rainbowDrawer);
+        }
+    }
+
     public boolean isScreenTouched() {
         return screenTouched;
     }
 
-    private void postHandleEvent(RainbowEvent event) {
+    private void postHandleEvent(MotionEvent event) {
         if ((event.getAction() == MotionEvent.ACTION_DOWN)
                 || (event.getAction() == MotionEvent.ACTION_UP)
                 || event.getAction() == MotionEvent.ACTION_MOVE) {
@@ -184,16 +205,16 @@ public class RainbowInputController {
     }
 
     public enum MovementDirection {
-        UP, DOWN, LEFT, RIGHT;
+        UP, DOWN, LEFT, RIGHT
     }
 
     public static interface RainbowInteractionListener {
-        void onSketchTouched(final RainbowEvent event, final RainbowDrawer rainbowDrawer);
+        void onSketchTouched(final MotionEvent event, final RainbowDrawer rainbowDrawer);
 
-        void onSketchReleased(final RainbowEvent event, final RainbowDrawer rainbowDrawer);
+        void onSketchReleased(final MotionEvent event, final RainbowDrawer rainbowDrawer);
 
-        void onFingerDragged(final RainbowEvent event, final RainbowDrawer rainbowDrawer);
+        void onFingerDragged(final MotionEvent event, final RainbowDrawer rainbowDrawer);
 
-        void onMotionEvent(final RainbowEvent event, final RainbowDrawer rainbowDrawer);
+        void onMotionEvent(final MotionEvent event, final RainbowDrawer rainbowDrawer);
     }
 }
