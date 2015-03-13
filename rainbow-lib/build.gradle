@@ -23,14 +23,19 @@ android {
         targetSdkVersion rootProject.ext.TARGET_SDK
         versionCode rootProject.ext.VERSION_CODE
         versionName rootProject.ext.VERSION_NAME
+
+        proguardFile getDefaultProguardFile('proguard-android.txt')
+        proguardFile 'proguard-rules.pro'
+
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            shrinkResources true
         }
         debug {
+            jniDebuggable false
             minifyEnabled false
         }
     }
