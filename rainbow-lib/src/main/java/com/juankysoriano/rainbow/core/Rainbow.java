@@ -131,11 +131,13 @@ public class Rainbow implements PaintStepListener {
     }
 
     public void resume() {
-        onDrawingResume();
-        paused = false;
-        if (drawingScheduler == null || drawingScheduler.isTerminated()) {
-            drawingScheduler = Executors.newSingleThreadScheduledExecutor();
-            drawingScheduler.scheduleAtFixedRate(drawingTask, 0, drawingTask.getDelay(), TimeUnit.MILLISECONDS);
+        if(paused) {
+            onDrawingResume();
+            paused = false;
+            if (drawingScheduler == null || drawingScheduler.isTerminated()) {
+                drawingScheduler = Executors.newSingleThreadScheduledExecutor();
+                drawingScheduler.scheduleAtFixedRate(drawingTask, 0, drawingTask.getDelay(), TimeUnit.MILLISECONDS);
+            }
         }
     }
 
