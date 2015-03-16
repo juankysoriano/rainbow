@@ -65,26 +65,28 @@ public class RainbowInputController {
                 break;
             case MotionEvent.ACTION_MOVE:
                 screenTouched = true;
-
-                float startX = px;
-                float startY = py;
-                float lowMiddleX = px + (x - px) / 3;
-                float lowMiddleY = py + (y - py) / 3;
-                float highMiddleX = px + 2 * (x - px) / 3;
-                float highMiddleY = py + 2 * (y - py) / 3;
-                float endX = x;
-                float endY = y;
-
-                notifyFingerDraggedFor(startX, startY, lowMiddleX, lowMiddleY, event, rainbowDrawer);
-                notifyFingerDraggedFor(lowMiddleX, lowMiddleY, highMiddleX, highMiddleY, event, rainbowDrawer);
-                notifyFingerDraggedFor(highMiddleX, highMiddleY, endX, endY, event, rainbowDrawer);
-
+                performMove(event, rainbowDrawer);
                 break;
         }
 
         if (hasInteractionListener()) {
             rainbowInteractionListener.onMotionEvent(event, rainbowDrawer);
         }
+    }
+
+    private void performMove(MotionEvent event, RainbowDrawer rainbowDrawer) {
+        float startX = px;
+        float startY = py;
+        float lowMiddleX = px + (x - px) / 3;
+        float lowMiddleY = py + (y - py) / 3;
+        float highMiddleX = px + 2 * (x - px) / 3;
+        float highMiddleY = py + 2 * (y - py) / 3;
+        float endX = x;
+        float endY = y;
+
+        notifyFingerDraggedFor(startX, startY, lowMiddleX, lowMiddleY, event, rainbowDrawer);
+        notifyFingerDraggedFor(lowMiddleX, lowMiddleY, highMiddleX, highMiddleY, event, rainbowDrawer);
+        notifyFingerDraggedFor(highMiddleX, highMiddleY, endX, endY, event, rainbowDrawer);
     }
 
     private void notifyFingerDraggedFor(float px, float py, float x, float y, MotionEvent event, RainbowDrawer rainbowDrawer) {
