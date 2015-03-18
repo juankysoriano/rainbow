@@ -123,7 +123,7 @@ public class Rainbow implements PaintStepListener {
     }
 
     public boolean isRunning() {
-        return !paused || drawingScheduler != null;
+        return !paused;
     }
 
     public void onDrawingStart() {
@@ -131,14 +131,18 @@ public class Rainbow implements PaintStepListener {
     }
 
     public void resume() {
-        if(paused) {
+        if (!isRunning()) {
             onDrawingResume();
             paused = false;
-            if (drawingScheduler == null || drawingScheduler.isTerminated()) {
+            if (hasDrawingScheduler() || drawingScheduler.isTerminated()) {
                 drawingScheduler = Executors.newSingleThreadScheduledExecutor();
                 drawingScheduler.scheduleAtFixedRate(drawingTask, 0, drawingTask.getDelay(), TimeUnit.MILLISECONDS);
             }
         }
+    }
+
+    private boolean hasDrawingScheduler() {
+        return drawingScheduler == null;
     }
 
     public void onDrawingResume() {
@@ -172,8 +176,10 @@ public class Rainbow implements PaintStepListener {
     }
 
     public void pause() {
-        paused = true;
-        onDrawingPause();
+        if(isRunning()) {
+            paused = true;
+            onDrawingPause();
+        }
     }
 
     public void onDrawingPause() {
@@ -181,9 +187,11 @@ public class Rainbow implements PaintStepListener {
     }
 
     public void stop() {
-        pause();
-        shutDownExecutioner();
-        onDrawingStop();
+        if(isRunning()) {
+            pause();
+            shutDownExecutioner();
+            onDrawingStop();
+        }
     }
 
     public void onDrawingStop() {
@@ -216,7 +224,6 @@ public class Rainbow implements PaintStepListener {
             e.printStackTrace();
         }
     }
-
 
     /**
      * @return View where the drawing is performed
