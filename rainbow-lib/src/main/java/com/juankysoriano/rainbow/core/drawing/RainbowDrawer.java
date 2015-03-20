@@ -612,9 +612,14 @@ public class RainbowDrawer {
      * @param y2       end y
      * @param listener PointDetectedListener which will apply a operation over the identified point
      */
-    public void exploreLine(final float x1, final float y1, final float x2, final float y2, final PointDetectedListener listener) {
+    public void exploreLine(float x1,
+                            float y1,
+                            float x2,
+                            float y2,
+                            LineExplorer.Precision precision,
+                            final PointDetectedListener listener) {
         LineExplorer lineExplorer = new LineExplorer();
-        lineExplorer.exploreLine(x1, y1, x2, y2, this, listener);
+        lineExplorer.exploreLine(x1, y1, x2, y2, precision, this, listener);
     }
 
     public void triangle(final float x1, final float y1, final float x2, final float y2, final float x3, final float y3) {
@@ -1802,7 +1807,7 @@ public class RainbowDrawer {
     }
 
     public interface PointDetectedListener {
-        void onPointDetected(float x, float y, RainbowDrawer rainbowDrawer);
+        void onPointDetected(float px, float py, float x, float y, RainbowDrawer rainbowDrawer);
     }
 
 }
