@@ -24,7 +24,10 @@ public class Rainbow implements PaintStepListener {
     private int width;
     private int height;
     private int frameCount;
+    private boolean stopped = true;
+    private boolean started = false;
     private boolean paused = true;
+    private boolean resumed = false;
     private boolean isSetup = false;
     private ScheduledExecutorService drawingScheduler;
     private RainbowInputController rainbowInputController;
@@ -116,14 +119,16 @@ public class Rainbow implements PaintStepListener {
     }
 
     public void start() {
-        if (!isRunning() || drawingScheduler.isTerminated()) {
+        if (!isStarted() || drawingScheduler.isTerminated()) {
             onDrawingStart();
+            started = true;
+            stopped = false;
             resume();
         }
     }
 
-    public boolean isRunning() {
-        return !paused;
+    private boolean isStarted() {
+        return started;
     }
 
     public void onDrawingStart() {
@@ -131,14 +136,19 @@ public class Rainbow implements PaintStepListener {
     }
 
     public void resume() {
-        if (!isRunning()) {
+        if (!isResumed()) {
             onDrawingResume();
+            resumed = true;
             paused = false;
             if (hasDrawingScheduler() || drawingScheduler.isTerminated()) {
                 drawingScheduler = Executors.newSingleThreadScheduledExecutor();
                 drawingScheduler.scheduleAtFixedRate(drawingTask, 0, drawingTask.getDelay(), TimeUnit.MILLISECONDS);
             }
         }
+    }
+
+    private boolean isResumed() {
+        return resumed;
     }
 
     private boolean hasDrawingScheduler() {
@@ -176,10 +186,15 @@ public class Rainbow implements PaintStepListener {
     }
 
     public void pause() {
-        if(isRunning()) {
+        if (!isPaused()) {
             paused = true;
+            resumed = false;
             onDrawingPause();
         }
+    }
+
+    private boolean isPaused() {
+        return paused;
     }
 
     public void onDrawingPause() {
@@ -187,11 +202,17 @@ public class Rainbow implements PaintStepListener {
     }
 
     public void stop() {
-        if(isRunning()) {
+        if (!isStopped()) {
             pause();
             shutDownExecutioner();
             onDrawingStop();
+            stopped = true;
+            started = false;
         }
+    }
+
+    private boolean isStopped() {
+        return stopped;
     }
 
     public void onDrawingStop() {
@@ -271,7 +292,7 @@ public class Rainbow implements PaintStepListener {
 
     public void frameRate(final float newRateTarget) {
         frameRate = newRateTarget;
-        if (isRunning()) {
+        if (!isPaused()) {
             pause();
             resume();
         }
@@ -306,7 +327,7 @@ public class Rainbow implements PaintStepListener {
 
         @Override
         public void run() {
-            if (!paused && !drawingScheduler.isShutdown()) {
+            if (!isPaused() && !drawingScheduler.isShutdown()) {
                 handleDraw();
             }
         }

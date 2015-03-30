@@ -23,16 +23,17 @@
 
 package com.juankysoriano.rainbow.core.graphics;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
 
 import com.juankysoriano.rainbow.core.Rainbow;
-import com.juankysoriano.rainbow.utils.RainbowIO;
 import com.juankysoriano.rainbow.utils.RainbowMath;
 
-import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -2123,7 +2124,17 @@ public class RainbowImage implements Cloneable {
         loadPixels();
 
         try {
-            OutputStream output = new BufferedOutputStream(RainbowIO.createOutput(context, path), 16 * 1024);
+            String mPath = path;
+
+            File imageFile = new File(mPath);
+
+            boolean created = imageFile.createNewFile();
+
+            if (!created) {
+                return false;
+            }
+
+            OutputStream output = new FileOutputStream(imageFile);
 
             String lower = path.toLowerCase();
             String extension = lower.substring(lower.lastIndexOf('.') + 1);
@@ -2146,6 +2157,10 @@ public class RainbowImage implements Cloneable {
             System.err.println("Could not write the image to " + path);
         }
         return success;
+    }
+
+    public void save(ContentResolver contentResolver, String title, String description) {
+        CaptureSketchUtils.insertImage(contentResolver, bitmap, title, description);
     }
 
     public int getWidth() {

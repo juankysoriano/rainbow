@@ -13,7 +13,6 @@ import com.juankysoriano.rainbow.core.matrix.RMatrix;
 import com.juankysoriano.rainbow.core.matrix.RMatrix2D;
 import com.juankysoriano.rainbow.core.matrix.RMatrix3D;
 import com.juankysoriano.rainbow.utils.RainbowBitmapUtils;
-import com.juankysoriano.rainbow.utils.RainbowIO;
 
 import java.io.File;
 
@@ -102,8 +101,8 @@ public class RainbowDrawer {
      * Intercepts any relative paths to make them absolute (relative to the
      * sketch folder) before passing to save() in PImage. (Changed in 0100)
      */
-    public void save(final String filename) {
-        graphics.save(getContext(), RainbowIO.savePath(getContext(), filename));
+    public void save(final String title, final String description) {
+        graphics.save(getContext().getContentResolver(), title, description);
     }
 
     public Context getContext() {
@@ -823,6 +822,7 @@ public class RainbowDrawer {
                        final float z4) {
         graphics.bezier(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4);
     }
+
     /**
      * Get a location along a catmull-rom curve segment.
      *
