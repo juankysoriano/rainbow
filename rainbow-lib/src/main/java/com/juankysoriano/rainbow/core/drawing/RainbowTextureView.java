@@ -10,7 +10,7 @@ import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.core.event.RainbowInputController;
 
 public class RainbowTextureView extends TextureView implements SurfaceTextureListener {
-    Rainbow mRainbow;
+    private final Rainbow mRainbow;
 
     public RainbowTextureView(ViewGroup parent, Rainbow rainbow) {
         super(parent.getContext());
