@@ -1,5 +1,6 @@
 package com.juankysoriano.rainbow.demo.sketch.rainbow.ink;
 
+import com.juankysoriano.rainbow.core.drawing.LineExplorer;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.event.RainbowInputController;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
@@ -20,6 +21,12 @@ public class InkDrawer implements StepDrawer, RainbowImage.LoadPictureListener {
     private RainbowImage image;
     private boolean enabled = true;
 
+    private InkDrawer(InkDrop inkDrop, RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
+        this.inkDrop = inkDrop;
+        this.rainbowDrawer = rainbowDrawer;
+        this.rainbowInputController = rainbowInputController;
+    }
+
     public static InkDrawer newInstance(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
         InkDrawer inkDrawer = new InkDrawer(new InkDrop(), rainbowDrawer, rainbowInputController);
         configureDrawer(rainbowDrawer);
@@ -30,12 +37,6 @@ public class InkDrawer implements StepDrawer, RainbowImage.LoadPictureListener {
     private static void configureDrawer(RainbowDrawer rainbowDrawer) {
         rainbowDrawer.noStroke();
         rainbowDrawer.smooth();
-    }
-
-    private InkDrawer(InkDrop inkDrop, RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
-        this.inkDrop = inkDrop;
-        this.rainbowDrawer = rainbowDrawer;
-        this.rainbowInputController = rainbowInputController;
     }
 
     @Override
@@ -57,22 +58,16 @@ public class InkDrawer implements StepDrawer, RainbowImage.LoadPictureListener {
 
     private void moveAndPaintInkDrop(final RainbowInputController rainbowInputController) {
         inkDrop.moveTo(rainbowInputController.getX(), rainbowInputController.getY());
-        rainbowDrawer.exploreLine(inkDrop.getX(), inkDrop.getY(), inkDrop.getOldX(), inkDrop.getOldY(), new RainbowDrawer.PointDetectedListener() {
+        rainbowDrawer.exploreLine(inkDrop.getX(), inkDrop.getY(), inkDrop.getOldX(), inkDrop.getOldY(), LineExplorer.Precision.NORMAL, new RainbowDrawer.PointDetectedListener() {
 
             @Override
-            public void onPointDetected(float x, float y, RainbowDrawer rainbowDrawer) {
+            public void onPointDetected(float px, float py, float x, float y, RainbowDrawer rainbowDrawer) {
                 inkDrop.updateInkRadius(rainbowInputController.isScreenTouched());
                 if (inkDrop.isMoving()) {
                     drawInk(x, y);
                 }
             }
         });
-    }
-
-    @Override
-    public void initDrawingAt(float x, float y) {
-        inkDrop.resetTo(x, y);
-        inkDrop.resetRadius();
     }
 
     private void drawInk(float x, float y) {
@@ -83,10 +78,8 @@ public class InkDrawer implements StepDrawer, RainbowImage.LoadPictureListener {
         }
     }
 
-    private void paintDropWithoutImage(float x, float y) {
-        rainbowDrawer.fill(BLACK, ALPHA);
-        rainbowDrawer.ellipseMode(RainbowGraphics.CENTER);
-        rainbowDrawer.ellipse(x, y, inkDrop.getRadius() * INK_DROP_IMAGE_SCALE, inkDrop.getRadius() * INK_DROP_IMAGE_SCALE);
+    private boolean hasToPaintDropImage() {
+        return RainbowMath.random(100) > INK_ISSUE_THRESHOLD && hasImage();
     }
 
     private void paintDropWithImage(float x, float y) {
@@ -99,12 +92,20 @@ public class InkDrawer implements StepDrawer, RainbowImage.LoadPictureListener {
         rainbowDrawer.popMatrix();
     }
 
-    private boolean hasToPaintDropImage() {
-        return RainbowMath.random(100) > INK_ISSUE_THRESHOLD && hasImage();
+    private void paintDropWithoutImage(float x, float y) {
+        rainbowDrawer.fill(BLACK, ALPHA);
+        rainbowDrawer.ellipseMode(RainbowGraphics.CENTER);
+        rainbowDrawer.ellipse(x, y, inkDrop.getRadius() * INK_DROP_IMAGE_SCALE, inkDrop.getRadius() * INK_DROP_IMAGE_SCALE);
     }
 
     private boolean hasImage() {
         return image != NO_IMAGE;
+    }
+
+    @Override
+    public void initDrawingAt(float x, float y) {
+        inkDrop.resetTo(x, y);
+        inkDrop.resetRadius();
     }
 
     public void enable() {

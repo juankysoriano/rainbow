@@ -1,10 +1,10 @@
 package com.juankysoriano.rainbow.demo.sketch.rainbow.ink;
 
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
-import com.juankysoriano.rainbow.core.event.RainbowEvent;
 import com.juankysoriano.rainbow.core.event.RainbowInputController;
 
 public class InkSketch extends Rainbow implements RainbowInputController.RainbowInteractionListener {
@@ -53,21 +53,21 @@ public class InkSketch extends Rainbow implements RainbowInputController.Rainbow
     }
 
     @Override
-    public void onSketchTouched(RainbowEvent event, RainbowDrawer rainbowDrawer) {
+    public void onSketchTouched(MotionEvent event, RainbowDrawer rainbowDrawer) {
         inkDrawer.initDrawingAt(event.getX(), event.getY());
     }
 
     @Override
-    public void onSketchReleased(RainbowEvent event, RainbowDrawer rainbowDrawer) {
+    public void onSketchReleased(MotionEvent event, RainbowDrawer rainbowDrawer) {
     }
 
     @Override
-    public void onFingerDragged(RainbowEvent event, RainbowDrawer rainbowDrawer) {
+    public void onFingerDragged(MotionEvent event, RainbowDrawer rainbowDrawer) {
         inkDrawer.paintStep();
     }
 
     @Override
-    public void onMotionEvent(RainbowEvent event, RainbowDrawer rainbowDrawer) {
+    public void onMotionEvent(MotionEvent event, RainbowDrawer rainbowDrawer) {
         //no-op
     }
 }
