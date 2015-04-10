@@ -28,7 +28,7 @@ public abstract class CaptureSketchUtils {
      *
      * @see android.provider.MediaStore.Images.Media#insertImage(ContentResolver, Bitmap, String, String)
      */
-    public static final String insertImage(ContentResolver cr,
+    public static Uri insertImage(ContentResolver cr,
                                            Bitmap source,
                                            String title,
                                            String description) {
@@ -41,41 +41,36 @@ public abstract class CaptureSketchUtils {
         values.put(Images.Media.DATE_ADDED, System.currentTimeMillis());
         values.put(Images.Media.DATE_TAKEN, System.currentTimeMillis());
 
-        Uri url = null;
-        String stringUrl = null;    /* value to be returned */
+        Uri uri = null;
 
         try {
-            url = cr.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            uri = cr.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 
             if (source != null) {
-                OutputStream imageOut = cr.openOutputStream(url);
+                OutputStream imageOut = cr.openOutputStream(uri);
                 try {
                     source.compress(Bitmap.CompressFormat.JPEG, 50, imageOut);
                 } finally {
                     imageOut.close();
                 }
 
-                long id = ContentUris.parseId(url);
+                long id = ContentUris.parseId(uri);
                 // Wait until MINI_KIND thumbnail is generated.
                 Bitmap miniThumb = Images.Thumbnails.getThumbnail(cr, id, Images.Thumbnails.MINI_KIND, null);
                 // This is for backward compatibility.
                 storeThumbnail(cr, miniThumb, id, 50F, 50F, Images.Thumbnails.MICRO_KIND);
             } else {
-                cr.delete(url, null, null);
-                url = null;
+                cr.delete(uri, null, null);
+                uri = null;
             }
         } catch (Exception e) {
-            if (url != null) {
-                cr.delete(url, null, null);
-                url = null;
+            if (uri != null) {
+                cr.delete(uri, null, null);
+                uri = null;
             }
         }
 
-        if (url != null) {
-            stringUrl = url.toString();
-        }
-
-        return stringUrl;
+        return uri;
     }
 
     /**
@@ -85,7 +80,7 @@ public abstract class CaptureSketchUtils {
      *
      * @see android.provider.MediaStore.Images.Media (StoreThumbnail private method)
      */
-    private static final Bitmap storeThumbnail(
+    private static Bitmap storeThumbnail(
             ContentResolver cr,
             Bitmap source,
             long id,

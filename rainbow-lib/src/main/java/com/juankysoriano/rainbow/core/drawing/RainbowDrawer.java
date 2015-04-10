@@ -97,12 +97,8 @@ public class RainbowDrawer {
         return image;
     }
 
-    /**
-     * Intercepts any relative paths to make them absolute (relative to the
-     * sketch folder) before passing to save() in PImage. (Changed in 0100)
-     */
-    public void save(final String title, final String description) {
-        graphics.save(getContext().getContentResolver(), title, description);
+    public Uri save(final String title, final String description) {
+        return graphics.save(getContext().getContentResolver(), title, description);
     }
 
     public Context getContext() {
