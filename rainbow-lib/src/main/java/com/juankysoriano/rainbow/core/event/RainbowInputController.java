@@ -210,7 +210,7 @@ public class RainbowInputController {
         UP, DOWN, LEFT, RIGHT
     }
 
-    public static interface RainbowInteractionListener {
+    public interface RainbowInteractionListener {
         void onSketchTouched(final MotionEvent event, final RainbowDrawer rainbowDrawer);
 
         void onSketchReleased(final MotionEvent event, final RainbowDrawer rainbowDrawer);
