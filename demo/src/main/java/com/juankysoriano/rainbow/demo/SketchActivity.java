@@ -5,11 +5,11 @@ import android.os.Bundle;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.demo.sketch.rainbow.LibraryApplication;
-import com.juankysoriano.rainbow.demo.sketch.rainbow.RainbowLineCirclesSketch;
+import com.juankysoriano.rainbow.demo.sketch.rainbow.ink.InkSketch;
 
 public class SketchActivity extends Activity {
 
-    private RainbowLineCirclesSketch sketch;
+    private InkSketch sketch;
     private ViewGroup sketchView;
 
     @Override
@@ -18,7 +18,7 @@ public class SketchActivity extends Activity {
         LibraryApplication.setContext(this);
         setContentView(R.layout.sketch);
         sketchView = getSketchView();
-        sketch = new RainbowLineCirclesSketch(sketchView);
+        sketch = InkSketch.newInstance(sketchView);
     }
 
     private ViewGroup getSketchView() {

@@ -3,6 +3,7 @@ package com.juankysoriano.rainbow.core.event;
 import android.os.AsyncTask;
 import android.view.MotionEvent;
 
+import com.juankysoriano.rainbow.R;
 import com.juankysoriano.rainbow.core.PaintStepListener;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 
@@ -75,18 +76,15 @@ public class RainbowInputController {
     }
 
     private void performMove(MotionEvent event, RainbowDrawer rainbowDrawer) {
-        float startX = px;
-        float startY = py;
-        float lowMiddleX = px + (x - px) / 3;
-        float lowMiddleY = py + (y - py) / 3;
-        float highMiddleX = px + 2 * (x - px) / 3;
-        float highMiddleY = py + 2 * (y - py) / 3;
-        float endX = x;
-        float endY = y;
+        int divisions = rainbowDrawer.getContext().getResources().getInteger(R.integer.dragging_divisions);
+        for (int i = 0; i < divisions; i++) {
+            float startX = px + (x - px) * i / 2;
+            float startY = py + (y - py) * i / 2;
+            float endX = px + (x - px) * (i + 1) / 2;
+            float endY = py + (y - py) * (i + 1) / 2;
+            notifyFingerDraggedFor(startX, startY, endX, endY, event, rainbowDrawer);
 
-        notifyFingerDraggedFor(startX, startY, lowMiddleX, lowMiddleY, event, rainbowDrawer);
-        notifyFingerDraggedFor(lowMiddleX, lowMiddleY, highMiddleX, highMiddleY, event, rainbowDrawer);
-        notifyFingerDraggedFor(highMiddleX, highMiddleY, endX, endY, event, rainbowDrawer);
+        }
     }
 
     private void notifyFingerDraggedFor(float px, float py, float x, float y, MotionEvent event, RainbowDrawer rainbowDrawer) {
