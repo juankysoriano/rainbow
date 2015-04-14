@@ -4,18 +4,22 @@ import com.juankysoriano.rainbow.utils.RainbowMath;
 
 public class LineExplorer {
     private static final float NO_PREVIOUS = -1;
-    private static float step;
+    private final int precision;
+    private final RainbowDrawer rainbowDrawer;
+    private final RainbowDrawer.PointDetectedListener listener;
     private float previousDetectedX = NO_PREVIOUS;
     private float previousDetectedY = NO_PREVIOUS;
+
+    public LineExplorer(Precision precision, RainbowDrawer rainbowDrawer, RainbowDrawer.PointDetectedListener listener) {
+        this.precision = precision.getValue();
+        this.rainbowDrawer = rainbowDrawer;
+        this.listener = listener;
+    }
 
     public void exploreLine(float px,
                             float py,
                             float x,
-                            float y,
-                            Precision precision,
-                            RainbowDrawer rainbowDrawer,
-                            RainbowDrawer.PointDetectedListener listener) {
-        step = precision.getValue();
+                            float y) {
         previousDetectedX = x;
         previousDetectedY = y;
         float dx = x - px;
@@ -56,13 +60,13 @@ public class LineExplorer {
     }
 
     private void processLineGoingLeft(float x, float px, RainbowDrawer rainbowDrawer, RainbowDrawer.PointDetectedListener listener, float k, float m) {
-        for (float i = RainbowMath.min(x, px); i <= RainbowMath.max(x, px); i += step / RainbowMath.max(1, RainbowMath.abs(k))) {
+        for (float i = RainbowMath.min(x, px); i <= RainbowMath.max(x, px); i += precision / RainbowMath.max(1, RainbowMath.abs(k))) {
             doProcessOnPoint(i, k * i + m, rainbowDrawer, listener);
         }
     }
 
     private void processLineGoingRight(float x, float px, RainbowDrawer rainbowDrawer, RainbowDrawer.PointDetectedListener listener, float k, float m) {
-        for (float i = RainbowMath.max(x, px); i >= RainbowMath.min(x, px); i -= step / RainbowMath.max(1, RainbowMath.abs(k))) {
+        for (float i = RainbowMath.max(x, px); i >= RainbowMath.min(x, px); i -= precision / RainbowMath.max(1, RainbowMath.abs(k))) {
             doProcessOnPoint(i, k * i + m, rainbowDrawer, listener);
         }
     }
@@ -72,13 +76,13 @@ public class LineExplorer {
     }
 
     private void processVerticalLineGoingDown(float x, float y, float py, RainbowDrawer rainbowDrawer, RainbowDrawer.PointDetectedListener listener) {
-        for (float i = RainbowMath.min(y, py); i <= RainbowMath.max(y, py); i += step) {
+        for (float i = RainbowMath.min(y, py); i <= RainbowMath.max(y, py); i += precision) {
             doProcessOnPoint(x, i, rainbowDrawer, listener);
         }
     }
 
     private void processVerticalLineGoingUp(float x, float y, float py, RainbowDrawer rainbowDrawer, RainbowDrawer.PointDetectedListener listener) {
-        for (float i = RainbowMath.max(y, py); i >= RainbowMath.min(y, py); i -= step) {
+        for (float i = RainbowMath.max(y, py); i >= RainbowMath.min(y, py); i -= precision) {
             doProcessOnPoint(x, i, rainbowDrawer, listener);
         }
     }

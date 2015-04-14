@@ -410,6 +410,10 @@ public class RainbowDrawer {
         drawing = false;
     }
 
+    public boolean imageChanged() {
+        return graphics.imageChanged();
+    }
+
     /**
      * Start a new shape of type POLYGON
      */
@@ -613,8 +617,8 @@ public class RainbowDrawer {
                             float y2,
                             LineExplorer.Precision precision,
                             final PointDetectedListener listener) {
-        LineExplorer lineExplorer = new LineExplorer();
-        lineExplorer.exploreLine(x1, y1, x2, y2, precision, this, listener);
+        LineExplorer lineExplorer = new LineExplorer(precision, this, listener);
+        lineExplorer.exploreLine(x1, y1, x2, y2);
     }
 
     public void triangle(final float x1, final float y1, final float x2, final float y2, final float x3, final float y3) {

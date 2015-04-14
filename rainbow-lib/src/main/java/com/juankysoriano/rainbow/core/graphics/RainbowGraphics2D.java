@@ -79,9 +79,9 @@ public class RainbowGraphics2D extends RainbowGraphics {
     private boolean isFillClear = false;
 
     private Bitmap normalBitmap;
-    private Bitmap backgroundBitmap;
     private Canvas canvas;
     private Shader backgroundBitmapShader;
+    private boolean changed;
 
     public RainbowGraphics2D() {
         transform = new float[9];
@@ -151,9 +151,13 @@ public class RainbowGraphics2D extends RainbowGraphics {
     @Override
     public void dispose() {
         normalBitmap = null;
-        backgroundBitmap = null;
         canvas = null;
         backgroundBitmapShader = null;
+    }
+
+    @Override
+    public boolean imageChanged() {
+        return changed;
     }
 
     @Override
@@ -164,7 +168,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
     @Override
     public synchronized void beginDraw() {
         checkSettings();
-        resetMatrix();
         vertexCount = 0;
     }
 
@@ -179,19 +182,19 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public synchronized void endDraw() {
-        if (primarySurface) {
-            Canvas screen = parent.getDrawingView().lockCanvas();
-            if (screen != null) {
-                android.graphics.Matrix matrix = new android.graphics.Matrix();
-                screen.drawBitmap(normalBitmap, matrix, null);
-                parent.getDrawingView().unlockCanvasAndPost(screen);
+        if(changed) {
+            if (primarySurface) {
+                Canvas screen = parent.getDrawingView().lockCanvas();
+                if (screen != null) {
+                    screen.drawBitmap(normalBitmap, 0, 0, null);
+                    parent.getDrawingView().unlockCanvasAndPost(screen);
+                }
+            } else {
+                loadPixels();
             }
-        } else {
-            loadPixels();
+            setModified();
         }
-
-        setModified();
-        super.updatePixels();
+        changed = false;
     }
 
     @Override
@@ -359,6 +362,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     private void endPointsShape() {
+        changed = true;
         android.graphics.Matrix m = getCanvas().getMatrix();
         if (strokeWeight == 1 && m.isIdentity()) {
             if (screenPoint == null) {
@@ -406,6 +410,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public float screenX(float x, float y) {
+        changed = true;
         if (screenPoint == null) {
             screenPoint = new float[2];
         }
@@ -417,6 +422,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public float screenY(float x, float y) {
+        changed = true;
         if (screenPoint == null) {
             screenPoint = new float[2];
         }
@@ -431,6 +437,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     void drawPath() {
+        changed = true;
         if (fill) {
             getCanvas().drawPath(path, getFillPaint());
         }
@@ -508,16 +515,18 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     @Override
-    public void point(float x, float y) {
+    public void point(float... vertex) {
+        changed = true;
         if (stroke) {
-            getCanvas().drawPoint(x, y, getStrokePaint());
+            getCanvas().drawPoints(vertex, getStrokePaint());
         }
     }
 
     @Override
-    public void line(float x1, float y1, float x2, float y2) {
+    public void line(float... vertex) {
+        changed = true;
         if (stroke) {
-            getCanvas().drawLine(x1, y1, x2, y2, getStrokePaint());
+            getCanvas().drawLines(vertex, getStrokePaint());
         }
     }
 
@@ -544,6 +553,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     protected void rectImpl(float x1, float y1, float x2, float y2) {
+        changed = true;
         if (fill) {
             getCanvas().drawRect(x1, y1, x2, y2, getFillPaint());
         }
@@ -554,6 +564,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     protected void arcImpl(float x, float y, float w, float h, float start, float stop, int mode) {
+        changed = true;
 
         if (stop - start >= RainbowMath.TWO_PI) {
             ellipseImpl(x, y, w, h);
@@ -607,6 +618,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     protected void ellipseImpl(float x, float y, float w, float h) {
+        changed = true;
         rect.set(x, y, x + w, y + h);
         if (fill) {
             getCanvas().drawOval(rect, getFillPaint());
@@ -661,6 +673,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
      */
     @Override
     protected void imageImpl(RainbowImage src, float x1, float y1, float x2, float y2, int u1, int v1, int u2, int v2) {
+        changed = true;
 
         if (src.getBitmap() == null && src.format == ALPHA) {
             // create an alpha normalBitmap for this feller
@@ -708,11 +721,13 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void translate(float tx, float ty) {
+        changed = true;
         getCanvas().translate(tx, ty);
     }
 
     @Override
     public void rotate(float angle) {
+        changed = true;
         getCanvas().rotate(angle * RainbowMath.RAD_TO_DEG);
     }
 
@@ -738,11 +753,13 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void scale(float s) {
+        changed = true;
         getCanvas().scale(s, s);
     }
 
     @Override
     public void scale(float sx, float sy) {
+        changed = true;
         getCanvas().scale(sx, sy);
     }
 
@@ -753,11 +770,13 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void shearX(float angle) {
+        changed = true;
         getCanvas().skew((float) Math.tan(angle), 0);
     }
 
     @Override
     public void shearY(float angle) {
+        changed = true;
         getCanvas().skew(0, (float) Math.tan(angle));
     }
 
@@ -766,6 +785,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
         android.graphics.Matrix m = new android.graphics.Matrix();
         m.setValues(new float[]{n00, n01, n02, n10, n11, n12, 0, 0, 1});
         getCanvas().concat(m);
+        changed = true;
     }
 
     @Override
@@ -795,6 +815,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public RMatrix2D getMatrix(RMatrix2D target) {
+        changed = true;
         if (target == null) {
             target = new RMatrix2D();
         }
@@ -808,6 +829,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void setMatrix(RMatrix2D source) {
+        changed = true;
         android.graphics.Matrix matrix = new android.graphics.Matrix();
         matrix.setValues(new float[]{source.m00, source.m01, source.m02, source.m10, source.m11, source.m12, 0, 0, 1});
         getCanvas().setMatrix(matrix);
@@ -910,6 +932,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void backgroundImpl() {
+        changed = true;
         getCanvas().drawColor(backgroundColor);
     }
 
@@ -970,6 +993,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void set(int x, int y, RainbowImage src) {
+        changed = true;
         if (src.format == ALPHA) {
             throw new RuntimeException("set() not available for ALPHA images");
         }
@@ -978,12 +1002,12 @@ public class RainbowGraphics2D extends RainbowGraphics {
             getCanvas().drawBitmap(src.pixels, 0, src.width, x, y, src.width, src.height, false, null);
         } else {
             if (src.width != src.getBitmap().getWidth() || src.height != src.getBitmap().getHeight()) {
-                src.setBitmap(Bitmap.createBitmap(src.width, src.height, Config.ARGB_8888));
+                src.setBitmap(Bitmap.createBitmap(src.width, src.height, Config.ARGB_4444));
                 src.modified = true;
             }
             if (src.modified) {
                 if (!src.getBitmap().isMutable()) {
-                    src.setBitmap(Bitmap.createBitmap(src.width, src.height, Config.ARGB_8888));
+                    src.setBitmap(Bitmap.createBitmap(src.width, src.height, Config.ARGB_4444));
                 }
                 src.getBitmap().setPixels(src.pixels, 0, src.width, 0, 0, src.width, src.height);
                 src.modified = false;
@@ -1010,5 +1034,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
         rect.set(sx, sy, sx + sw, sy + sh);
         Rect src = new Rect(dx, dy, dx + dw, dy + dh);
         getCanvas().drawBitmap(normalBitmap, src, rect, null);
+        changed = true;
     }
 }

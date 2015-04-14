@@ -1644,7 +1644,7 @@ public abstract class RainbowMath {
     /**
      * Convert a byte into a two digit hex string.
      */
-    static final public String hex(final byte what) {
+    static public String hex(final byte what) {
         return RainbowMath.hex(what, 2);
     }
 
@@ -1655,7 +1655,7 @@ public abstract class RainbowMath {
      * @param digits the number of digits (maximum 8)
      * @return a String object with the formatted values
      */
-    static final public String hex(final int what, int digits) {
+    static public String hex(final int what, int digits) {
         final String stuff = Integer.toHexString(what).toUpperCase();
         if (digits > 8) {
             digits = 8;
@@ -1674,18 +1674,18 @@ public abstract class RainbowMath {
     /**
      * Convert a Unicode character into a four digit hex string.
      */
-    static final public String hex(final char what) {
+    static public String hex(final char what) {
         return RainbowMath.hex(what, 4);
     }
 
     /**
      * Convert an integer into an eight digit hex string.
      */
-    static final public String hex(final int what) {
+    static public String hex(final int what) {
         return RainbowMath.hex(what, 8);
     }
 
-    static final public int unhex(final String what) {
+    static public int unhex(final String what) {
         // has to parse as a Long so that it'll work for numbers bigger than
         // 2^31
         return (int) (Long.parseLong(what, 16));
@@ -1695,7 +1695,7 @@ public abstract class RainbowMath {
      * Returns a String that contains the binary value of a byte. The returned
      * value will always have 8 digits.
      */
-    static final public String binary(final byte what) {
+    static public String binary(final byte what) {
         return RainbowMath.binary(what, 8);
     }
 
@@ -1703,7 +1703,7 @@ public abstract class RainbowMath {
      * Returns a String that contains the binary value of an int. The digits
      * parameter determines how many digits will be used.
      */
-    static final public String binary(final int what, int digits) {
+    static public String binary(final int what, int digits) {
         final String stuff = Integer.toBinaryString(what);
         if (digits > 32) {
             digits = 32;
@@ -1724,7 +1724,7 @@ public abstract class RainbowMath {
      * Returns a String that contains the binary value of a char. The returned
      * value will always have 16 digits because chars are two bytes long.
      */
-    static final public String binary(final char what) {
+    static public String binary(final char what) {
         return RainbowMath.binary(what, 16);
     }
 
@@ -1733,7 +1733,7 @@ public abstract class RainbowMath {
      * depends on the size of the number itself. If you want a specific number
      * of digits use binary(int what, int digits) to specify how many.
      */
-    static final public String binary(final int what) {
+    static public String binary(final int what) {
         return RainbowMath.binary(what, 32);
     }
 
@@ -1741,7 +1741,7 @@ public abstract class RainbowMath {
      * Unpack a binary String into an int. i.e. unbinary("00001000") would
      * return 8.
      */
-    static final public int unbinary(final String what) {
+    static public int unbinary(final String what) {
         return Integer.parseInt(what, 2);
     }
 
@@ -1755,7 +1755,7 @@ public abstract class RainbowMath {
      * random(5, 5) will return 5 (useful) and random(7, 4) will return 7 (not
      * useful.. better idea?)
      */
-    public static final float random(final float howsmall, final float howbig) {
+    public static float random(final float howsmall, final float howbig) {
         if (howsmall >= howbig) {
             return howsmall;
         }
@@ -1769,7 +1769,7 @@ public abstract class RainbowMath {
      * The number returned will range from zero up to (but not including)
      * 'howbig'.
      */
-    public static final float random(final float howbig) {
+    public static float random(final float howbig) {
         // for some reason (rounding error?) Math.random() * 3
         // can sometimes return '3' (once in ~30 million tries)
         // so a check was added to avoid the inclusion of 'howbig'
@@ -1792,7 +1792,36 @@ public abstract class RainbowMath {
         return value;
     }
 
-    public static final void randomSeed(final long what) {
+    /**
+     * Return a random number in the range [0, howbig).
+     * <p/>
+     * The number returned will range from zero up to (but not including)
+     * 'howbig'.
+     */
+    public static float random(final int howbig) {
+        // for some reason (rounding error?) Math.random() * 3
+        // can sometimes return '3' (once in ~30 million tries)
+        // so a check was added to avoid the inclusion of 'howbig'
+
+        // avoid an infinite loop
+        if (howbig == 0) {
+            return 0;
+        }
+
+        // internal random number object
+        if (internalRandom == null) {
+            internalRandom = new Random();
+        }
+
+        float value = 0;
+        do {
+            // value = (float)Math.random() * howbig;
+            value = internalRandom.nextInt(howbig);
+        } while (value == howbig);
+        return value;
+    }
+
+    public static void randomSeed(final long what) {
         // internal random number object
         if (internalRandom == null) {
             internalRandom = new Random();

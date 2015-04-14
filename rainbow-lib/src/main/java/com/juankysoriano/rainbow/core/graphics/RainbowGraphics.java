@@ -35,85 +35,6 @@ import com.juankysoriano.rainbow.utils.RainbowMath;
 import java.util.HashMap;
 import java.util.WeakHashMap;
 
-/**
- * Main graphics and rendering context, as well as the base API implementation.
- * <p/>
- * <h2>Subclassing and initializing PGraphics objects</h2> Starting in release
- * 0149, subclasses of PGraphics are handled differently. The constructor for
- * subclasses takes no parameters, instead a series of functions are called by
- * the hosting Imagine to specify its attributes.
- * <ul>
- * <li>setParent(Imagine) - is called to specify the parent
- * Imagine.
- * <li>setPrimary(boolean) - called with true if this PGraphics will be the
- * primary drawing surface used by the sketch, or false if not.
- * <li>setPath(String) - called when the renderer needs a filename or output
- * path, such as with the PDF or DXF renderers.
- * <li>setSize(int, int) - this is called last, at which point it's safe for the
- * renderer to complete its initialization routine.
- * </ul>
- * The functions were broken out because of the growing number of parameters
- * such as these that might be used by a renderer, yet with the exception of
- * setSize(), it's not clear which will be necessary. So while the size could be
- * passed in to the constructor instead of a setSize() function, a function
- * would still be needed that would notify the renderer that it was time to
- * finish its initialization. Thus, setSize() simply does both.
- * <p/>
- * <h2>Know your rights: public vs. private methods</h2> Methods that are
- * protected are often subclassed by other renderers, however they are not set
- * 'public' because they shouldn't be part of the user-facing public API
- * accessible from Imagine. That is, we don't want sketches calling
- * textModeCheck() or vertexTexture() directly.
- * <p/>
- * <h2>Handling warnings and exceptions</h2> Methods that are unavailable
- * generally show a warning, unless their lack of availability will soon cause
- * another exception. For instance, if a method like getMatrix() returns null
- * because it is unavailable, an exception will be thrown stating that the
- * method is unavailable, rather than waiting for the NullPointerException that
- * will occur when the sketch tries to use that method. As of release 0149,
- * warnings will only be shown once, and exceptions have been changed to
- * warnings where possible.
- * <p/>
- * <h2>Using xxxxImpl() for subclassing smoothness</h2> The xxxImpl() methods
- * are generally renderer-specific handling for some subset if tasks for a
- * particular function (vague enough for you?) For instance, imageImpl() handles
- * drawing an image whose x/y/w/h and u/v coords have been specified, and screen
- * placement (independent of imageMode) has been determined. There's no point in
- * all renderers implementing the <tt>if (imageMode == BLAH)</tt>
- * placement/sizing logic, so that's handled by PGraphics, which then calls
- * imageImpl() once all that is figured out.
- * <p/>
- * <h2>His brother PImage</h2> PGraphics subclasses PImage so that it can be
- * drawn and manipulated in a similar fashion. As such, many methods are
- * inherited from PGraphics, though many are unavailable: for instance, resize()
- * is not likely to be implemented; the same goes for mask(), depending on the
- * situation.
- * <p/>
- * <h2>What's in PGraphics, what ain't</h2> For the benefit of subclasses, as
- * much as possible has been placed inside PGraphics. For instance, bezier
- * interpolation code and implementations of the strokeCap() method (that simply
- * sets the strokeCap variable) are handled here. Features that will vary widely
- * between renderers are located inside the subclasses themselves. For instance,
- * all matrix handling code is per-renderer: Java 2D uses its own
- * AffineTransform, P2D uses a PMatrix2D, and PGraphics3D needs to keep
- * continually update forward and reverse transformations. A proper (future)
- * OpenGL implementation will have all its matrix madness handled by the card.
- * Lighting also falls under this category, however the base material property
- * settings (emissive, specular, et al.) are handled in PGraphics because they
- * use the standard colorMode() logic. Subclasses should override methods like
- * emissiveFromCalc(), which is a point where a valid color has been defined
- * internally, and can be applied in some manner based on the calcXxxx values.
- * <p/>
- * <h2>What's in the PGraphics documentation, what ain't</h2> Some things are
- * noted here, some things are not. For public API, always refer to the <a
- * href="http://processing.org/reference">reference</A> on Processing.org for
- * proper explanations. <b>No attempt has been made to keep the javadoc up to
- * date or complete.</b> It's an enormous task for which we simply do not have
- * the time. That is, it's not something that to be done once&mdash;it's a
- * matter of keeping the multiple references synchronized (to say nothing of the
- * translation issues), while targeting them for their separate audiences. Ouch.
- */
-
 public abstract class RainbowGraphics extends RainbowImage {
 
     public static final int VERTEX_FIELD_COUNT = 37;
@@ -136,13 +57,10 @@ public abstract class RainbowGraphics extends RainbowImage {
     public static final int HAS_NORMAL = 36;
     public static final int ROUND = 1 << 1;
     public static final int DEFAULT_STROKE_CAP = ROUND;
-    public int strokeCap = DEFAULT_STROKE_CAP;
     public static final int PROJECT = 1 << 2;  // called 'square' in the svg spec
     public static final int MITER = 1 << 3;
     public static final int DEFAULT_STROKE_JOIN = MITER;
-    public int strokeJoin = DEFAULT_STROKE_JOIN;
     public static final float DEFAULT_STROKE_WEIGHT = 1;
-    public float strokeWeight = DEFAULT_STROKE_WEIGHT;
     public static final float[] sinLUT;
     public static final float SINCOS_PRECISION = 0.5f;
     public static final int SINCOS_LENGTH = (int) (360f / SINCOS_PRECISION);
@@ -153,10 +71,6 @@ public abstract class RainbowGraphics extends RainbowImage {
      * Draw mode convention to use (x, y) to (width, height)
      */
     public static final int CORNER = 0;
-    /**
-     * The current image alignment (read-only)
-     */
-    private int imageMode = CORNER;
     /**
      * Draw mode convention to use (x1, y1) to (x2, y2) coordinates
      */
@@ -170,36 +84,28 @@ public abstract class RainbowGraphics extends RainbowImage {
      * Formerly called CENTER_DIAMETER in alpha releases.
      */
     public static final int CENTER = 3;
-
-    // arc drawing modes
     /**
      * Synonym for the CENTER constant. Draw from the center,
      * using second pair of values as the diameter.
      */
     public static final int DIAMETER = 3;
     public static final int CHORD = 2;
-
     // vertically alignment modes for text
     public static final int PIE = 3;
-
-    // error messages
     /**
      * texture coordinates based on image width/height
      */
     public static final int IMAGE = 2;
-    /**
-     * Sets whether texture coordinates passed to vertex() calls will be based
-     * on coordinates that are based on the IMAGE or NORMALIZED.
-     */
-    private int textureMode = IMAGE;
+
+    // arc drawing modes
     public static final int RGB = 1;  // image & color
     public static final int ARGB = 2;  // image
     public static final int HSB = 3;  // color
+
+    // error messages
     public static final int ALPHA = 4;  // image
     public static final int CLEAR = -200;
-
     public static final int POINTS = 3;   // vertices
-
     public static final int LINES = 5;   // beginShape(), createShape()
     public static final int TRIANGLES = 9;   // vertices
     public static final int TRIANGLE_STRIP = 10;  // vertices
@@ -208,11 +114,23 @@ public abstract class RainbowGraphics extends RainbowImage {
     public static final int QUADS = 17;  // vertices
     public static final int QUAD_STRIP = 18;  // vertices
     public static final int POLYGON = 20;  // in the end, probably cannot
-
-    // shape closing modes
-
     public static final int OPEN = 1;
     public static final int CLOSE = 2;
+    private static final String ERROR_BACKGROUND_IMAGE_SIZE =
+            "background image must be the same size as your application";
+    private static final String ERROR_BACKGROUND_IMAGE_FORMAT =
+            "background images should be RGB or ARGB";
+    private static final int NORMAL_MODE_AUTO = 0;
+
+    // shape closing modes
+    private static final int NORMAL_MODE_SHAPE = 1;
+    private static final int NORMAL_MODE_VERTEX = 2;
+    private static final int STYLE_STACK_DEPTH = 64;
+    private static final int DEFAULT_VERTICES = 512;
+    private static HashMap<String, Object> warnings;
+    private static float[] lerpColorHSB1;
+    private static float[] lerpColorHSB2;
+    private static float[] lerpColorHSB3;
 
     static {
         sinLUT = new float[SINCOS_LENGTH];
@@ -223,24 +141,12 @@ public abstract class RainbowGraphics extends RainbowImage {
         }
     }
 
-    private static final String ERROR_BACKGROUND_IMAGE_SIZE =
-            "background image must be the same size as your application";
-    private static final String ERROR_BACKGROUND_IMAGE_FORMAT =
-            "background images should be RGB or ARGB";
-    private static final int NORMAL_MODE_AUTO = 0;
-    private static final int NORMAL_MODE_SHAPE = 1;
-    private static final int NORMAL_MODE_VERTEX = 2;
-    private static final int STYLE_STACK_DEPTH = 64;
-    private RainbowStyle[] styleStack = new RainbowStyle[STYLE_STACK_DEPTH];
-    private static final int DEFAULT_VERTICES = 512;
-    protected float vertices[][] = new float[DEFAULT_VERTICES][VERTEX_FIELD_COUNT];
-    private static HashMap<String, Object> warnings;
-    private static float[] lerpColorHSB1;
-    private static float[] lerpColorHSB2;
-    private static float[] lerpColorHSB3;
     private final WeakHashMap<RainbowImage, Object> cacheMap = new WeakHashMap<RainbowImage, Object>();
     private final RMatrix3D bezierBasisMatrix = new RMatrix3D(-1, 3, -3, 1, 3, -6, 3, 0, -3, 3, 0, 0, 1, 0, 0, 0);
     private final float[] cacheHsbValue = new float[3];
+    public int strokeCap = DEFAULT_STROKE_CAP;
+    public int strokeJoin = DEFAULT_STROKE_JOIN;
+    public float strokeWeight = DEFAULT_STROKE_WEIGHT;
     public int pixelCount;
     public boolean smooth = false;
     /**
@@ -260,10 +166,6 @@ public abstract class RainbowGraphics extends RainbowImage {
      * true if fill() is enabled, (read-only)
      */
     public boolean fill;
-
-    // ........................................................
-
-    // Additional stroke properties
     /**
      * fill that was last set (read-only)
      */
@@ -280,6 +182,11 @@ public abstract class RainbowGraphics extends RainbowImage {
      * Last background color that was set, zero if an image
      */
     public int backgroundColor = 0xffCCCCCC;
+
+    // ........................................................
+
+    // Additional stroke properties
+    protected float vertices[][] = new float[DEFAULT_VERTICES][VERTEX_FIELD_COUNT];
     protected int quality;
     /**
      * true if this is the main drawing surface for a particular sketch. This
@@ -296,6 +203,16 @@ public abstract class RainbowGraphics extends RainbowImage {
     protected int vertexCount; // total number of vertices
     protected RMatrix3D curveToBezierMatrix;
     protected int curveVertexCount;
+    /**
+     * The current image alignment (read-only)
+     */
+    private int imageMode = CORNER;
+    /**
+     * Sets whether texture coordinates passed to vertex() calls will be based
+     * on coordinates that are based on the IMAGE or NORMALIZED.
+     */
+    private int textureMode = IMAGE;
+    private RainbowStyle[] styleStack = new RainbowStyle[STYLE_STACK_DEPTH];
     /**
      * The current colorMode
      */
@@ -446,15 +363,6 @@ public abstract class RainbowGraphics extends RainbowImage {
      * The last RGB value converted to HSB
      */
     private int cacheHsbKey;
-
-    /**
-     * Constructor for the PGraphics object. Use this to ensure that the
-     * defaults get set properly. In a subclass, use this(w, h) as the first
-     * line of a subclass' constructor to properly set the internal fields and
-     * defaults.
-     */
-    public RainbowGraphics() {
-    }
 
     /**
      * Display a warning that the specified method is only available with 3D.
@@ -1111,24 +1019,10 @@ public abstract class RainbowGraphics extends RainbowImage {
     public void endShape(int mode) {
     }
 
-    public void point(float x, float y, float z) {
-        beginShape(POINTS);
-        vertex(x, y, z);
-        endShape();
+    public void point(float... vertex) {
     }
 
-    public void line(float x1, float y1, float x2, float y2) {
-        beginShape(LINES);
-        vertex(x1, y1);
-        vertex(x2, y2);
-        endShape();
-    }
-
-    public void line(float x1, float y1, float z1, float x2, float y2, float z2) {
-        beginShape(LINES);
-        vertex(x1, y1, z1);
-        vertex(x2, y2, z2);
-        endShape();
+    public void line(float... vertex) {
     }
 
     public void triangle(float x1, float y1, float x2, float y2, float x3, float y3) {
@@ -2434,13 +2328,6 @@ public abstract class RainbowGraphics extends RainbowImage {
     }
 
     /**
-     * Set the current transformation to the contents of the specified source.
-     */
-    public void setMatrix(RMatrix3D source) {
-        showMissingWarning("setMatrix");
-    }
-
-    /**
      * Set the current transformation matrix to the contents of another.
      */
     public void setMatrix(RMatrix source) {
@@ -2455,6 +2342,13 @@ public abstract class RainbowGraphics extends RainbowImage {
      * Set the current transformation to the contents of the specified source.
      */
     public void setMatrix(RMatrix2D source) {
+        showMissingWarning("setMatrix");
+    }
+
+    /**
+     * Set the current transformation to the contents of the specified source.
+     */
+    public void setMatrix(RMatrix3D source) {
         showMissingWarning("setMatrix");
     }
 
@@ -3651,4 +3545,5 @@ public abstract class RainbowGraphics extends RainbowImage {
         return false;
     }
 
+    public abstract boolean imageChanged();
 }
