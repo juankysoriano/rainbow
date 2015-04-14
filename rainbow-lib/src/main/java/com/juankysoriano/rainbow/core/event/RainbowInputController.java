@@ -3,7 +3,6 @@ package com.juankysoriano.rainbow.core.event;
 import android.os.AsyncTask;
 import android.view.MotionEvent;
 
-import com.juankysoriano.rainbow.R;
 import com.juankysoriano.rainbow.core.PaintStepListener;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 
@@ -21,20 +20,27 @@ public class RainbowInputController {
     }
 
     public void postEvent(final MotionEvent motionEvent, final RainbowDrawer rainbowDrawer) {
-        AsyncTask<Void, Void, Void> postTask = new AsyncTask<Void, Void, Void>() {
+        AsyncTask<MotionEvent, Void, MotionEvent> postTask = new AsyncTask<MotionEvent, Void, MotionEvent>() {
             @Override
-            protected Void doInBackground(Void... params) {
+            protected void onPreExecute() {
                 preHandleEvent(motionEvent);
-                handleSketchEvent(motionEvent, rainbowDrawer);
-                if (isScreenTouched()) {
-                    paintStepListener.onDrawingStep();
-                }
+            }
+
+            @Override
+            protected MotionEvent doInBackground(MotionEvent... motionEvents) {
+                MotionEvent motionEvent = motionEvents[0];
+                handleSketchEvent(motionEvents[0], rainbowDrawer);
+                paintStepListener.onDrawingStep();
+                return motionEvent;
+            }
+
+            @Override
+            protected void onPostExecute(MotionEvent motionEvent) {
                 postHandleEvent(motionEvent);
-                return null;
             }
         };
 
-        postTask.execute();
+        postTask.execute(motionEvent);
     }
 
     private void preHandleEvent(MotionEvent event) {
@@ -76,15 +82,7 @@ public class RainbowInputController {
     }
 
     private void performMove(MotionEvent event, RainbowDrawer rainbowDrawer) {
-        int divisions = rainbowDrawer.getContext().getResources().getInteger(R.integer.dragging_divisions);
-        for (int i = 0; i < divisions; i++) {
-            float startX = px + (x - px) * i / 2;
-            float startY = py + (y - py) * i / 2;
-            float endX = px + (x - px) * (i + 1) / 2;
-            float endY = py + (y - py) * (i + 1) / 2;
-            notifyFingerDraggedFor(startX, startY, endX, endY, event, rainbowDrawer);
-
-        }
+        notifyFingerDraggedFor(px, py, x, y, event, rainbowDrawer);
     }
 
     private void notifyFingerDraggedFor(float px, float py, float x, float y, MotionEvent event, RainbowDrawer rainbowDrawer) {

@@ -18,7 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Rainbow implements PaintStepListener {
-    private static final int DEFAULT_FRAME_RATE = 120;
+    private static final int DEFAULT_FRAME_RATE = 180;
     private float frameRate = DEFAULT_FRAME_RATE;
     private boolean surfaceReady;
     private int width;
@@ -37,13 +37,19 @@ public class Rainbow implements PaintStepListener {
 
     protected Rainbow(ViewGroup viewGroup) {
         this(new RainbowDrawer(), new RainbowInputController());
+        injectInto(viewGroup);
     }
 
     protected Rainbow(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
         this.rainbowInputController = rainbowInputController;
         this.rainbowDrawer = rainbowDrawer;
         this.drawingTask = new DrawingTask();
-        rainbowInputController.setPaintStepListener(this);
+        rainbowInputController.setPaintStepListener(new PaintStepListener() {
+            @Override
+            public void onDrawingStep() {
+                performDrawingStep();
+            }
+        });
     }
 
     protected Rainbow(ViewGroup viewGroup, RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
@@ -161,7 +167,7 @@ public class Rainbow implements PaintStepListener {
 
     private void handleDraw() {
         if (canDraw()) {
-            fireDrawStep();
+            performDrawingStep();
         }
     }
 
@@ -169,16 +175,27 @@ public class Rainbow implements PaintStepListener {
         return rainbowDrawer != null
                 && rainbowDrawer.hasGraphics()
                 && surfaceReady
-                && isSetup;
+                && isSetup
+                && !rainbowInputController.isScreenTouched();
     }
 
-    private void fireDrawStep() {
+    private void performDrawingStep() {
         frameCount++;
-        rainbowDrawer.beginDraw();
-        if (!rainbowInputController.isScreenTouched()) {
-            onDrawingStep();
+        if (hasToPaintIntoBuffer()) {
+            doDrawingIfNotTouching();
+        } else {
+            rainbowDrawer.beginDraw();
+            doDrawingIfNotTouching();
+            rainbowDrawer.endDraw();
         }
-        rainbowDrawer.endDraw();
+    }
+
+    private void doDrawingIfNotTouching() {
+        onDrawingStep();
+    }
+
+    private boolean hasToPaintIntoBuffer() {
+        return frameCount % 3 != 0;
     }
 
     public void onDrawingStep() {
