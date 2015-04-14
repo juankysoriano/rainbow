@@ -15,7 +15,7 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputCon
 
         @Override
         public void onPointDetected(float px, float py, float x, float y, RainbowDrawer rainbowDrawer) {
-            drawEllipse(x, y, 250, 0, rainbowDrawer);
+            drawEllipse(x, y, 50, 50, rainbowDrawer);
         }
 
         private void drawEllipse(float x, float y, float radius, int color, RainbowDrawer rainbowDrawer) {

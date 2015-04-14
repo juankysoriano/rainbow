@@ -5,11 +5,11 @@ import android.os.Bundle;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.demo.sketch.rainbow.LibraryApplication;
-import com.juankysoriano.rainbow.demo.sketch.rainbow.ink.InkSketch;
+import com.juankysoriano.rainbow.demo.sketch.rainbow.forces.RainbowParticleSystem;
 
 public class SketchActivity extends Activity {
 
-    private InkSketch sketch;
+    private RainbowParticleSystem sketch;
     private ViewGroup sketchView;
 
     @Override
@@ -18,7 +18,7 @@ public class SketchActivity extends Activity {
         LibraryApplication.setContext(this);
         setContentView(R.layout.sketch);
         sketchView = getSketchView();
-        sketch = InkSketch.newInstance(sketchView);
+        sketch = new RainbowParticleSystem(sketchView);
     }
 
     private ViewGroup getSketchView() {
