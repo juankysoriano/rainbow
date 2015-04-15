@@ -37,13 +37,17 @@ public class RainbowTextureView extends TextureView implements SurfaceTextureLis
         float py = rainbowInputController.getY();
         float diffX = event.getX() - px;
         float diffY = event.getY() - py;
-        int divisions = getContext().getResources().getInteger(R.integer.dragging_divisions);
+        int divisions = getDivisionsFor(event);
         for (int i = 0; i < divisions; i++) {
             float newEventX = px + diffX * (i + 1) / 2;
             float newEventY = py + diffY * (i + 1) / 2;
             MotionEvent subEvent = obtainEventWithNewPosition(event, newEventX, newEventY);
             rainbowInputController.postEvent(subEvent, rainbow.getRainbowDrawer());
         }
+    }
+
+    private int getDivisionsFor(MotionEvent event) {
+        return event.getAction() != MotionEvent.ACTION_MOVE ? 1 : getContext().getResources().getInteger(R.integer.dragging_divisions);
     }
 
     private MotionEvent obtainEventWithNewPosition(@NonNull MotionEvent event, float newEventX, float newEventY) {
