@@ -58,17 +58,11 @@ public class RainbowInputController {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                screenTouched = true;
-                fingerPositionPredictor.resetTo(x, y);
-                if (hasInteractionListener()) {
-                    rainbowInteractionListener.onSketchTouched(event, rainbowDrawer);
-                }
+                performTouch(event, rainbowDrawer);
                 break;
             case MotionEvent.ACTION_UP:
                 screenTouched = false;
-                if (hasInteractionListener()) {
-                    rainbowInteractionListener.onSketchReleased(event, rainbowDrawer);
-                }
+                performRelease(event, rainbowDrawer);
                 break;
             case MotionEvent.ACTION_MOVE:
                 screenTouched = true;
@@ -76,24 +70,35 @@ public class RainbowInputController {
                 break;
         }
 
+        performMotion(event, rainbowDrawer);
+    }
+
+    private void performTouch(MotionEvent event, RainbowDrawer rainbowDrawer) {
+        screenTouched = true;
+        fingerPositionPredictor.resetTo(x, y);
         if (hasInteractionListener()) {
-            rainbowInteractionListener.onMotionEvent(event, rainbowDrawer);
+            rainbowInteractionListener.onSketchTouched(event, rainbowDrawer);
+        }
+    }
+
+    private void performRelease(MotionEvent event, RainbowDrawer rainbowDrawer) {
+        fingerPositionPredictor.resetTo(x, y);
+        if (hasInteractionListener()) {
+            rainbowInteractionListener.onSketchReleased(event, rainbowDrawer);
         }
     }
 
     private void performMove(MotionEvent event, RainbowDrawer rainbowDrawer) {
-        notifyFingerDraggedFor(px, py, x, y, event, rainbowDrawer);
-    }
-
-    private void notifyFingerDraggedFor(float px, float py, float x, float y, MotionEvent event, RainbowDrawer rainbowDrawer) {
-        this.px = px;
-        this.py = py;
-        this.x = x;
-        this.y = y;
         fingerPositionPredictor.moveTo(x, y);
         if (hasInteractionListener()) {
             event.setLocation(x, y);
             rainbowInteractionListener.onFingerDragged(event, rainbowDrawer);
+        }
+    }
+
+    private void performMotion(MotionEvent event, RainbowDrawer rainbowDrawer) {
+        if (hasInteractionListener()) {
+            rainbowInteractionListener.onMotionEvent(event, rainbowDrawer);
         }
     }
 
