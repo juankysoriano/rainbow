@@ -18,7 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Rainbow implements PaintStepListener {
-    private static final int DEFAULT_FRAME_RATE = 180;
+    private static final int DEFAULT_FRAME_RATE = 60;
     private float frameRate = DEFAULT_FRAME_RATE;
     private boolean surfaceReady;
     private int width;
