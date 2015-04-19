@@ -210,4 +210,4 @@ License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 [1]:https://github.com/processing
-[2]:https://github.com/juankysoriano/rainbow/tree/master/demo
+[2]:https://github.com/juankysoriano/rainbow/
