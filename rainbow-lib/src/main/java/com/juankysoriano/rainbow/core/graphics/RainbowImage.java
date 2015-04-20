@@ -28,9 +28,9 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
 import android.net.Uri;
+import android.provider.MediaStore;
 
 import com.juankysoriano.rainbow.core.Rainbow;
-import com.juankysoriano.rainbow.utils.CaptureSketchUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -1910,7 +1910,7 @@ public class RainbowImage implements Cloneable {
     }
 
     public Uri save(ContentResolver contentResolver, String title, String description) {
-        return CaptureSketchUtils.insertImage(contentResolver, bitmap, title, description);
+        return Uri.parse(MediaStore.Images.Media.insertImage(contentResolver, bitmap, title, description));
     }
 
     public int getWidth() {
