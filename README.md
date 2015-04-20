@@ -123,16 +123,16 @@ You can also register to it a `RainbowInteractionListener` for more fine grained
 
 ```java
 public interface RainbowInteractionListener {
-    void onSketchTouched(final RainbowEvent event, 
+    void onSketchTouched(final MotionEvent event, 
                         final RainbowDrawer rainbowDrawer);
 
-    void onSketchReleased(final RainbowEvent event, 
+    void onSketchReleased(final MotionEvent event, 
                         final RainbowDrawer rainbowDrawer);
 
-    void onFingerDragged(final RainbowEvent event, 
+    void onFingerDragged(final MotionEvent event, 
                         final RainbowDrawer rainbowDrawer);
 
-    void onMotionEvent(final RainbowEvent event, 
+    void onMotionEvent(final MotionEvent event, 
                         final RainbowDrawer rainbowDrawer);
 }
 ```
