@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 
 import java.io.FileNotFoundException;
@@ -43,12 +44,12 @@ public abstract class CaptureSketchUtils {
         Uri uri = null;
 
         try {
-            uri = cr.insert(Images.Media.INTERNAL_CONTENT_URI, values);
+            uri = cr.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 
             if (source != null) {
                 OutputStream imageOut = cr.openOutputStream(uri);
                 try {
-                    source.compress(Bitmap.CompressFormat.JPEG, 100, imageOut);
+                    source.compress(Bitmap.CompressFormat.JPEG, 50, imageOut);
                 } finally {
                     imageOut.close();
                 }
