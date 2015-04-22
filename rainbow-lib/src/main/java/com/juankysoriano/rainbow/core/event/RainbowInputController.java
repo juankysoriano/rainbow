@@ -13,6 +13,7 @@ public class RainbowInputController {
     private float x, y;
     private float px, py;
     private boolean screenTouched;
+    private boolean fingerMoving;
 
     public RainbowInputController() {
         fingerPositionPredictor = new FingerPositionSmoother();
@@ -58,14 +59,18 @@ public class RainbowInputController {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                screenTouched = true;
+                fingerMoving = false;
                 performTouch(event, rainbowDrawer);
                 break;
             case MotionEvent.ACTION_UP:
                 screenTouched = false;
+                fingerMoving = false;
                 performRelease(event, rainbowDrawer);
                 break;
             case MotionEvent.ACTION_MOVE:
                 screenTouched = true;
+                fingerMoving = true;
                 performMove(event, rainbowDrawer);
                 break;
         }
@@ -74,7 +79,6 @@ public class RainbowInputController {
     }
 
     private void performTouch(MotionEvent event, RainbowDrawer rainbowDrawer) {
-        screenTouched = true;
         fingerPositionPredictor.resetTo(x, y);
         if (hasInteractionListener()) {
             rainbowInteractionListener.onSketchTouched(event, rainbowDrawer);
@@ -104,6 +108,10 @@ public class RainbowInputController {
 
     public boolean isScreenTouched() {
         return screenTouched;
+    }
+
+    public boolean isFingerMoving() {
+        return fingerMoving;
     }
 
     private void postHandleEvent(MotionEvent event) {

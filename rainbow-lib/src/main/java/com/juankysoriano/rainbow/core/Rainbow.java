@@ -18,7 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Rainbow implements PaintStepListener {
-    private static final int DEFAULT_FRAME_RATE = 60;
+    private static final int DEFAULT_FRAME_RATE = 120;
     private float frameRate = DEFAULT_FRAME_RATE;
     private boolean surfaceReady;
     private int width;
@@ -147,7 +147,7 @@ public class Rainbow implements PaintStepListener {
             resumed = true;
             paused = false;
             if (hasDrawingScheduler() || drawingScheduler.isTerminated()) {
-                drawingScheduler = Executors.newSingleThreadScheduledExecutor();
+                drawingScheduler = Executors.newScheduledThreadPool(10);
                 drawingScheduler.scheduleAtFixedRate(drawingTask, 0, drawingTask.getDelay(), TimeUnit.MILLISECONDS);
             }
         }
@@ -176,22 +176,18 @@ public class Rainbow implements PaintStepListener {
                 && rainbowDrawer.hasGraphics()
                 && surfaceReady
                 && isSetup
-                && !rainbowInputController.isScreenTouched();
+                && !rainbowInputController.isFingerMoving();
     }
 
     private void performDrawingStep() {
         frameCount++;
         if (hasToPaintIntoBuffer()) {
-            doDrawingIfNotTouching();
+            onDrawingStep();
         } else {
             rainbowDrawer.beginDraw();
-            doDrawingIfNotTouching();
+            onDrawingStep();
             rainbowDrawer.endDraw();
         }
-    }
-
-    private void doDrawingIfNotTouching() {
-        onDrawingStep();
     }
 
     private boolean hasToPaintIntoBuffer() {
