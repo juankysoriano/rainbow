@@ -3544,4 +3544,6 @@ public abstract class RainbowGraphics extends RainbowImage {
     public boolean isGL() {
         return false;
     }
+
+    public abstract boolean imageChanged();
 }

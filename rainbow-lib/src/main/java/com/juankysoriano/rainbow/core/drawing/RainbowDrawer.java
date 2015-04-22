@@ -410,6 +410,10 @@ public class RainbowDrawer {
         drawing = false;
     }
 
+    public boolean imageChanged() {
+        return graphics.imageChanged();
+    }
+
     /**
      * Start a new shape of type POLYGON
      */
