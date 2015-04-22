@@ -6,6 +6,9 @@ import android.view.MotionEvent;
 import com.juankysoriano.rainbow.core.PaintStepListener;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RainbowInputController {
     private final FingerPositionSmoother fingerPositionPredictor;
     private PaintStepListener paintStepListener;
@@ -14,34 +17,34 @@ public class RainbowInputController {
     private float px, py;
     private boolean screenTouched;
     private boolean fingerMoving;
+    private List<AsyncTask> runningInputEventTasks;
 
     public RainbowInputController() {
+        runningInputEventTasks = new ArrayList<>();
         fingerPositionPredictor = new FingerPositionSmoother();
         x = y = px = py = -1;
     }
 
     public void postEvent(final MotionEvent motionEvent, final RainbowDrawer rainbowDrawer) {
-        AsyncTask<MotionEvent, Void, MotionEvent> postTask = new AsyncTask<MotionEvent, Void, MotionEvent>() {
-            @Override
-            protected void onPreExecute() {
-                preHandleEvent(motionEvent);
-            }
+        switch (motionEvent.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                new RainbowInputEventTask(motionEvent, rainbowDrawer).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, motionEvent);
+                break;
+            case MotionEvent.ACTION_UP:
+                cancelAllRunningTasks();
+                new RainbowInputEventTask(motionEvent, rainbowDrawer).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, motionEvent);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                runningInputEventTasks.add(new RainbowInputEventTask(motionEvent, rainbowDrawer).execute(motionEvent));
+                break;
+        }
+    }
 
-            @Override
-            protected MotionEvent doInBackground(MotionEvent... motionEvents) {
-                MotionEvent motionEvent = motionEvents[0];
-                handleSketchEvent(motionEvents[0], rainbowDrawer);
-                paintStepListener.onDrawingStep();
-                return motionEvent;
-            }
-
-            @Override
-            protected void onPostExecute(MotionEvent motionEvent) {
-                postHandleEvent(motionEvent);
-            }
-        };
-
-        postTask.execute(motionEvent);
+    private void cancelAllRunningTasks() {
+        for(AsyncTask asyncTask: runningInputEventTasks) {
+            asyncTask.cancel(true);
+        }
+        runningInputEventTasks.clear();
     }
 
     private void preHandleEvent(MotionEvent event) {
@@ -227,5 +230,35 @@ public class RainbowInputController {
         void onFingerDragged(final MotionEvent event, final RainbowDrawer rainbowDrawer);
 
         void onMotionEvent(final MotionEvent event, final RainbowDrawer rainbowDrawer);
+    }
+
+    private class RainbowInputEventTask extends AsyncTask<MotionEvent, Void, MotionEvent> {
+        private final MotionEvent motionEvent;
+        private final RainbowDrawer rainbowDrawer;
+
+        public RainbowInputEventTask(MotionEvent motionEvent, RainbowDrawer rainbowDrawer) {
+            this.motionEvent = motionEvent;
+            this.rainbowDrawer = rainbowDrawer;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            preHandleEvent(motionEvent);
+        }
+
+        @Override
+        protected MotionEvent doInBackground(MotionEvent... motionEvents) {
+            MotionEvent motionEvent = motionEvents[0];
+            handleSketchEvent(motionEvents[0], rainbowDrawer);
+            paintStepListener.onDrawingStep();
+            return motionEvent;
+        }
+
+        @Override
+        protected void onPostExecute(MotionEvent motionEvent) {
+            postHandleEvent(motionEvent);
+        }
+
+
     }
 }

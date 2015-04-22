@@ -18,7 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Rainbow implements PaintStepListener {
-    private static final int DEFAULT_FRAME_RATE = 120;
+    private static final int DEFAULT_FRAME_RATE = 60;
     private float frameRate = DEFAULT_FRAME_RATE;
     private boolean surfaceReady;
     private int width;
@@ -147,7 +147,7 @@ public class Rainbow implements PaintStepListener {
             resumed = true;
             paused = false;
             if (hasDrawingScheduler() || drawingScheduler.isTerminated()) {
-                drawingScheduler = Executors.newScheduledThreadPool(10);
+                drawingScheduler = Executors.newSingleThreadScheduledExecutor();
                 drawingScheduler.scheduleAtFixedRate(drawingTask, 0, drawingTask.getDelay(), TimeUnit.MILLISECONDS);
             }
         }

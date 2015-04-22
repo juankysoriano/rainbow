@@ -3545,5 +3545,4 @@ public abstract class RainbowGraphics extends RainbowImage {
         return false;
     }
 
-    public abstract boolean imageChanged();
 }
