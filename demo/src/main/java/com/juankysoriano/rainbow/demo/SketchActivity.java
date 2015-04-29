@@ -10,15 +10,13 @@ import com.juankysoriano.rainbow.demo.sketch.rainbow.forces.RainbowParticleSyste
 public class SketchActivity extends Activity {
 
     private RainbowParticleSystem sketch;
-    private ViewGroup sketchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LibraryApplication.setContext(this);
         setContentView(R.layout.sketch);
-        sketchView = getSketchView();
-        sketch = new RainbowParticleSystem(sketchView);
+        sketch = new RainbowParticleSystem(getSketchView());
     }
 
     private ViewGroup getSketchView() {
@@ -34,7 +32,7 @@ public class SketchActivity extends Activity {
     @Override
     public void onStart() {
         super.onStart();
-        sketch.start();
+        sketch.start(this);
     }
 
     @Override
@@ -45,13 +43,13 @@ public class SketchActivity extends Activity {
 
     @Override
     public void onStop() {
-        sketch.stop();
+        sketch.stop(this);
         super.onStop();
     }
 
     @Override
     public void onDestroy() {
-        sketch.destroy();
+        sketch.destroy(this);
         super.onDestroy();
     }
 }

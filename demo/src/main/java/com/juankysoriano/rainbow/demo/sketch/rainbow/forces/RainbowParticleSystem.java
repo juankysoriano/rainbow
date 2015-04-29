@@ -26,22 +26,26 @@ public class RainbowParticleSystem extends Rainbow implements RainbowInputContro
 
     @Override
     public void onDrawingStart() {
+        super.onDrawingStart();
         getRainbowInputController().setRainbowInteractionListener(this);
     }
 
     @Override
     public void onDrawingStep() {
+        super.onDrawingStep();
         particleWorld.updateAndDisplay(getRainbowDrawer());
     }
 
     @Override
     public void onDrawingStop() {
         getRainbowInputController().removeSketchInteractionListener();
+        super.onDrawingStop();
     }
 
     @Override
     public void onSketchDestroy() {
         particleWorld = null;
+        super.onSketchDestroy();
     }
 
     @Override

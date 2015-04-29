@@ -3,7 +3,7 @@ package com.juankysoriano.rainbow.core.event;
 import android.os.AsyncTask;
 import android.view.MotionEvent;
 
-import com.juankysoriano.rainbow.core.PaintStepListener;
+import com.juankysoriano.rainbow.core.InputEventListener;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.List;
 
 public class RainbowInputController {
     private final FingerPositionSmoother fingerPositionPredictor;
-    private PaintStepListener paintStepListener;
+    private InputEventListener inputEventListener;
     private RainbowInteractionListener rainbowInteractionListener;
     private float x, y;
     private float px, py;
@@ -147,15 +147,15 @@ public class RainbowInputController {
     }
 
     public boolean hasPaintStepListener() {
-        return this.paintStepListener != null;
+        return this.inputEventListener != null;
     }
 
-    public void setPaintStepListener(PaintStepListener paintStepListener) {
-        this.paintStepListener = paintStepListener;
+    public void setInputEventListener(InputEventListener inputEventListener) {
+        this.inputEventListener = inputEventListener;
     }
 
     public void removePaintStepListener() {
-        this.paintStepListener = null;
+        this.inputEventListener = null;
     }
 
     public float getX() {
@@ -250,7 +250,7 @@ public class RainbowInputController {
         protected MotionEvent doInBackground(MotionEvent... motionEvents) {
             MotionEvent motionEvent = motionEvents[0];
             handleSketchEvent(motionEvents[0], rainbowDrawer);
-            paintStepListener.onDrawingStep();
+            inputEventListener.onInputEvent();
             return motionEvent;
         }
 
