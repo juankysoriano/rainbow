@@ -20,11 +20,9 @@ public class EdgeDetection extends Metaballs2D {
     // Constructor
     // --------------------------------------------
     public EdgeDetection(int imgWidth, int imgHeight) {
+        super.init(imgWidth, imgHeight);
         this.imgWidth = imgWidth;
         this.imgHeight = imgHeight;
-        super.init(imgWidth, imgHeight);
-
-        // colorFlag=C_ALL;
         posDiscrimination = false;
     }
 
@@ -47,15 +45,6 @@ public class EdgeDetection extends Metaballs2D {
         }
         setIsovalue(value * m_coeff);
     }
-
-
-    // --------------------------------------------
-    // setComponent()
-    // --------------------------------------------
-    /*
-     * public void setComponent(byte flag) { if (flag==0) flag = C_ALL;
-	 * colorFlag = flag; }
-	 */
 
     // --------------------------------------------
     // setImage()
@@ -81,11 +70,7 @@ public class EdgeDetection extends Metaballs2D {
         int pixel, r, g, b;
         int x, y;
         int offset;
-        float coeff = 0.0f;
 
-        r = 0;
-        g = 0;
-        b = 0;
         for (y = 0; y < imgHeight; y++)
             for (x = 0; x < imgWidth; x++) {
                 offset = x + imgWidth * y;
@@ -96,7 +81,7 @@ public class EdgeDetection extends Metaballs2D {
                 g = (pixel & 0x0000FF00) >> 8;
                 b = (pixel & 0x000000FF);
 
-                gridValue[offset] = (float) (r + g + b);// /m_coeff
+                gridValue[offset] = (float) (r + g + b);
             }
     }
 
@@ -105,33 +90,33 @@ public class EdgeDetection extends Metaballs2D {
     // --------------------------------------------
     protected int getSquareIndex(int x, int y) {
         int squareIndex = 0;
-        int offy = resx * y;
-        int offy1 = resx * (y + 1);
+        int offY = resx * y;
+        int nextOffY = resx * (y + 1);
 
-        if (posDiscrimination == false) {
-            if (gridValue[x + offy] < isovalue) {
+        if (posDiscrimination) {
+            if (gridValue[x + offY] > isovalue) {
                 squareIndex |= 1;
             }
-            if (gridValue[x + 1 + offy] < isovalue) {
+            if (gridValue[x + 1 + offY] > isovalue) {
                 squareIndex |= 2;
             }
-            if (gridValue[x + 1 + offy1] < isovalue) {
+            if (gridValue[x + 1 + nextOffY] > isovalue) {
                 squareIndex |= 4;
             }
-            if (gridValue[x + offy1] < isovalue) {
+            if (gridValue[x + nextOffY] > isovalue) {
                 squareIndex |= 8;
             }
         } else {
-            if (gridValue[x + offy] > isovalue) {
+            if (gridValue[x + offY] < isovalue) {
                 squareIndex |= 1;
             }
-            if (gridValue[x + 1 + offy] > isovalue) {
+            if (gridValue[x + 1 + offY] < isovalue) {
                 squareIndex |= 2;
             }
-            if (gridValue[x + 1 + offy1] > isovalue) {
+            if (gridValue[x + 1 + nextOffY] < isovalue) {
                 squareIndex |= 4;
             }
-            if (gridValue[x + offy1] > isovalue) {
+            if (gridValue[x + nextOffY] < isovalue) {
                 squareIndex |= 8;
             }
         }

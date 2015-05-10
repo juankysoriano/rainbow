@@ -14,9 +14,9 @@ public class Blob {
     public int[] line;
     public int nbLine;
 
-    public Blob(BlobDetection parent) {
+    public Blob(BlobDetection parent, int maxLinesPerBlob) {
         this.parent = parent;
-        line = new int[parent.MAX_NBLINE]; // stack of index
+        line = new int[maxLinesPerBlob]; // stack of index
         nbLine = 0;
     }
 

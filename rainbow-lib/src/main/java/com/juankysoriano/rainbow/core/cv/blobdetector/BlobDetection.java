@@ -6,17 +6,14 @@ import java.util.Arrays;
 //class BlobDetection
 //==================================================
 public class BlobDetection extends EdgeDetection {
-    public static int MAX_NBLINE = 4000;
-    public static int MAX_NB = 1000;
-    // Temp
-    public int blobNumber;
-    public boolean[] gridVisited;
-    public ThreadGroup threadGroup = new ThreadGroup("BLOB");
+    public static final int DEFAULT_MAX_LINES_PER_BLOB = 4000;
+    public static final int DEFAULT_MAX_NUMBER_OF_BLOBS = 1000;
 
-    public int blobWidthMin, blobHeightMin;
-    private static int counter = 0;
-    // Temp
-    Object parent;
+    private int blobNumber;
+    private final boolean[] gridVisited;
+    private final ThreadGroup threadGroup = new ThreadGroup("BLOB");
+    private int maxNumberOfBlobs = DEFAULT_MAX_NUMBER_OF_BLOBS;
+    private int maxLinesPerBlob = DEFAULT_MAX_LINES_PER_BLOB;
 
     // --------------------------------------------
     // Constructor
@@ -26,17 +23,16 @@ public class BlobDetection extends EdgeDetection {
 
         gridVisited = new boolean[nbGridValue];
         blobNumber = 0;
-        blobWidthMin = 0;
-        blobHeightMin = 0;
+    }
+
+    public BlobDetection(int imgWidth, int imgHeight, int maxNumberOfBlobs, int maxLinesPerBlob) {
+        this(imgWidth, imgHeight);
+        this.maxNumberOfBlobs = maxNumberOfBlobs;
+        this.maxLinesPerBlob = maxLinesPerBlob;
     }
 
     public int getBlobNb() {
         return blobNumber;
-    }
-
-    public static void setConstants(int maxBlobNb, int maxBlobNLine) {
-        MAX_NB = maxBlobNb;
-        MAX_NBLINE = maxBlobNLine;
     }
 
     // --------------------------------------------
@@ -44,7 +40,6 @@ public class BlobDetection extends EdgeDetection {
     // --------------------------------------------
     public void computeBlobs(int[] pixels, final OnBlobDetectedCallback onBlobDetectedCallback) {
         setImage(pixels);
-        counter = 0;
 
         Thread thread = new Thread(threadGroup, new Runnable() {
             @Override
@@ -54,12 +49,12 @@ public class BlobDetection extends EdgeDetection {
 
                 computeIsovalue();
 
-                int x, y, squareIndex, n;
+                int x, y, squareIndex;
                 int offset;
 
                 nbLineToDraw = 0;
                 blobNumber = 0;
-                Blob newBlob = new Blob(BlobDetection.this);
+                Blob newBlob = new Blob(BlobDetection.this, maxLinesPerBlob);
                 for (x = 0; x < resx - 1; x++) {
                     for (y = 0; y < resy - 1; y++) {
                         offset = x + resx * y;
@@ -67,7 +62,7 @@ public class BlobDetection extends EdgeDetection {
                             squareIndex = getSquareIndex(x, y);
 
                             if (squareIndex > 0 && squareIndex < 15) {
-                                if (blobNumber >= 0 && blobNumber < MAX_NB) {
+                                if (blobNumber >= 0 && blobNumber < maxNumberOfBlobs) {
                                     findBlob(newBlob, x, y, onBlobDetectedCallback);
                                     blobNumber++;
                                 }
@@ -114,9 +109,9 @@ public class BlobDetection extends EdgeDetection {
 
         gridVisited[offset] = true;
 
-        if (newBlob.nbLine < MAX_NBLINE) {
+        if (newBlob.nbLine < maxLinesPerBlob) {
             nbLineToDraw++;
-            newBlob.line[newBlob.nbLine++] = ((x) * resy + (y)) * 2 ;
+            newBlob.line[newBlob.nbLine++] = ((x) * resy + (y)) * 2;
 
             calculateNextEdgeVertex(newBlob, x, y);
             try {
@@ -160,16 +155,16 @@ public class BlobDetection extends EdgeDetection {
         int squareIndex = getSquareIndex(x, y);
         byte neighborVoxel = MetaballsTable.neightborVoxel[squareIndex];
 
-        if (x < resx - 2 && (neighborVoxel & (1 << 0)) > 0) {
+        if (x < resx - 2 && (neighborVoxel & 1) == 1) {
             computeEdgeVertex(newBlob, x + 1, y);
         }
-        if (x > 0 && (neighborVoxel & (1 << 1)) > 0) {
+        if (x > 0 && (neighborVoxel & 2) == 2) {
             computeEdgeVertex(newBlob, x - 1, y);
         }
-        if (y < resy - 2 && (neighborVoxel & (1 << 2)) > 0) {
+        if (y < resy - 2 && (neighborVoxel & 4) == 4) {
             computeEdgeVertex(newBlob, x, y + 1);
         }
-        if (y > 0 && (neighborVoxel & (1 << 3)) > 0) {
+        if (y > 0 && (neighborVoxel & 8) == 8) {
             computeEdgeVertex(newBlob, x, y - 1);
         }
     }
