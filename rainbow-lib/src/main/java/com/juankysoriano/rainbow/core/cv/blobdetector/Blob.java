@@ -1,18 +1,19 @@
 package com.juankysoriano.rainbow.core.cv.blobdetector;
 
+import com.juankysoriano.rainbow.core.matrix.RVector;
+
 //==================================================
 //class Blob
 //==================================================
 public class Blob {
-    public BlobDetection parent;
+    protected int id;
+    protected float x, y; // position of its center
+    protected float w, h; // width & height
+    protected int[] line;
+    protected float xMin, xMax, yMin, yMax;
+    protected int nbLine;
 
-    public int id;
-    public float x, y; // position of its center
-    public float w, h; // width & height
-    public float xMin, xMax, yMin, yMax;
-
-    public int[] line;
-    public int nbLine;
+    private final BlobDetection parent;
 
     public Blob(BlobDetection parent, int maxLinesPerBlob) {
         this.parent = parent;
@@ -46,5 +47,13 @@ public class Blob {
         x = 0.5f * (xMax + xMin);
         y = 0.5f * (yMax + yMin);
         nbLine /= 2;
+    }
+
+    public float getArea() {
+        return w * h;
+    }
+
+    public RVector getCenter() {
+        return new RVector(x, y);
     }
 }
