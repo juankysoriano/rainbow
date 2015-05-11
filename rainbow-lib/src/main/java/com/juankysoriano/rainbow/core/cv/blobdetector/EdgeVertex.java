@@ -1,8 +1,5 @@
 package com.juankysoriano.rainbow.core.cv.blobdetector;
 
-//==================================================
-//class EdgeVertex
-//==================================================
 public class EdgeVertex {
     public float x, y;
 
@@ -10,4 +7,4 @@ public class EdgeVertex {
         this.x = x;
         this.y = y;
     }
-};
+}

@@ -3,16 +3,31 @@ package com.juankysoriano.rainbow.core.cv.blobdetector;
 //==================================================
 //class EdgeDetection
 //==================================================
-public class EdgeDetection extends Metaballs2D {
-    public final static byte C_R = 0x01;
-    public final static byte C_G = 0x02;
-    public final static byte C_B = 0x04;
-    // public final static byte C_ALL = C_R|C_G|C_B;
+public class EdgeDetection {
 
+    // Isovalue
+    // ------------------
+    protected float isovalue;
+
+    // Grid
+    // ------------------
+    protected int resx, resy;
+    protected float stepx, stepy;
+    protected float[] gridValue;
+    protected int nbGridValue;
+
+    // EdgeVertex
+    // ------------------
+    protected EdgeVertex[] edgeVrt;
+    protected int nbEdgeVrt;
+
+    // Lines
+    // what we pass to the renderer
+    // ------------------
+    protected int nbLineToDraw;
     // public byte colorFlag;
     public int imgWidth, imgHeight;
     public int[] pixels;
-    public boolean posDiscrimination;
 
     public float m_coeff = 3.0f * 255.0f;
 
@@ -20,17 +35,9 @@ public class EdgeDetection extends Metaballs2D {
     // Constructor
     // --------------------------------------------
     public EdgeDetection(int imgWidth, int imgHeight) {
-        super.init(imgWidth, imgHeight);
+        init(imgWidth, imgHeight);
         this.imgWidth = imgWidth;
         this.imgHeight = imgHeight;
-        posDiscrimination = false;
-    }
-
-    // --------------------------------------------
-    // setPosDiscrimination()
-    // --------------------------------------------
-    public void setPosDiscrimination(boolean is) {
-        posDiscrimination = is;
     }
 
     // --------------------------------------------
@@ -53,14 +60,6 @@ public class EdgeDetection extends Metaballs2D {
         if (pixels != this.pixels) {
             this.pixels = pixels;
         }
-    }
-
-    // --------------------------------------------
-    // computeEdges()
-    // --------------------------------------------
-    public void computeEdges(int[] pixels) {
-        setImage(pixels);
-        computeMesh();
     }
 
     // --------------------------------------------
@@ -93,32 +92,17 @@ public class EdgeDetection extends Metaballs2D {
         int offY = resx * y;
         int nextOffY = resx * (y + 1);
 
-        if (posDiscrimination) {
-            if (gridValue[x + offY] > isovalue) {
-                squareIndex |= 1;
-            }
-            if (gridValue[x + 1 + offY] > isovalue) {
-                squareIndex |= 2;
-            }
-            if (gridValue[x + 1 + nextOffY] > isovalue) {
-                squareIndex |= 4;
-            }
-            if (gridValue[x + nextOffY] > isovalue) {
-                squareIndex |= 8;
-            }
-        } else {
-            if (gridValue[x + offY] < isovalue) {
-                squareIndex |= 1;
-            }
-            if (gridValue[x + 1 + offY] < isovalue) {
-                squareIndex |= 2;
-            }
-            if (gridValue[x + 1 + nextOffY] < isovalue) {
-                squareIndex |= 4;
-            }
-            if (gridValue[x + nextOffY] < isovalue) {
-                squareIndex |= 8;
-            }
+        if (gridValue[x + offY] > isovalue) {
+            squareIndex |= 1;
+        }
+        if (gridValue[x + 1 + offY] > isovalue) {
+            squareIndex |= 2;
+        }
+        if (gridValue[x + 1 + nextOffY] > isovalue) {
+            squareIndex |= 4;
+        }
+        if (gridValue[x + nextOffY] > isovalue) {
+            squareIndex |= 8;
         }
         return squareIndex;
     }
@@ -129,4 +113,44 @@ public class EdgeDetection extends Metaballs2D {
     public EdgeVertex getEdgeVertex(int index) {
         return edgeVrt[index];
     }
-};
+
+    // init(int, int)
+    // ------------------
+    public void init(int resx, int resy) {
+        this.resx = resx;
+        this.resy = resy;
+
+        this.stepx = 1.0f / ((float) (resx - 1));
+        this.stepy = 1.0f / ((float) (resy - 1));
+
+        // Allocate gridValue
+        nbGridValue = resx * resy;
+        gridValue = new float[nbGridValue];
+
+        // Allocate EdgeVertices
+        edgeVrt = new EdgeVertex[2 * nbGridValue];
+        nbEdgeVrt = 2 * nbGridValue;
+
+        // Allocate Lines
+        nbLineToDraw = 0;
+
+        // Precompute some values
+        int n = 0;
+        for (int x = 0; x < resx; x++) {
+            for (int y = 0; y < resy; y++) {
+                int index = 2 * n;
+                edgeVrt[index] = new EdgeVertex(x * stepx, y * stepy);
+                edgeVrt[index + 1] = new EdgeVertex(x * stepx, y * stepy);
+                n++;
+            }
+        }
+
+    }
+
+    // setIsoValue(float)
+    // ------------------
+    public void setIsovalue(float iso) {
+        this.isovalue = iso;
+    }
+
+}

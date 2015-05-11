@@ -65,6 +65,10 @@ public class BlobDetection extends EdgeDetection {
                                 if (blobNumber >= 0 && blobNumber < maxNumberOfBlobs) {
                                     findBlob(newBlob, x, y, onBlobDetectedCallback);
                                     blobNumber++;
+                                } else {
+                                    nbLineToDraw /= 2;
+                                    onBlobDetectedCallback.onBlobDetectionFinish();
+                                    return;
                                 }
                             }
                         }
@@ -107,65 +111,54 @@ public class BlobDetection extends EdgeDetection {
             return;
         }
 
-        gridVisited[offset] = true;
-
         if (newBlob.nbLine < maxLinesPerBlob) {
+            gridVisited[offset] = true;
             nbLineToDraw++;
             newBlob.line[newBlob.nbLine++] = ((x) * resy + (y)) * 2;
 
-            calculateNextEdgeVertex(newBlob, x, y);
-            try {
-                computeNextEdgeVertex(newBlob, x, y);
-            } catch (StackOverflowError error) {
-                computeNextEdgeVertex(newBlob, x, y);
+            calculateEdgeVertex(newBlob, x, y);
+
+            int squareIndex = getSquareIndex(x, y);
+            byte neighborVoxel = MetaballsTable.neightborVoxel[squareIndex];
+            if (x < resx - 2 && (neighborVoxel & 1) == 1) {
+                computeEdgeVertex(newBlob, x + 1, y);
+            }
+            if (x > 0 && (neighborVoxel & 2) == 2) {
+                computeEdgeVertex(newBlob, x - 1, y);
+            }
+            if (y < resy - 2 && (neighborVoxel & 4) == 4) {
+                computeEdgeVertex(newBlob, x, y + 1);
+            }
+            if (y > 0 && (neighborVoxel & 8) == 8) {
+                computeEdgeVertex(newBlob, x, y - 1);
             }
         }
     }
 
-    private void calculateNextEdgeVertex(Blob newBlob, int x, int y) {
+    private void calculateEdgeVertex(Blob newBlob, int x, int y) {
         int index = (x * resy + y) * 2;
         int offset = x + resx * y;
         int squareIndex = getSquareIndex(x, y);
         int toCompute = MetaballsTable.edgeToCompute[squareIndex];
-        if (toCompute > 0) {
-            float t;
-            float value;
-            if ((toCompute & 1) > 0) {
-                float vx = (float) x * stepx;
-                t = (isovalue - gridValue[offset]) / (gridValue[offset + 1] - gridValue[offset]);
-                value = vx * (1.0f - t) + t * (vx + stepx);
-                edgeVrt[index].x = value;
+        float t;
+        float value;
+        if ((toCompute & 1) > 0) {
+            float vx = (float) x * stepx;
+            t = (isovalue - gridValue[offset]) / (gridValue[offset + 1] - gridValue[offset]);
+            value = vx * (1.0f - t) + t * (vx + stepx);
+            edgeVrt[index].x = value;
 
-                newBlob.xMin = Math.min(value, newBlob.xMin);
-                newBlob.xMax = Math.max(value, newBlob.xMax);
-            }
-            if ((toCompute & 2) > 0) {
-                float vy = (float) y * stepy;
-                t = (isovalue - gridValue[offset]) / (gridValue[offset + resx] - gridValue[offset]);
-                value = vy * (1.0f - t) + t * (vy + stepy);
-                edgeVrt[index + 1].y = value;
+            newBlob.xMin = Math.min(value, newBlob.xMin);
+            newBlob.xMax = Math.max(value, newBlob.xMax);
+        }
+        if ((toCompute & 2) > 0) {
+            float vy = (float) y * stepy;
+            t = (isovalue - gridValue[offset]) / (gridValue[offset + resx] - gridValue[offset]);
+            value = vy * (1.0f - t) + t * (vy + stepy);
+            edgeVrt[index + 1].y = value;
 
-                newBlob.yMin = Math.min(value, newBlob.yMin);
-                newBlob.yMax = Math.max(value, newBlob.yMax);
-            }
+            newBlob.yMin = Math.min(value, newBlob.yMin);
+            newBlob.yMax = Math.max(value, newBlob.yMax);
         }
     }
-
-    private void computeNextEdgeVertex(Blob newBlob, int x, int y) {
-        int squareIndex = getSquareIndex(x, y);
-        byte neighborVoxel = MetaballsTable.neightborVoxel[squareIndex];
-
-        if (x < resx - 2 && (neighborVoxel & 1) == 1) {
-            computeEdgeVertex(newBlob, x + 1, y);
-        }
-        if (x > 0 && (neighborVoxel & 2) == 2) {
-            computeEdgeVertex(newBlob, x - 1, y);
-        }
-        if (y < resy - 2 && (neighborVoxel & 4) == 4) {
-            computeEdgeVertex(newBlob, x, y + 1);
-        }
-        if (y > 0 && (neighborVoxel & 8) == 8) {
-            computeEdgeVertex(newBlob, x, y - 1);
-        }
-    }
-};
+}
