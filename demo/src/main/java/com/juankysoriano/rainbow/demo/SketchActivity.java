@@ -5,18 +5,18 @@ import android.os.Bundle;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.demo.sketch.rainbow.LibraryApplication;
-import com.juankysoriano.rainbow.demo.sketch.rainbow.forces.RainbowParticleSystem;
+import com.juankysoriano.rainbow.demo.sketch.rainbow.detection.RainbowBlobDetection;
 
 public class SketchActivity extends Activity {
 
-    private RainbowParticleSystem sketch;
+    private RainbowBlobDetection sketch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LibraryApplication.setContext(this);
         setContentView(R.layout.sketch);
-        sketch = new RainbowParticleSystem(getSketchView());
+        sketch = new RainbowBlobDetection(getSketchView());
     }
 
     private ViewGroup getSketchView() {
@@ -32,7 +32,7 @@ public class SketchActivity extends Activity {
     @Override
     public void onStart() {
         super.onStart();
-        sketch.start(this);
+        sketch.start();
     }
 
     @Override
@@ -43,13 +43,13 @@ public class SketchActivity extends Activity {
 
     @Override
     public void onStop() {
-        sketch.stop(this);
+        sketch.stop();
         super.onStop();
     }
 
     @Override
     public void onDestroy() {
-        sketch.destroy(this);
+        sketch.destroy();
         super.onDestroy();
     }
 }
