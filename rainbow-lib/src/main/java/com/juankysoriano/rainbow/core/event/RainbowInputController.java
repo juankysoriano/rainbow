@@ -6,6 +6,7 @@ import android.view.MotionEvent;
 import com.juankysoriano.rainbow.core.InputEventListener;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,14 +29,14 @@ public class RainbowInputController {
     public void postEvent(final MotionEvent motionEvent, final RainbowDrawer rainbowDrawer) {
         switch (motionEvent.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                new RainbowInputEventTask(motionEvent, rainbowDrawer).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, motionEvent);
+                new RainbowInputEventTask(rainbowDrawer).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, motionEvent);
                 break;
             case MotionEvent.ACTION_UP:
                 cancelAllRunningTasks();
-                new RainbowInputEventTask(motionEvent, rainbowDrawer).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, motionEvent);
+                new RainbowInputEventTask(rainbowDrawer).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, motionEvent);
                 break;
             case MotionEvent.ACTION_MOVE:
-                runningInputEventTasks.add(new RainbowInputEventTask(motionEvent, rainbowDrawer).execute(motionEvent));
+                runningInputEventTasks.add(new RainbowInputEventTask(rainbowDrawer).execute(motionEvent));
                 break;
         }
     }
@@ -233,23 +234,19 @@ public class RainbowInputController {
     }
 
     private class RainbowInputEventTask extends AsyncTask<MotionEvent, Void, MotionEvent> {
-        private final MotionEvent motionEvent;
-        private final RainbowDrawer rainbowDrawer;
+        private final WeakReference<RainbowDrawer> rainbowDrawer;
 
-        public RainbowInputEventTask(MotionEvent motionEvent, RainbowDrawer rainbowDrawer) {
-            this.motionEvent = motionEvent;
-            this.rainbowDrawer = rainbowDrawer;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            preHandleEvent(motionEvent);
+        public RainbowInputEventTask(RainbowDrawer rainbowDrawer) {
+            this.rainbowDrawer = new WeakReference<>(rainbowDrawer);
         }
 
         @Override
         protected MotionEvent doInBackground(MotionEvent... motionEvents) {
             MotionEvent motionEvent = motionEvents[0];
-            handleSketchEvent(motionEvents[0], rainbowDrawer);
+            preHandleEvent(motionEvent);
+            if (this.rainbowDrawer.get() != null) {
+                handleSketchEvent(motionEvents[0], rainbowDrawer.get());
+            }
             inputEventListener.onInputEvent();
             return motionEvent;
         }

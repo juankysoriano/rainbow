@@ -16,6 +16,7 @@ public class RainbowParticleSystem extends Rainbow implements RainbowInputContro
 
     @Override
     public void onSketchSetup() {
+        super.onSketchSetup();
         getRainbowDrawer().smooth();
         getRainbowDrawer().noFill();
 

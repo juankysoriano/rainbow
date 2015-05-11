@@ -1,12 +1,6 @@
 package com.juankysoriano.rainbow.core;
 
-import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.AsyncTask;
-import android.os.IBinder;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
@@ -17,8 +11,14 @@ import com.juankysoriano.rainbow.core.event.RainbowInputController;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics2D;
 
-public class Rainbow implements InputEventListener, RainbowStepCallback {
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+public class Rainbow implements InputEventListener {
     private static final int DEFAULT_FRAME_RATE = 60;
+    private static final long TIMEOUT = 10;
+    private static final long SECOND = 1000;
     private float frameRate = DEFAULT_FRAME_RATE;
     private boolean surfaceReady;
     private int width;
@@ -29,10 +29,11 @@ public class Rainbow implements InputEventListener, RainbowStepCallback {
     private boolean paused = true;
     private boolean resumed = false;
     private boolean isSetup = false;
-    private RainbowInputController rainbowInputController;
-    private RainbowDrawer rainbowDrawer;
+    private final RainbowInputController rainbowInputController;
+    private final RainbowDrawer rainbowDrawer;
     private RainbowTextureView drawingView;
-    private RainbowService rainbowService;
+    private SetupSketchTask setupSketchTask;
+    private ScheduledExecutorService drawingScheduler;
 
     protected Rainbow(ViewGroup viewGroup) {
         this(new RainbowDrawer(), new RainbowInputController());
@@ -42,6 +43,7 @@ public class Rainbow implements InputEventListener, RainbowStepCallback {
     protected Rainbow(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
         this.rainbowInputController = rainbowInputController;
         this.rainbowDrawer = rainbowDrawer;
+        this.setupSketchTask = SetupSketchTask.newInstance(this);
     }
 
     protected Rainbow(ViewGroup viewGroup, RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
@@ -61,8 +63,9 @@ public class Rainbow implements InputEventListener, RainbowStepCallback {
     private ViewTreeObserver.OnPreDrawListener onPreDrawListener = new ViewTreeObserver.OnPreDrawListener() {
         @Override
         public boolean onPreDraw() {
-            rainbowInputController.setInputEventListener(Rainbow.this);
             removeOnPreDrawListener();
+
+            rainbowInputController.setInputEventListener(Rainbow.this);
             setupSketch();
             return true;
         }
@@ -77,71 +80,41 @@ public class Rainbow implements InputEventListener, RainbowStepCallback {
     }
 
     private void setupSketch() {
-        setupSketchTask.execute();
+        initDimensions();
+        setupSketchTask.start();
+        isSetup = true;
+        surfaceReady = true;
     }
 
-    private AsyncTask<Void, Void, Void> setupSketchTask = new AsyncTask<Void, Void, Void>() {
-        @Override
-        protected void onPreExecute() {
-            width = drawingView.getMeasuredWidth();
-            height = drawingView.getMeasuredHeight();
-            initGraphics(width, height);
-        }
+    private void initDimensions() {
+        width = drawingView.getMeasuredWidth();
+        height = drawingView.getMeasuredHeight();
+        initGraphics(width, height);
+    }
 
-        private void initGraphics(int width, int height) {
-            RainbowGraphics graphics = new RainbowGraphics2D();
-            graphics.setParent(Rainbow.this);
-            graphics.setPrimary(true);
-            if (width > 0 && height > 0) {
-                graphics.setSize(width, height);
-                rainbowDrawer.setGraphics(graphics);
-            }
+    private void initGraphics(int width, int height) {
+        RainbowGraphics graphics = new RainbowGraphics2D();
+        graphics.setParent(Rainbow.this);
+        graphics.setPrimary(true);
+        if (width > 0 && height > 0) {
+            graphics.setSize(width, height);
+            rainbowDrawer.setGraphics(graphics);
         }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            rainbowDrawer.beginDraw();
-            Rainbow.this.onSketchSetup();
-            rainbowDrawer.endDraw();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void param) {
-            isSetup = true;
-            surfaceReady = true;
-        }
-    };
-
-    private ServiceConnection rainbowServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            rainbowService = ((RainbowService.RainbowBinder) iBinder).getService();
-            rainbowService.setDrawingStepCallback(Rainbow.this);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            rainbowService = null;
-        }
-    };
+    }
 
     public void onSketchSetup() {
     }
 
-    public void start(Activity activity) {
-        if (!isStarted()) {
+    public void start() {
+        if (!isStarted() || drawingScheduler.isTerminated()) {
             onDrawingStart();
             started = true;
             stopped = false;
-            Intent intent = new Intent(activity.getApplicationContext(), RainbowService.class);
-            activity.startService(intent);
-            activity.bindService(intent, rainbowServiceConnection, Context.BIND_AUTO_CREATE);
             resume();
         }
     }
 
-    private boolean isStarted() {
+    public boolean isStarted() {
         return started;
     }
 
@@ -154,14 +127,27 @@ public class Rainbow implements InputEventListener, RainbowStepCallback {
             onDrawingResume();
             resumed = true;
             paused = false;
+            if (!hasDrawingScheduler()) {
+                drawingScheduler = Executors.newSingleThreadScheduledExecutor();
+                drawingScheduler.scheduleAtFixedRate(new DrawingTask(this), SECOND, getDelay(), TimeUnit.MILLISECONDS);
+            }
         }
     }
 
-    private boolean isResumed() {
+    private long getDelay() {
+        return Math.max(1, (long) (SECOND / frameRate));
+    }
+
+    private boolean hasDrawingScheduler() {
+        return drawingScheduler != null;
+    }
+
+    public boolean isResumed() {
         return resumed;
     }
 
     public void onDrawingResume() {
+        //no-op
     }
 
     private boolean canDraw() {
@@ -196,7 +182,6 @@ public class Rainbow implements InputEventListener, RainbowStepCallback {
     public void onDrawingStep() {
     }
 
-    @Override
     public void performStep() {
         handleDraw();
     }
@@ -214,7 +199,7 @@ public class Rainbow implements InputEventListener, RainbowStepCallback {
         }
     }
 
-    private boolean isPaused() {
+    public boolean isPaused() {
         return paused;
     }
 
@@ -222,18 +207,28 @@ public class Rainbow implements InputEventListener, RainbowStepCallback {
         //no-op
     }
 
-    public void stop(Activity activity) {
+    public void stop() {
         if (!isStopped()) {
             pause();
+            shutDownExecutioner();
             onDrawingStop();
-            rainbowService.stopSelf();
-            activity.unbindService(rainbowServiceConnection);
+            setupSketchTask.cancel();
             stopped = true;
             started = false;
         }
     }
 
-    private boolean isStopped() {
+    private void shutDownExecutioner() {
+        try {
+            drawingScheduler.shutdownNow();
+            drawingScheduler.awaitTermination(TIMEOUT, TimeUnit.SECONDS);
+            drawingScheduler = null;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean isStopped() {
         return stopped;
     }
 
@@ -241,20 +236,18 @@ public class Rainbow implements InputEventListener, RainbowStepCallback {
         //no-op
     }
 
-    public void destroy(Activity activity) {
-        stop(activity);
+    public void destroy() {
+        stop();
         onSketchDestroy();
         RainbowGraphics graphics = rainbowDrawer.getGraphics();
         if (graphics != null) {
             graphics.dispose();
         }
         drawingView = null;
-        rainbowDrawer.setGraphics(null);
-        rainbowDrawer = null;
-        rainbowInputController = null;
     }
 
     public void onSketchDestroy() {
+        //no-op
     }
 
     /**
@@ -331,4 +324,5 @@ public class Rainbow implements InputEventListener, RainbowStepCallback {
         }
         surfaceReady = true;
     }
+
 }

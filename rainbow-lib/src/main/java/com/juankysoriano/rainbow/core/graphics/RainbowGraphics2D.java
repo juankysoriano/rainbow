@@ -149,9 +149,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void dispose() {
-        normalBitmap = null;
-        canvas = null;
-        backgroundBitmapShader = null;
+        normalBitmap.recycle();
     }
 
     @Override

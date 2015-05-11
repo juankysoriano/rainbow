@@ -59,14 +59,14 @@ public class RainbowImage implements Cloneable {
     public static final int LOAD_ORIGINAL_SIZE = 2;
     // blend mode keyword definitions
     // @see imagine.core.PImage#blendColor(int,int,int)
-    static final int BLUR = 11;
-    static final int GRAY = 12;
-    static final int INVERT = 13;
-    static final int OPAQUE = 14;
-    static final int POSTERIZE = 15;
-    static final int THRESHOLD = 16;
-    static final int ERODE = 17;
-    static final int DILATE = 18;
+    public static final int BLUR = 11;
+    public static final int GRAY = 12;
+    public static final int INVERT = 13;
+    public static final int OPAQUE = 14;
+    public static final int POSTERIZE = 15;
+    public static final int THRESHOLD = 16;
+    public static final int ERODE = 17;
+    public static final int DILATE = 18;
     private final static int REPLACE = 0;
     private final static int BLEND = 1 << 0;
     private final static int ADD = 1 << 1;
