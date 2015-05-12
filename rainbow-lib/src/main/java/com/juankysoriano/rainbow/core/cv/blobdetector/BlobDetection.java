@@ -1,5 +1,6 @@
 package com.juankysoriano.rainbow.core.cv.blobdetector;
 
+import com.juankysoriano.rainbow.core.graphics.RainbowImage;
 import com.juankysoriano.rainbow.utils.RainbowMath;
 
 import java.util.Arrays;
@@ -26,19 +27,19 @@ public class BlobDetection extends EdgeDetection {
     // --------------------------------------------
     // Constructor
     // --------------------------------------------
-    public BlobDetection(int imgWidth, int imgHeight) {
-        init(imgWidth, imgHeight);
+    public BlobDetection(RainbowImage rainbowImage) {
+        init(rainbowImage);
     }
 
-    public BlobDetection(int imgWidth, int imgHeight, int maxNumberOfBlobs, int maxLinesPerBlob) {
-        this(imgWidth, imgHeight);
+    public BlobDetection(RainbowImage rainbowImage, int maxNumberOfBlobs, int maxLinesPerBlob) {
+        this(rainbowImage);
         this.maxNumberOfBlobs = maxNumberOfBlobs;
         this.maxLinesPerBlob = maxLinesPerBlob;
     }
 
-    protected void init(int resX, int resY) {
-        this.resX = resX;
-        this.resY = resY;
+    protected void init(RainbowImage rainbowImage) {
+        this.resX = rainbowImage.getWidth();
+        this.resY = rainbowImage.getHeight();
 
         this.stepX = 1.0f / ((float) (resX - 1));
         this.stepY = 1.0f / ((float) (resY - 1));
@@ -47,6 +48,7 @@ public class BlobDetection extends EdgeDetection {
         gridValue = new int[gridSize];
         gridVisited = new boolean[gridSize];
         edgeVrt = new EdgeVertex[2 * gridSize];
+        computeIsoValue(rainbowImage);
         nbLineToDraw = 0;
 
         int n = 0;
@@ -72,16 +74,18 @@ public class BlobDetection extends EdgeDetection {
         setIsoValue(RainbowMath.constrain(value, 0.0f, 1.0f) * m_coeff);
     }
 
-    public void computeIsoValue(int[] pixels) {
+    public void computeIsoValue(RainbowImage rainbowImage) {
         int color, r, g, b;
 
-        for (int i = 0; i < pixels.length; i++) {
-            color = pixels[i];
-            r = (color & 0x00FF0000) >> 16;
-            g = (color & 0x0000FF00) >> 8;
-            b = (color & 0x000000FF);
-
-            gridValue[i] = r + g + b;
+        for (int i = 0; i < rainbowImage.getWidth(); i++) {
+            for (int j = 0; j < rainbowImage.getHeight(); j++) {
+                color = rainbowImage.get(i, j);
+                r = (color & 0x00FF0000) >> 16;
+                g = (color & 0x0000FF00) >> 8;
+                b = (color & 0x000000FF);
+                int index = i + rainbowImage.getWidth() * j;
+                gridValue[index] = r + g + b;
+            }
         }
     }
 
@@ -123,12 +127,11 @@ public class BlobDetection extends EdgeDetection {
     // --------------------------------------------
     // computeBlobs()
     // --------------------------------------------
-    public void computeBlobs(final int[] pixels, final OnBlobDetectedCallback onBlobDetectedCallback) {
+    public void computeBlobs(final OnBlobDetectedCallback onBlobDetectedCallback) {
         Thread thread = new Thread(threadGroup, new Runnable() {
             @Override
             public void run() {
                 Arrays.fill(gridVisited, false);
-                computeIsoValue(pixels);
 
                 int x, y, squareIndex;
                 int offset;
@@ -247,5 +250,9 @@ public class BlobDetection extends EdgeDetection {
             newBlob.yMin = Math.min(value, newBlob.yMin);
             newBlob.yMax = Math.max(value, newBlob.yMax);
         }
+    }
+
+    public void cancel() {
+        threadGroup.interrupt();
     }
 }

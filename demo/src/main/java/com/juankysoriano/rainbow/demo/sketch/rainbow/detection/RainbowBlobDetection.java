@@ -39,6 +39,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     public void onSketchSetup() {
         super.onSketchSetup();
         getRainbowDrawer().noFill();
+        getRainbowDrawer().background(0, 0, 0);
         getRainbowDrawer().loadImage(R.drawable.gatito
                 ,
                 getWidth() / RESIZE_FACTOR,
@@ -48,8 +49,8 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
                     @Override
                     public void onLoadSucceed(RainbowImage image) {
                         rainbowImage = image;
-                        rainbowImage.loadPixels();
                         mediaPlayer.start();
+                        blobDetection = new BlobDetection(rainbowImage);
                     }
 
                     @Override
@@ -58,7 +59,6 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
                     }
                 });
 
-        getRainbowDrawer().background(0, 0, 0);
     }
 
     @Override
@@ -86,11 +86,10 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     }
 
     private void startNextBunchDetection() {
-        if (blobDetection == null) {
-            blobDetection = new BlobDetection(rainbowImage.width, rainbowImage.height);
+        if (blobDetection != null) {
+            blobDetection.setThreshold(1.0f - detectThreshold);
+            blobDetection.computeBlobs(this);
         }
-        blobDetection.setThreshold(1.0f - detectThreshold);
-        blobDetection.computeBlobs(rainbowImage.pixels, this);
     }
 
     @Override
@@ -154,8 +153,9 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
 
     @Override
     public void onSketchDestroy() {
-        super.onSketchDestroy();
         mediaPlayer.stop();
         mediaPlayer.release();
+        blobDetection.cancel();
+        blobDetection = null;
     }
 }
