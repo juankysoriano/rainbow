@@ -14,7 +14,7 @@ public class SketchActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LibraryApplication.setContext(this);
+        LibraryApplication.setContext(getApplicationContext());
         setContentView(R.layout.sketch);
         sketch = new RainbowBlobDetection(getSketchView());
     }

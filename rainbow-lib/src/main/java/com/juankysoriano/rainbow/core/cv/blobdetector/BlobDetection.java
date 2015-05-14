@@ -1,59 +1,47 @@
 package com.juankysoriano.rainbow.core.cv.blobdetector;
 
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;
+import com.juankysoriano.rainbow.core.matrix.RVector;
 import com.juankysoriano.rainbow.utils.RainbowMath;
-
-import java.util.Arrays;
 
 //==================================================
 //class BlobDetection
 //==================================================
-public class BlobDetection extends EdgeDetection {
-    public static final int DEFAULT_MAX_LINES_PER_BLOB = 4000;
-    public static final int DEFAULT_MAX_NUMBER_OF_BLOBS = 1000;
+public class BlobDetection {
+    private static final int DEFAULT_MAX_LINES_PER_BLOB = 4000;
+    private static final int DEFAULT_MAX_NUMBER_OF_BLOBS = 1000;
+    private static final float MAX_ISO_VALUE = 3.0f * 255.0f;
 
     private final ThreadGroup threadGroup = new ThreadGroup("BLOB");
-    private int maxNumberOfBlobs = DEFAULT_MAX_NUMBER_OF_BLOBS;
-    private int maxLinesPerBlob = DEFAULT_MAX_LINES_PER_BLOB;
-    private int blobNumber;
-    private boolean[] gridVisited;
-    private float isoValue;
-    private int resX, resY;
-    private float stepX, stepY;
-    private int[] gridValue;
-    private EdgeVertex[] edgeVrt;
-    protected int nbLineToDraw;
 
-    // --------------------------------------------
-    // Constructor
-    // --------------------------------------------
+    private final EdgeVertex[] edges;
+    private final int maxNumberOfBlobs;
+    private final int maxLinesPerBlob;
+    private final float stepX, stepY;
+    private final Grid grid;
+    private float isoValue;
+    private int blobNumber;
+
     public BlobDetection(RainbowImage rainbowImage) {
-        init(rainbowImage);
+        this(rainbowImage, DEFAULT_MAX_NUMBER_OF_BLOBS, DEFAULT_MAX_LINES_PER_BLOB);
     }
 
     public BlobDetection(RainbowImage rainbowImage, int maxNumberOfBlobs, int maxLinesPerBlob) {
-        this(rainbowImage);
+        int width = rainbowImage.getWidth();
+        int height = rainbowImage.getHeight();
+        this.grid = new Grid(rainbowImage);
+        this.stepX = 1.0f / ((float) (width - 1));
+        this.stepY = 1.0f / ((float) (height - 1));
         this.maxNumberOfBlobs = maxNumberOfBlobs;
         this.maxLinesPerBlob = maxLinesPerBlob;
+        this.edges = initEdges();
     }
 
-    protected void init(RainbowImage rainbowImage) {
-        this.resX = rainbowImage.getWidth();
-        this.resY = rainbowImage.getHeight();
-
-        this.stepX = 1.0f / ((float) (resX - 1));
-        this.stepY = 1.0f / ((float) (resY - 1));
-
-        int gridSize = resX * resY;
-        gridValue = new int[gridSize];
-        gridVisited = new boolean[gridSize];
-        edgeVrt = new EdgeVertex[2 * gridSize];
-        computeIsoValue(rainbowImage);
-        nbLineToDraw = 0;
-
+    private EdgeVertex[] initEdges() {
+        EdgeVertex[] edgeVrt = new EdgeVertex[2 * grid.getWidth() * grid.getHeight()];
         int n = 0;
-        for (int x = 0; x < resX; x++) {
-            for (int y = 0; y < resY; y++) {
+        for (int x = 0; x < grid.getWidth(); x++) {
+            for (int y = 0; y < grid.getHeight(); y++) {
                 int index = 2 * n;
                 edgeVrt[index] = new EdgeVertex(x * stepX, y * stepY);
                 edgeVrt[index + 1] = new EdgeVertex(x * stepX, y * stepY);
@@ -61,163 +49,86 @@ public class BlobDetection extends EdgeDetection {
             }
         }
 
-        blobNumber = 0;
-
+        return edgeVrt;
     }
 
-    public float m_coeff = 3.0f * 255.0f;
-
-    // --------------------------------------------
-    // setThreshold()
-    // --------------------------------------------
     public void setThreshold(float value) {
-        setIsoValue(RainbowMath.constrain(value, 0.0f, 1.0f) * m_coeff);
+        setIsoValue(RainbowMath.constrain(value, 0.0f, 1.0f) * MAX_ISO_VALUE);
     }
 
-    public void computeIsoValue(RainbowImage rainbowImage) {
-        int color, r, g, b;
-
-        for (int i = 0; i < rainbowImage.getWidth(); i++) {
-            for (int j = 0; j < rainbowImage.getHeight(); j++) {
-                color = rainbowImage.get(i, j);
-                r = (color & 0x00FF0000) >> 16;
-                g = (color & 0x0000FF00) >> 8;
-                b = (color & 0x000000FF);
-                int index = i + rainbowImage.getWidth() * j;
-                gridValue[index] = r + g + b;
-            }
-        }
+    private void setIsoValue(float iso) {
+        isoValue = iso;
+        grid.setIsoValue(iso);
     }
 
-    // --------------------------------------------
-    // getSquareIndex()
-    // --------------------------------------------
-    protected int getSquareIndex(int x, int y) {
-        int squareIndex = 0;
-        int offY = resX * y;
-        int nextOffY = resX * (y + 1);
-
-        if (gridValue[x + offY] > isoValue) {
-            squareIndex |= 1;
-        }
-        if (gridValue[x + 1 + offY] > isoValue) {
-            squareIndex |= 2;
-        }
-        if (gridValue[x + 1 + nextOffY] > isoValue) {
-            squareIndex |= 4;
-        }
-        if (gridValue[x + nextOffY] > isoValue) {
-            squareIndex |= 8;
-        }
-        return squareIndex;
-    }
-
-    public EdgeVertex getEdgeVertex(int index) {
-        return edgeVrt[index];
-    }
-
-    public void setIsoValue(float iso) {
-        this.isoValue = iso;
-    }
-
-    public int getBlobNb() {
+    public int getNumberOfBlobs() {
         return blobNumber;
     }
 
-    // --------------------------------------------
-    // computeBlobs()
-    // --------------------------------------------
     public void computeBlobs(final OnBlobDetectedCallback onBlobDetectedCallback) {
         Thread thread = new Thread(threadGroup, new Runnable() {
             @Override
             public void run() {
-                Arrays.fill(gridVisited, false);
-
-                int x, y, squareIndex;
-                int offset;
-
-                nbLineToDraw = 0;
-                blobNumber = 0;
-                Blob newBlob = new Blob(BlobDetection.this, maxLinesPerBlob);
-                for (x = 0; x < resX - 1; x++) {
-                    for (y = 0; y < resY - 1; y++) {
-                        offset = x + resX * y;
-                        if (!gridVisited[offset]) {
-                            squareIndex = getSquareIndex(x, y);
-
-                            if (squareIndex > 0 && squareIndex < 15) {
-                                if (blobNumber >= 0 && blobNumber < maxNumberOfBlobs) {
-                                    findBlob(newBlob, x, y, onBlobDetectedCallback);
-                                    blobNumber++;
-                                } else {
-                                    nbLineToDraw /= 2;
-                                    onBlobDetectedCallback.onBlobDetectionFinish();
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
-                nbLineToDraw /= 2;
+                grid.reset();
+                detectBlobs(onBlobDetectedCallback);
                 onBlobDetectedCallback.onBlobDetectionFinish();
             }
         }, "blobDetection", 100000);
         thread.start();
     }
 
-    public void findBlob(Blob newBlob, int x, int y, OnBlobDetectedCallback onBlobDetectedCallback) {
-
-        newBlob.id = blobNumber;
-        newBlob.xMin = Integer.MAX_VALUE;
-        newBlob.xMax = Integer.MIN_VALUE;
-        newBlob.yMin = Integer.MAX_VALUE;
-        newBlob.yMax = Integer.MIN_VALUE;
-        newBlob.nbLine = 0;
-
-        computeEdgeVertex(newBlob, x, y);
-        newBlob.update();
-        if (onBlobDetectedCallback != null) {
-            if (onBlobDetectedCallback.isToDiscardBlob(newBlob)) {
-                blobNumber--;
-            } else {
-                onBlobDetectedCallback.onBlobDetected(newBlob);
+    private void detectBlobs(OnBlobDetectedCallback onBlobDetectedCallback) {
+        for (int x = 0; x < grid.getWidth() - 1; x++) {
+            for (int y = 0; y < grid.getHeight() - 1; y++) {
+                if (hasToPaintMoreBlobs()) {
+                    if (grid.isBlobEdge(x, y) && !grid.isVisited(x, y)) {
+                        Blob newBlob = findBlob(x, y);
+                        if (!onBlobDetectedCallback.isToDiscardBlob(newBlob)) {
+                            onBlobDetectedCallback.onBlobDetected(newBlob);
+                            blobNumber++;
+                        }
+                    }
+                } else {
+                    return;
+                }
             }
         }
     }
 
-    // --------------------------------------------
-    // computeEdgeVertex()
-    // --------------------------------------------
-    void computeEdgeVertex(final Blob newBlob, final int x, final int y) {
-        final int offset = x + resX * y;
-        if (gridVisited[offset]) {
+    private Blob findBlob(int x, int y) {
+        Blob newBlob = new Blob(x, y);
+        computeEdgeVertex(newBlob, x, y);
+        newBlob.update();
+
+        return newBlob;
+    }
+
+    private void computeEdgeVertex(final Blob newBlob, final int x, final int y) {
+        if (grid.isVisited(x, y)) {
             return;
         }
 
-        if (newBlob.nbLine < maxLinesPerBlob) {
-            gridVisited[offset] = true;
-            nbLineToDraw++;
-            newBlob.line[newBlob.nbLine++] = ((x) * resY + (y)) * 2;
-
+        grid.visit(x, y);
+        if (newBlob.getEdgeCount() < maxLinesPerBlob) {
             calculateEdgeVertex(newBlob, x, y);
-
-            final int squareIndex = getSquareIndex(x, y);
+            newBlob.nbLine++;
             try {
-                computeEdgeVertexInNeighbours(newBlob, x, y, MetaballsTable.neightborVoxel[squareIndex]);
+                exploreNeighbours(newBlob, x, y);
             } catch (StackOverflowError error) {
-                computeEdgeVertexInNeighbours(newBlob, x, y, MetaballsTable.neightborVoxel[squareIndex]);
+                exploreNeighbours(newBlob, x, y);
             }
         }
     }
 
-    private void computeEdgeVertexInNeighbours(Blob newBlob, int x, int y, byte neighborVoxel) {
-        if (x < resX - 2 && (neighborVoxel & 1) == 1) {
+    private void exploreNeighbours(Blob newBlob, int x, int y) {
+        byte neighborVoxel = grid.getNeighbourVoxel(x, y);
+        if (x < grid.getWidth() - 2 && (neighborVoxel & 1) == 1) {
             computeEdgeVertex(newBlob, x + 1, y);
         }
         if (x > 0 && (neighborVoxel & 2) == 2) {
             computeEdgeVertex(newBlob, x - 1, y);
         }
-        if (y < resY - 2 && (neighborVoxel & 4) == 4) {
+        if (y < grid.getHeight() - 2 && (neighborVoxel & 4) == 4) {
             computeEdgeVertex(newBlob, x, y + 1);
         }
         if (y > 0 && (neighborVoxel & 8) == 8) {
@@ -226,33 +137,86 @@ public class BlobDetection extends EdgeDetection {
     }
 
     private void calculateEdgeVertex(Blob newBlob, int x, int y) {
-        int index = (x * resY + y) * 2;
-        int offset = x + resX * y;
-        int squareIndex = getSquareIndex(x, y);
-        int toCompute = MetaballsTable.edgeToCompute[squareIndex];
+        int index = (x * grid.getHeight() + y) * 2;
+        int offset = x + grid.getWidth() * y;
+        int toCompute = grid.getEdgesToCompute(x, y);
         float t;
         float value;
+        int[] gridValues = grid.getGridValues();
+
+        newBlob.line[newBlob.nbLine] = index;
+
         if ((toCompute & 1) > 0) {
             float vx = (float) x * stepX;
-            t = (isoValue - gridValue[offset]) / (float) (gridValue[offset + 1] - gridValue[offset]);
+            t = (isoValue - gridValues[offset]) / (float) (gridValues[offset + 1] - gridValues[offset]);
             value = vx * (1.0f - t) + t * (vx + stepX);
-            edgeVrt[index].x = value;
-
+            edges[index].x = value;
             newBlob.xMin = Math.min(value, newBlob.xMin);
             newBlob.xMax = Math.max(value, newBlob.xMax);
         }
+
         if ((toCompute & 2) > 0) {
             float vy = (float) y * stepY;
-            t = (isoValue - gridValue[offset]) / (float) (gridValue[offset + resX] - gridValue[offset]);
+            t = (isoValue - gridValues[offset]) / (float) (gridValues[offset + grid.getWidth()] - gridValues[offset]);
             value = vy * (1.0f - t) + t * (vy + stepY);
-            edgeVrt[index + 1].y = value;
+            edges[index + 1].y = value;
 
             newBlob.yMin = Math.min(value, newBlob.yMin);
             newBlob.yMax = Math.max(value, newBlob.yMax);
         }
     }
 
+    private boolean hasToPaintMoreBlobs() {
+        return blobNumber < maxNumberOfBlobs;
+    }
+
     public void cancel() {
         threadGroup.interrupt();
+    }
+
+    public class Blob {
+        private float x, y;
+        private float w, h;
+        private float xMin, xMax, yMin, yMax;
+        private int nbLine;
+        protected int[] line;
+
+        public Blob(float x, float y) {
+            this.x = x;
+            this.y = y;
+            line = new int[maxLinesPerBlob];
+            xMin = Integer.MAX_VALUE;
+            xMax = Integer.MIN_VALUE;
+            yMin = Integer.MAX_VALUE;
+            yMax = Integer.MIN_VALUE;
+        }
+
+        public EdgeVertex getEdgeVertexA(int iEdge) {
+            return edges[line[iEdge * 2]];
+        }
+
+        public EdgeVertex getEdgeVertexB(int iEdge) {
+            return edges[line[iEdge * 2 + 1]];
+        }
+
+        public int getEdgeCount() {
+            return nbLine;
+        }
+
+        private void update() {
+            w = (xMax - xMin);
+            h = (yMax - yMin);
+            x = 0.5f * (xMax + xMin);
+            y = 0.5f * (yMax + yMin);
+            nbLine /= 2;
+        }
+
+        public float getArea() {
+            return w * h;
+        }
+
+        public RVector getCenter() {
+            return new RVector(x, y);
+        }
     }
 }

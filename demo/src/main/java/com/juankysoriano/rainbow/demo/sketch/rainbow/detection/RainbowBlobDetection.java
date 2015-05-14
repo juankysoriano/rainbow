@@ -4,7 +4,6 @@ import android.media.MediaPlayer;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.core.Rainbow;
-import com.juankysoriano.rainbow.core.cv.blobdetector.Blob;
 import com.juankysoriano.rainbow.core.cv.blobdetector.BlobDetection;
 import com.juankysoriano.rainbow.core.cv.blobdetector.EdgeVertex;
 import com.juankysoriano.rainbow.core.cv.blobdetector.OnBlobDetectedCallback;
@@ -40,8 +39,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         super.onSketchSetup();
         getRainbowDrawer().noFill();
         getRainbowDrawer().background(0, 0, 0);
-        getRainbowDrawer().loadImage(R.drawable.gatito
-                ,
+        getRainbowDrawer().loadImage(R.drawable.gatito,
                 getWidth() / RESIZE_FACTOR,
                 getHeight() / RESIZE_FACTOR,
                 RainbowImage.LOAD_CENTER_CROP, new RainbowImage.LoadPictureListener() {
@@ -93,27 +91,27 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     }
 
     @Override
-    public void onBlobDetected(final Blob b) {
+    public void onBlobDetected(final BlobDetection.Blob b) {
         paintBlob(b);
     }
 
-    private void paintBlob(Blob b) {
-        for (int i = 0; i < b.getEdgeNb(); i++) {
+    private void paintBlob(BlobDetection.Blob b) {
+        for (int i = 0; i < b.getEdgeCount(); i++) {
             EdgeVertex edgeA = b.getEdgeVertexA(i);
-            EdgeVertex edgeB = b.getEdgeVertexB((int) RainbowMath.random(b.getEdgeNb()));
+            EdgeVertex edgeB = b.getEdgeVertexB((int) RainbowMath.random(b.getEdgeCount()));
             drawLineColoredByDivisions(edgeA, edgeB, 2);
         }
     }
 
     @Override
-    public boolean isToDiscardBlob(Blob b) {
+    public boolean isToDiscardBlob(BlobDetection.Blob b) {
         float blobPseudoArea = getBlobArea(b);
         float area = getArea();
         return blobPseudoArea < MIN_DISCARD_BLOB_THRESHOLD[iteration] * area
                 || blobPseudoArea > MAX_DISCARD_BLOB_THRESHOLD[iteration] * area;
     }
 
-    private float getBlobArea(Blob blob) {
+    private float getBlobArea(BlobDetection.Blob blob) {
         return blob.getArea() * getWidth() * getHeight();
     }
 
