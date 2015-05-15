@@ -30,7 +30,7 @@ public class SetupSketchTask {
             }
         };
 
-        task.execute();
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void cancel() {

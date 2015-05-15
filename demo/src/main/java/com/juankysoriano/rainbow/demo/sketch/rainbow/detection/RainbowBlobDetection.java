@@ -4,6 +4,7 @@ import android.media.MediaPlayer;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.core.Rainbow;
+import com.juankysoriano.rainbow.core.cv.blobdetector.Blob;
 import com.juankysoriano.rainbow.core.cv.blobdetector.BlobDetection;
 import com.juankysoriano.rainbow.core.cv.blobdetector.EdgeVertex;
 import com.juankysoriano.rainbow.core.cv.blobdetector.OnBlobDetectedCallback;
@@ -12,6 +13,11 @@ import com.juankysoriano.rainbow.core.graphics.RainbowImage;
 import com.juankysoriano.rainbow.demo.R;
 import com.juankysoriano.rainbow.demo.sketch.rainbow.LibraryApplication;
 import com.juankysoriano.rainbow.utils.RainbowMath;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallback {
 
@@ -26,12 +32,15 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     private BlobDetection blobDetection;
     private float detectThreshold = 0.0f;
     private int painted = 0;
-    private boolean backgroundPainted = false;
     private MediaPlayer mediaPlayer;
+    private final List<Blob> blobList;
+    private final ExecutorService executor;
 
     public RainbowBlobDetection(ViewGroup viewGroup) {
         super(viewGroup);
+        blobList = new ArrayList<>();
         mediaPlayer = MediaPlayer.create(LibraryApplication.getContext(), R.raw.mozart);
+        executor = Executors.newSingleThreadExecutor();
     }
 
     @Override
@@ -49,6 +58,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
                         rainbowImage = image;
                         mediaPlayer.start();
                         blobDetection = new BlobDetection(rainbowImage);
+                        startNextBunchDetection();
                     }
 
                     @Override
@@ -61,13 +71,24 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
 
     @Override
     public void onDrawingStep() {
-        if (rainbowImage != null && !backgroundPainted) {
-            paintBackgroundLines();
-            if (painted >= 5000) {
-                backgroundPainted = true;
-                startNextBunchDetection();
+        if (rainbowImage != null) {
+            if (painted < 5000) {
+                paintBackgroundLines();
+            } else {
+                paintBlob();
             }
         }
+    }
+
+    private void paintBlob() {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                if(!blobList.isEmpty()) {
+                    paintBlob(blobList.remove(0));
+                }
+            }
+        });
     }
 
     private void paintBackgroundLines() {
@@ -91,27 +112,27 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     }
 
     @Override
-    public void onBlobDetected(final BlobDetection.Blob b) {
-        paintBlob(b);
+    public void onBlobDetected(final Blob b) {
+        blobList.add(b);
     }
 
-    private void paintBlob(BlobDetection.Blob b) {
-        for (int i = 0; i < b.getEdgeCount(); i++) {
+    private void paintBlob(Blob b) {
+        for (int i = 0; i < b.getLineCount(); i++) {
             EdgeVertex edgeA = b.getEdgeVertexA(i);
-            EdgeVertex edgeB = b.getEdgeVertexB((int) RainbowMath.random(b.getEdgeCount()));
+            EdgeVertex edgeB = b.getEdgeVertexB((int) RainbowMath.random(b.getLineCount()));
             drawLineColoredByDivisions(edgeA, edgeB, 2);
         }
     }
 
     @Override
-    public boolean isToDiscardBlob(BlobDetection.Blob b) {
+    public boolean isToDiscardBlob(Blob b) {
         float blobPseudoArea = getBlobArea(b);
         float area = getArea();
         return blobPseudoArea < MIN_DISCARD_BLOB_THRESHOLD[iteration] * area
                 || blobPseudoArea > MAX_DISCARD_BLOB_THRESHOLD[iteration] * area;
     }
 
-    private float getBlobArea(BlobDetection.Blob blob) {
+    private float getBlobArea(Blob blob) {
         return blob.getArea() * getWidth() * getHeight();
     }
 
@@ -138,22 +159,38 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
             drawLineColoredByDivisions(vertexA, vertexBetweenAB, divisions);
             drawLineColoredByDivisions(vertexBetweenAB, vertexB, divisions);
         } else {
-            RainbowDrawer rainbowDrawer = getRainbowDrawer();
-            int color = rainbowImage.get((int) (vertexA.x * rainbowImage.width), (int) (vertexA.y * rainbowImage.height));
-            int x1 = (int) (vertexA.x * getWidth());
-            int x2 = (int) (vertexB.x * getWidth());
-            int y1 = (int) (vertexA.y * getHeight());
-            int y2 = (int) (vertexB.y * getHeight());
-            rainbowDrawer.stroke(color, DEFAULT_ALPHA);
-            rainbowDrawer.line(x1, y1, x2, y2);
+            drawLineColorBetween(vertexA, vertexB);
         }
+    }
+
+    private synchronized void drawLineColorBetween(EdgeVertex vertexA, EdgeVertex vertexB) {
+        RainbowDrawer rainbowDrawer = getRainbowDrawer();
+        int color = rainbowImage.get((int) (vertexA.x * rainbowImage.width), (int) (vertexA.y * rainbowImage.height));
+        int x1 = (int) (vertexA.x * getWidth());
+        int x2 = (int) (vertexB.x * getWidth());
+        int y1 = (int) (vertexA.y * getHeight());
+        int y2 = (int) (vertexB.y * getHeight());
+        rainbowDrawer.stroke(color, DEFAULT_ALPHA);
+        rainbowDrawer.line(x1, y1, x2, y2);
     }
 
     @Override
     public void onSketchDestroy() {
+        releaseMediaPlayer();
+        releaseBlobDetectionIfAvailable();
+        executor.shutdown();
+    }
+
+    private void releaseBlobDetectionIfAvailable() {
+        if (blobDetection != null) {
+            blobDetection.cancel();
+            blobDetection = null;
+        }
+    }
+
+    private void releaseMediaPlayer() {
         mediaPlayer.stop();
         mediaPlayer.release();
-        blobDetection.cancel();
-        blobDetection = null;
+        mediaPlayer = null;
     }
 }
