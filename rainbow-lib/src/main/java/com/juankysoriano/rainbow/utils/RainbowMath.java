@@ -1798,7 +1798,7 @@ public abstract class RainbowMath {
      * The number returned will range from zero up to (but not including)
      * 'howbig'.
      */
-    public static float random(final int howbig) {
+    public static int random(final int howbig) {
         // for some reason (rounding error?) Math.random() * 3
         // can sometimes return '3' (once in ~30 million tries)
         // so a check was added to avoid the inclusion of 'howbig'
@@ -1813,12 +1813,7 @@ public abstract class RainbowMath {
             internalRandom = new Random();
         }
 
-        float value = 0;
-        do {
-            // value = (float)Math.random() * howbig;
-            value = internalRandom.nextInt(howbig);
-        } while (value == howbig);
-        return value;
+        return internalRandom.nextInt(howbig);
     }
 
     public static void randomSeed(final long what) {

@@ -7,7 +7,6 @@ import java.util.List;
 
 public class Blob {
     private float x, y;
-    private float w, h;
     private float xMin, xMax, yMin, yMax;
     private List<EdgeVertex> edgeVertexes;
 
@@ -58,10 +57,10 @@ public class Blob {
     }
 
     public float getWidth() {
-        return w;
+        return xMax - xMin;
     }
 
     public float getHeight() {
-        return h;
+        return yMax - yMin;
     }
 }

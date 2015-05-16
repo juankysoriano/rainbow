@@ -21,17 +21,17 @@ import java.util.concurrent.Executors;
 
 public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallback {
 
-    private static final int RESIZE_FACTOR = 2;
-    private static final float[] THRESHOLD_STEP = {0.04f, 0.03f, 0.02f};
+    private static final int RESIZE_FACTOR = 1;
     private static final int DEFAULT_ALPHA = 70;
-    private static final int TOTAL_ITERATIONS = 3;
+    private static final int MAX_ITERATIONS = 3;
+    private static final float[] THRESHOLD_STEP = {0.09f, 0.045f, 0.0225f};
     private static final float[] MIN_DISCARD_BLOB_THRESHOLD = {0.125f, 0.015625f, 0.0005f};
     private static final float[] MAX_DISCARD_BLOB_THRESHOLD = {1.0f, 0.125f, 0.015625f};
+    private float detectThreshold = 0.0f;
     private int iteration;
+    private int painted = 0;
     private RainbowImage rainbowImage;
     private BlobDetection blobDetection;
-    private float detectThreshold = 0.0f;
-    private int painted = 0;
     private MediaPlayer mediaPlayer;
     private final List<Blob> blobList;
     private final ExecutorService executor;
@@ -46,9 +46,10 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     @Override
     public void onSketchSetup() {
         super.onSketchSetup();
+        frameRate(200);
         getRainbowDrawer().noFill();
         getRainbowDrawer().background(0, 0, 0);
-        getRainbowDrawer().loadImage(R.drawable.gatito,
+        getRainbowDrawer().loadImage(R.drawable.silvares,
                 getWidth() / RESIZE_FACTOR,
                 getHeight() / RESIZE_FACTOR,
                 RainbowImage.LOAD_CENTER_CROP, new RainbowImage.LoadPictureListener() {
@@ -66,7 +67,6 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
                         //no-op
                     }
                 });
-
     }
 
     @Override
@@ -75,20 +75,28 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
             if (painted < 5000) {
                 paintBackgroundLines();
             } else {
-                paintBlob();
+                paintNextBlob();
             }
         }
     }
 
-    private void paintBlob() {
+    private void paintNextBlob() {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                if(!blobList.isEmpty()) {
+                if (!blobList.isEmpty()) {
                     paintBlob(blobList.remove(0));
                 }
             }
         });
+    }
+
+    private void paintBlob(Blob blob) {
+        for (int i = 0; i < blob.getLineCount(); i++) {
+            EdgeVertex start = blob.getEdgeVertexA(i);
+            EdgeVertex end = blob.getEdgeVertexB(RainbowMath.random(blob.getLineCount()));
+            drawLineWithDivisions(start, end, 2);
+        }
     }
 
     private void paintBackgroundLines() {
@@ -97,9 +105,9 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
             float y1 = RainbowMath.random(1f);
             float x2 = RainbowMath.random(1f);
             float y2 = RainbowMath.random(1f);
-            EdgeVertex edgeA = new EdgeVertex(x1, y1);
-            EdgeVertex edgeB = new EdgeVertex(x2, y2);
-            drawLineColoredByDivisions(edgeA, edgeB, 3);
+            EdgeVertex start = new EdgeVertex(x1, y1);
+            EdgeVertex end = new EdgeVertex(x2, y2);
+            drawLineWithDivisions(start, end, 3);
             painted++;
         }
     }
@@ -112,24 +120,28 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     }
 
     @Override
-    public void onBlobDetected(final Blob b) {
-        blobList.add(b);
-    }
-
-    private void paintBlob(Blob b) {
-        for (int i = 0; i < b.getLineCount(); i++) {
-            EdgeVertex edgeA = b.getEdgeVertexA(i);
-            EdgeVertex edgeB = b.getEdgeVertexB((int) RainbowMath.random(b.getLineCount()));
-            drawLineColoredByDivisions(edgeA, edgeB, 2);
+    public void onBlobDetectionFinish() {
+        if (detectThreshold < 1.0f) {
+            updateThreshold();
+            startNextBunchDetection();
+        } else if (iteration < MAX_ITERATIONS - 1) {
+            resetThreshold();
+            nextIteration();
+            startNextBunchDetection();
         }
     }
 
     @Override
-    public boolean isToDiscardBlob(Blob b) {
-        float blobPseudoArea = getBlobArea(b);
+    public void onBlobDetected(final Blob b) {
+        blobList.add(b);
+    }
+
+    @Override
+    public boolean filterBlob(Blob blob) {
+        float blobPseudoArea = getBlobArea(blob);
         float area = getArea();
-        return blobPseudoArea < MIN_DISCARD_BLOB_THRESHOLD[iteration] * area
-                || blobPseudoArea > MAX_DISCARD_BLOB_THRESHOLD[iteration] * area;
+        return blobPseudoArea >= MIN_DISCARD_BLOB_THRESHOLD[iteration] * area
+                && blobPseudoArea <= MAX_DISCARD_BLOB_THRESHOLD[iteration] * area;
     }
 
     private float getBlobArea(Blob blob) {
@@ -140,36 +152,37 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         return Math.abs(getWidth() * getHeight());
     }
 
-    @Override
-    public void onBlobDetectionFinish() {
-        if (detectThreshold < 1.0f) {
-            detectThreshold += THRESHOLD_STEP[iteration];
-            startNextBunchDetection();
-        } else if (iteration < TOTAL_ITERATIONS - 1) {
-            iteration++;
-            detectThreshold = 0.0f;
-            startNextBunchDetection();
-        }
+    private void nextIteration() {
+        iteration++;
     }
 
-    private void drawLineColoredByDivisions(EdgeVertex vertexA, EdgeVertex vertexB, int divisions) {
+    private void resetThreshold() {
+        detectThreshold = 0.0f;
+    }
+
+    private void updateThreshold() {
+        detectThreshold += THRESHOLD_STEP[iteration];
+        detectThreshold = RainbowMath.min(detectThreshold, 1.0f);
+    }
+
+    private void drawLineWithDivisions(EdgeVertex start, EdgeVertex end, int divisions) {
         if (divisions > 0) {
             divisions--;
-            EdgeVertex vertexBetweenAB = new EdgeVertex((vertexA.x + vertexB.x) / 2, (vertexA.y + vertexB.y) / 2);
-            drawLineColoredByDivisions(vertexA, vertexBetweenAB, divisions);
-            drawLineColoredByDivisions(vertexBetweenAB, vertexB, divisions);
+            EdgeVertex middle = new EdgeVertex((start.x + end.x) / 2, (start.y + end.y) / 2);
+            drawLineWithDivisions(start, middle, divisions);
+            drawLineWithDivisions(middle, end, divisions);
         } else {
-            drawLineColorBetween(vertexA, vertexB);
+            paintLine(start, end);
         }
     }
 
-    private synchronized void drawLineColorBetween(EdgeVertex vertexA, EdgeVertex vertexB) {
+    private void paintLine(EdgeVertex start, EdgeVertex end) {
         RainbowDrawer rainbowDrawer = getRainbowDrawer();
-        int color = rainbowImage.get((int) (vertexA.x * rainbowImage.width), (int) (vertexA.y * rainbowImage.height));
-        int x1 = (int) (vertexA.x * getWidth());
-        int x2 = (int) (vertexB.x * getWidth());
-        int y1 = (int) (vertexA.y * getHeight());
-        int y2 = (int) (vertexB.y * getHeight());
+        int color = rainbowImage.get((int) (start.x * rainbowImage.width), (int) (start.y * rainbowImage.height));
+        int x1 = (int) (start.x * getWidth());
+        int x2 = (int) (end.x * getWidth());
+        int y1 = (int) (start.y * getHeight());
+        int y2 = (int) (end.y * getHeight());
         rainbowDrawer.stroke(color, DEFAULT_ALPHA);
         rainbowDrawer.line(x1, y1, x2, y2);
     }
@@ -177,11 +190,11 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     @Override
     public void onSketchDestroy() {
         releaseMediaPlayer();
-        releaseBlobDetectionIfAvailable();
+        releaseBlobDetection();
         executor.shutdown();
     }
 
-    private void releaseBlobDetectionIfAvailable() {
+    private void releaseBlobDetection() {
         if (blobDetection != null) {
             blobDetection.cancel();
             blobDetection = null;

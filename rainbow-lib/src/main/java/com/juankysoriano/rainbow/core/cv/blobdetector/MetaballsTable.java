@@ -6,9 +6,5 @@ package com.juankysoriano.rainbow.core.cv.blobdetector;
 public class MetaballsTable {
 
     // neightbourVoxel Array
-    public static byte neightbourVoxel[] = {
-            0, 10, 9, 3,
-            5, 15, 12, 6,
-            6, 12, 15, 5,
-            3, 9, 10, 0};
+    public static byte neightbourVoxel[] = {0, 10, 9, 3, 5, 15, 12, 6, 6, 12, 12, 5, 3, 9, 10, 0};
 }

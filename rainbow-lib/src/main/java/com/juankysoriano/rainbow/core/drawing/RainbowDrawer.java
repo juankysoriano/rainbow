@@ -590,12 +590,8 @@ public class RainbowDrawer {
         graphics.point(x, y, z);
     }
 
-    public void line(final float x1, final float y1, final float x2, final float y2) {
-        graphics.line(x1, y1, x2, y2);
-    }
-
-    public void line(final float x1, final float y1, final float z1, final float x2, final float y2, final float z2) {
-        graphics.line(x1, y1, z1, x2, y2, z2);
+    public void line(final float... vertex) {
+        graphics.line(vertex);
     }
 
     /**
