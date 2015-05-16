@@ -14,10 +14,6 @@ public class BlobDetection {
     private final ThreadGroup threadGroup = new ThreadGroup("BLOB");
 
     private final int maxNumberOfBlobs;
-    private final int maxX;
-    private final int maxY;
-    private final int minX;
-    private final int minY;
     private final Grid grid;
     private int blobNumber;
 
@@ -27,10 +23,6 @@ public class BlobDetection {
 
     public BlobDetection(RainbowImage rainbowImage, int maxNumberOfBlobs) {
         this.grid = Grid.newInstance(rainbowImage);
-        this.minX = BORDER_OFFSET;
-        this.minY = BORDER_OFFSET;
-        this.maxX = grid.getWidth() - BORDER_OFFSET;
-        this.maxY = grid.getHeight() - BORDER_OFFSET;
         this.maxNumberOfBlobs = maxNumberOfBlobs;
     }
 
@@ -59,15 +51,9 @@ public class BlobDetection {
     }
 
     private void detectBlobs(OnBlobDetectedCallback onBlobDetectedCallback) {
-        int diffX = maxX - minX;
-        int diffY = maxY - minY;
-        int offsetX = RainbowMath.random((diffX) / 2);
-        int offsetY = RainbowMath.random((diffY) / 2);
 
-        for (int i = minX; i < maxX; i++) {
-            for (int j = minY; j < maxY; j++) {
-                int x = (i + offsetX) % diffX + minX;
-                int y = (j + offsetY) % diffY + minY;
+        for (int x = BORDER_OFFSET; x < grid.getWidth() - BORDER_OFFSET; x++) {
+            for (int y = BORDER_OFFSET; y < grid.getHeight() - BORDER_OFFSET; y++) {
                 if (hasToPaintMoreBlobs()) {
                     if (grid.isBlobEdge(x, y) && !grid.isVisited(x, y)) {
                         findBlob(x, y, onBlobDetectedCallback);
@@ -95,8 +81,7 @@ public class BlobDetection {
         }
 
         grid.visit(x, y);
-        if (/*newBlob.getEdgeCount() < maxEdgesPerBlob &&*/
-                grid.shouldExploreNeighbours(x, y)) {
+        if (grid.shouldExploreNeighbours(x, y)) {
             calculateEdgeVertex(newBlob, x, y);
             try {
                 exploreNeighbours(newBlob, x, y);

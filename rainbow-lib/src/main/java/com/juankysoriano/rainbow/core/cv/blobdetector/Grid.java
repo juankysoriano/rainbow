@@ -7,6 +7,8 @@ import com.juankysoriano.rainbow.core.graphics.RainbowImage;
 import java.util.Arrays;
 
 public class Grid {
+    private static byte[] NEIGHBOUR_VOXEL = {0, 10, 9, 3, 5, 15, 12, 6, 6, 12, 12, 5, 3, 9, 10, 0};
+
     private final int[] gridValue;
     private final boolean[] gridVisited;
     private final int width;
@@ -66,7 +68,7 @@ public class Grid {
     }
 
     private byte getNeighbourVoxel(int x, int y) {
-        return MetaballsTable.neightbourVoxel[getSquareIndex(x, y)];
+        return NEIGHBOUR_VOXEL[getSquareIndex(x, y)];
     }
 
     protected boolean shouldExploreRight(int x, int y) {
