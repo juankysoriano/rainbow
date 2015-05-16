@@ -4,19 +4,20 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.ViewGroup;
 
+import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.demo.sketch.rainbow.LibraryApplication;
-import com.juankysoriano.rainbow.demo.sketch.rainbow.detection.RainbowBlobDetection;
+import com.juankysoriano.rainbow.demo.sketch.rainbow.forces.RainbowParticleSystem;
 
 public class SketchActivity extends Activity {
 
-    private RainbowBlobDetection sketch;
+    private Rainbow sketch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LibraryApplication.setContext(getApplicationContext());
         setContentView(R.layout.sketch);
-        sketch = new RainbowBlobDetection(getSketchView());
+        sketch = new RainbowParticleSystem(getSketchView());
     }
 
     private ViewGroup getSketchView() {
