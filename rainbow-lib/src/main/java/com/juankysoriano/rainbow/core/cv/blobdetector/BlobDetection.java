@@ -1,7 +1,6 @@
 package com.juankysoriano.rainbow.core.cv.blobdetector;
 
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;
-import com.juankysoriano.rainbow.utils.RainbowMath;
 
 //==================================================
 //class BlobDetection
@@ -9,53 +8,48 @@ import com.juankysoriano.rainbow.utils.RainbowMath;
 public class BlobDetection {
     private static final int DEFAULT_MAX_NUMBER_OF_BLOBS = 750;
     private static final float MAX_ISO_VALUE = 3.0f * 255.0f;
-    private static final int BORDER_OFFSET = 20;
 
     private final ThreadGroup threadGroup = new ThreadGroup("BLOB");
-
     private final int maxNumberOfBlobs;
-    private final Grid grid;
-    private int blobNumber;
+    private final LuminanceMap luminanceMap;
+
+    private int numberOfBlobsDetected;
+    private float luminanceThreshold;
 
     public BlobDetection(RainbowImage rainbowImage) {
         this(rainbowImage, DEFAULT_MAX_NUMBER_OF_BLOBS);
     }
 
     public BlobDetection(RainbowImage rainbowImage, int maxNumberOfBlobs) {
-        this.grid = Grid.newInstance(rainbowImage);
+        this.luminanceMap = LuminanceMap.newInstance(rainbowImage);
         this.maxNumberOfBlobs = maxNumberOfBlobs;
     }
 
     public void setThreshold(float value) {
-        setIsoValue(RainbowMath.constrain(value, 0.0f, 1.0f) * MAX_ISO_VALUE);
-    }
-
-    private void setIsoValue(float iso) {
-        grid.setIsoValue(iso);
-    }
-
-    public int getNumberOfBlobs() {
-        return blobNumber;
+        if (value < 0 || value > 1) {
+            throw new IllegalArgumentException("Developer error, threshold should be a value between 0 and 1");
+        }
+        luminanceThreshold = value * MAX_ISO_VALUE;
     }
 
     public void computeBlobs(final OnBlobDetectedCallback onBlobDetectedCallback) {
         Thread thread = new Thread(threadGroup, new Runnable() {
             @Override
             public void run() {
-                grid.reset();
+                luminanceMap.reset();
                 detectBlobs(onBlobDetectedCallback);
                 onBlobDetectedCallback.onBlobDetectionFinish();
             }
-        }, "blobDetection", 100000);
+        }, "blobDetection", 1024 * 1024);
         thread.start();
     }
 
     private void detectBlobs(OnBlobDetectedCallback onBlobDetectedCallback) {
 
-        for (int x = BORDER_OFFSET; x < grid.getWidth() - BORDER_OFFSET; x++) {
-            for (int y = BORDER_OFFSET; y < grid.getHeight() - BORDER_OFFSET; y++) {
+        for (int x = 0; x < luminanceMap.getWidth(); x++) {
+            for (int y = 0; y < luminanceMap.getHeight(); y++) {
                 if (hasToPaintMoreBlobs()) {
-                    if (grid.isBlobEdge(x, y) && !grid.isVisited(x, y)) {
+                    if (!luminanceMap.isVisited(x, y) && isBlobEdge(x, y)) {
                         findBlob(x, y, onBlobDetectedCallback);
                     }
                 } else {
@@ -70,57 +64,68 @@ public class BlobDetection {
         exploreVertex(newBlob, x, y);
 
         if (onBlobDetectedCallback.filterBlob(newBlob)) {
-            blobNumber++;
+            numberOfBlobsDetected++;
             onBlobDetectedCallback.onBlobDetected(newBlob);
         }
     }
 
     private void exploreVertex(final Blob newBlob, final int x, final int y) {
-        if (grid.isVisited(x, y)) {
+        if (luminanceMap.isVisited(x, y)) {
             return;
         }
 
-        grid.visit(x, y);
-        if (grid.shouldExploreNeighbours(x, y)) {
-            calculateEdgeVertex(newBlob, x, y);
+        luminanceMap.visit(x, y);
+        if (isBlobEdge(x, y)) {
+            addVertexToBlob(newBlob, x, y);
             try {
                 exploreNeighbours(newBlob, x, y);
-            } catch (StackOverflowError error) {
+            } catch (StackOverflowError e) {
                 exploreNeighbours(newBlob, x, y);
             }
         }
+    }
+
+    public boolean isBlobEdge(int x, int y) {
+
+        int neighbourInsideBlobCounter = 0;
+        if (isInsideBlob(x - 1, y)) {
+            neighbourInsideBlobCounter++;
+        }
+        if (isInsideBlob(x, y - 1)) {
+            neighbourInsideBlobCounter++;
+        }
+        if (isInsideBlob(x, y + 1)) {
+            neighbourInsideBlobCounter++;
+        }
+        if (isInsideBlob(x + 1, y)) {
+            neighbourInsideBlobCounter++;
+        }
+
+        // We have already seen if the neighbours are inside a blob.
+        // If all of them are, or none of them are, then we can guarantee that coord(x, y)
+        // is not a blob edge.
+        return neighbourInsideBlobCounter != 0 && neighbourInsideBlobCounter != 4;
+    }
+
+    public boolean isInsideBlob(int x, int y) {
+        return luminanceMap.getLuminanceAt(x, y) < luminanceThreshold;
     }
 
     private void exploreNeighbours(Blob newBlob, int x, int y) {
-        if (areCoordinatesInsideGrid(x, y)) {
-            if (grid.shouldExploreRight(x, y)) {
-                exploreVertex(newBlob, x + 1, y);
-            }
-            if (grid.shouldExploreLeft(x, y)) {
-                exploreVertex(newBlob, x - 1, y);
-            }
-            if (grid.shouldExploreUp(x, y)) {
-                exploreVertex(newBlob, x, y + 1);
-            }
-            if (grid.shouldExploreDown(x, y)) {
-                exploreVertex(newBlob, x, y - 1);
-            }
-        }
+        exploreVertex(newBlob, x - 1, y);
+        exploreVertex(newBlob, x + 1, y);
+        exploreVertex(newBlob, x, y - 1);
+        exploreVertex(newBlob, x, y + 1);
     }
 
-    private boolean areCoordinatesInsideGrid(int x, int y) {
-        return x > 0 && x < grid.getWidth()
-                && y > 0 && y < grid.getHeight();
-    }
-
-    private void calculateEdgeVertex(Blob newBlob, int x, int y) {
-        float edgeX = x / (float) grid.getWidth();
-        float edgeY = y / (float) grid.getHeight();
+    private void addVertexToBlob(Blob newBlob, int x, int y) {
+        float edgeX = x / (float) luminanceMap.getWidth();
+        float edgeY = y / (float) luminanceMap.getHeight();
         newBlob.addEdgeVertex(new EdgeVertex(edgeX, edgeY));
     }
 
     private boolean hasToPaintMoreBlobs() {
-        return blobNumber < maxNumberOfBlobs;
+        return numberOfBlobsDetected < maxNumberOfBlobs;
     }
 
     public void cancel() {

@@ -20,6 +20,10 @@ public class Blob {
         yMax = Integer.MIN_VALUE;
     }
 
+    public EdgeVertex getEdgeVertex(int edgeIndex) {
+        return edgeVertexes.get(edgeIndex);
+    }
+
     public EdgeVertex getEdgeVertexA(int lineIndex) {
         return edgeVertexes.get(lineIndex * 2);
     }
@@ -51,8 +55,8 @@ public class Blob {
     }
 
     public RVector getCenter() {
-        x = (xMax + xMin)/2;
-        y = (yMax + yMin)/2;
+        x = (xMax + xMin) / 2;
+        y = (yMax + yMin) / 2;
         return new RVector(x, y);
     }
 
