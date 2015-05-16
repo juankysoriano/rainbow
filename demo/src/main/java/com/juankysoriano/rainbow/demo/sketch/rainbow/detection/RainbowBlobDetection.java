@@ -21,7 +21,7 @@ import java.util.concurrent.Executors;
 
 public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallback {
 
-    private static final int RESIZE_FACTOR = 1;
+    private static final int RESIZE_FACTOR = 2;
     private static final int DEFAULT_ALPHA = 70;
     private static final int MAX_ITERATIONS = 3;
     private static final float[] THRESHOLD_STEP = {0.09f, 0.045f, 0.0225f};
@@ -49,7 +49,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         frameRate(200);
         getRainbowDrawer().noFill();
         getRainbowDrawer().background(0, 0, 0);
-        getRainbowDrawer().loadImage(R.drawable.silvares,
+        getRainbowDrawer().loadImage(R.drawable.cat_wrap,
                 getWidth() / RESIZE_FACTOR,
                 getHeight() / RESIZE_FACTOR,
                 RainbowImage.LOAD_CENTER_CROP, new RainbowImage.LoadPictureListener() {
@@ -59,6 +59,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
                         rainbowImage = image;
                         mediaPlayer.start();
                         blobDetection = new BlobDetection(rainbowImage);
+                        resetThreshold();
                         startNextBunchDetection();
                     }
 
@@ -69,10 +70,22 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
                 });
     }
 
+    private void startNextBunchDetection() {
+        if (blobDetection != null) {
+            blobDetection.setThreshold(1.0f - detectThreshold);
+            blobDetection.computeBlobs(this);
+        }
+    }
+
+    @Override
+    public void onBlobDetected(final Blob blob) {
+        blobList.add(blob);
+    }
+
     @Override
     public void onDrawingStep() {
         if (rainbowImage != null) {
-            if (painted < 5000) {
+            if (!isBackgroundPainted()) {
                 paintBackgroundLines();
             } else {
                 paintNextBlob();
@@ -80,23 +93,20 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         }
     }
 
+    private boolean isBackgroundPainted() {
+        return painted >= 5000;
+    }
+
     private void paintNextBlob() {
         executor.execute(new Runnable() {
             @Override
             public void run() {
                 if (!blobList.isEmpty()) {
-                    paintBlob(blobList.remove(0));
+                    Blob blob = blobList.remove(0);
+                    paintBlob(blob);
                 }
             }
         });
-    }
-
-    private void paintBlob(Blob blob) {
-        for (int i = 0; i < blob.getLineCount(); i++) {
-            EdgeVertex start = blob.getEdgeVertexA(i);
-            EdgeVertex end = blob.getEdgeVertexB(RainbowMath.random(blob.getLineCount()));
-            drawLineWithDivisions(start, end, 2);
-        }
     }
 
     private void paintBackgroundLines() {
@@ -112,28 +122,12 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         }
     }
 
-    private void startNextBunchDetection() {
-        if (blobDetection != null) {
-            blobDetection.setThreshold(1.0f - detectThreshold);
-            blobDetection.computeBlobs(this);
+    private void paintBlob(Blob blob) {
+        for (int i = 0; i < blob.getLineCount(); i++) {
+            EdgeVertex start = blob.getEdgeVertexA(i);
+            EdgeVertex end = blob.getEdgeVertexB(RainbowMath.random(blob.getLineCount()));
+            drawLineWithDivisions(start, end, 2);
         }
-    }
-
-    @Override
-    public void onBlobDetectionFinish() {
-        if (detectThreshold < 1.0f) {
-            updateThreshold();
-            startNextBunchDetection();
-        } else if (iteration < MAX_ITERATIONS - 1) {
-            resetThreshold();
-            nextIteration();
-            startNextBunchDetection();
-        }
-    }
-
-    @Override
-    public void onBlobDetected(final Blob b) {
-        blobList.add(b);
     }
 
     @Override
@@ -152,12 +146,24 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         return Math.abs(getWidth() * getHeight());
     }
 
+    @Override
+    public void onBlobDetectionFinish() {
+        if (detectThreshold < 1.0f) {
+            updateThreshold();
+            startNextBunchDetection();
+        } else if (iteration < MAX_ITERATIONS - 1) {
+            resetThreshold();
+            nextIteration();
+            startNextBunchDetection();
+        }
+    }
+
     private void nextIteration() {
         iteration++;
     }
 
     private void resetThreshold() {
-        detectThreshold = 0.0f;
+        detectThreshold = THRESHOLD_STEP[iteration];
     }
 
     private void updateThreshold() {

@@ -20,8 +20,17 @@ public class Blob {
         yMax = Integer.MIN_VALUE;
     }
 
+    public EdgeVertex getEdgeVertex(int edgeIndex) {
+        return edgeVertexes.get(edgeIndex);
+    }
+
+    public int getEdgeCount() {
+        return edgeVertexes.size();
+    }
+
+
     public EdgeVertex getEdgeVertexA(int lineIndex) {
-        return edgeVertexes.get(lineIndex * 2);
+        return edgeVertexes.get(lineIndex * 2);  // http://heavy.com/social/2013/10/wtf-gifs-weird-strange-crazy/16/
     }
 
     public EdgeVertex getEdgeVertexB(int lineIndex) {
@@ -30,10 +39,6 @@ public class Blob {
 
     public int getLineCount() {
         return edgeVertexes.size() / 2;
-    }
-
-    public int getEdgeCount() {
-        return edgeVertexes.size();
     }
 
     public void addEdgeVertex(EdgeVertex edgeVertex) {
@@ -51,8 +56,8 @@ public class Blob {
     }
 
     public RVector getCenter() {
-        x = (xMax + xMin)/2;
-        y = (yMax + yMin)/2;
+        x = (xMax + xMin) / 2;
+        y = (yMax + yMin) / 2;
         return new RVector(x, y);
     }
 
