@@ -86,13 +86,16 @@ public class BlobDetection {
     }
 
     private void findVertexes(final Blob newBlob, final int x, final int y) {
-        if (isVisited(x, y) || !isBlobEdge(x, y)) {
+        if (isVisited(x, y)) {
             return;
         }
 
         maskAsVisited(x, y);
-        addVertexToBlob(newBlob, x, y);
-        infallibleExploreNeighbours(newBlob, x, y);
+
+        if(isBlobEdge(x, y)) {
+            addVertexToBlob(newBlob, x, y);
+            infallibleExploreNeighbours(newBlob, x, y);
+        }
     }
 
     private void addVertexToBlob(Blob newBlob, int x, int y) {
