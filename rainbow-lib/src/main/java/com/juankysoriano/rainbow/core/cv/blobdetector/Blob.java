@@ -27,8 +27,6 @@ public class Blob {
     public int getEdgeCount() {
         return edgeVertexes.size();
     }
-
-
     public EdgeVertex getEdgeVertexA(int lineIndex) {
         return edgeVertexes.get(lineIndex * 2);  // http://heavy.com/social/2013/10/wtf-gifs-weird-strange-crazy/16/
     }
