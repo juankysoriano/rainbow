@@ -46,10 +46,9 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     @Override
     public void onSketchSetup() {
         super.onSketchSetup();
-        frameRate(200);
         getRainbowDrawer().noFill();
         getRainbowDrawer().background(0, 0, 0);
-        getRainbowDrawer().loadImage(R.drawable.cat_wrap,
+        getRainbowDrawer().loadImage(R.drawable.gatito,
                 getWidth() / RESIZE_FACTOR,
                 getHeight() / RESIZE_FACTOR,
                 RainbowImage.LOAD_CENTER_CROP, new RainbowImage.LoadPictureListener() {
@@ -123,9 +122,9 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     }
 
     private void paintBlob(Blob blob) {
-        for (int i = 0; i < blob.getLineCount(); i++) {
-            EdgeVertex start = blob.getEdgeVertexA(i);
-            EdgeVertex end = blob.getEdgeVertexB(RainbowMath.random(blob.getLineCount()));
+        for (int i = 0; i < blob.getEdgeCount(); i += 2) {
+            EdgeVertex start = blob.getEdgeVertex(i);
+            EdgeVertex end = blob.getEdgeVertex(RainbowMath.random(blob.getEdgeCount()));
             drawLineWithDivisions(start, end, 2);
         }
     }

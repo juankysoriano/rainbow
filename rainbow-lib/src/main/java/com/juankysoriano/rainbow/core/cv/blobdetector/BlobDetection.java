@@ -68,7 +68,7 @@ public class BlobDetection {
             return;
         }
 
-        Blob newBlob = new Blob(x, y);
+        Blob newBlob = new Blob();
         findVertexes(newBlob, x, y);
 
         if (onBlobDetectedCallback.filterBlob(newBlob)) {

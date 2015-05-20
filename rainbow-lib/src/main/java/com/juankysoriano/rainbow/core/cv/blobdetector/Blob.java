@@ -6,13 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Blob {
-    private float x, y;
     private float xMin, xMax, yMin, yMax;
     private List<EdgeVertex> edgeVertexes;
 
-    public Blob(float x, float y) {
-        this.x = x;
-        this.y = y;
+    public Blob() {
         edgeVertexes = new ArrayList<>();
         xMin = Integer.MAX_VALUE;
         xMax = Integer.MIN_VALUE;
@@ -21,22 +18,11 @@ public class Blob {
     }
 
     public EdgeVertex getEdgeVertex(int edgeIndex) {
-        return edgeVertexes.get(edgeIndex);
+        return edgeVertexes.get(edgeIndex % edgeVertexes.size());
     }
 
     public int getEdgeCount() {
         return edgeVertexes.size();
-    }
-    public EdgeVertex getEdgeVertexA(int lineIndex) {
-        return edgeVertexes.get(lineIndex * 2);  // http://heavy.com/social/2013/10/wtf-gifs-weird-strange-crazy/16/
-    }
-
-    public EdgeVertex getEdgeVertexB(int lineIndex) {
-        return edgeVertexes.get(lineIndex * 2 + 1);
-    }
-
-    public int getLineCount() {
-        return edgeVertexes.size() / 2;
     }
 
     public void addEdgeVertex(EdgeVertex edgeVertex) {
@@ -54,8 +40,8 @@ public class Blob {
     }
 
     public RVector getCenter() {
-        x = (xMax + xMin) / 2;
-        y = (yMax + yMin) / 2;
+        float x = (xMax + xMin) / 2;
+        float y = (yMax + yMin) / 2;
         return new RVector(x, y);
     }
 
