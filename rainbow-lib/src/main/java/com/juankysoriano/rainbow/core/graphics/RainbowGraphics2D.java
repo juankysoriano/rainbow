@@ -24,7 +24,6 @@ package com.juankysoriano.rainbow.core.graphics;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
-import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
@@ -33,7 +32,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 
 import com.juankysoriano.rainbow.core.matrix.RMatrix;
@@ -75,12 +73,8 @@ public class RainbowGraphics2D extends RainbowGraphics {
     private Paint tintPaint;
     private Paint strokePaint;
     private Paint fillPaint;
-    private Paint clearingFillPaint;
-    private boolean isFillClear = false;
 
-    private Bitmap normalBitmap;
     private Canvas canvas;
-    private Shader backgroundBitmapShader;
 
     public RainbowGraphics2D() {
         transform = new float[9];
@@ -109,15 +103,11 @@ public class RainbowGraphics2D extends RainbowGraphics {
     protected void allocate() {
         initBitmaps();
         initPaints();
-        if (primarySurface) {
-            initShaders();
-        }
     }
 
     private void initBitmaps() {
-        normalBitmap = Bitmap.createBitmap(width, height, Config.ARGB_4444);
-
-        canvas = new Canvas(normalBitmap);
+        setBitmap(Bitmap.createBitmap(width, height, Config.ARGB_8888));
+        canvas = new Canvas(getBitmap());
 
         if (primarySurface) {
             Drawable parentBackground = parent.getDrawingView().getBackground();
@@ -126,8 +116,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
                 parentBackground.draw(canvas);
             }
         }
-
-        super.setBitmap(normalBitmap);
     }
 
     private void initPaints() {
@@ -136,20 +124,11 @@ public class RainbowGraphics2D extends RainbowGraphics {
         strokePaint = new Paint();
         strokePaint.setStyle(Style.STROKE);
         tintPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
-        clearingFillPaint = new Paint();
-        clearingFillPaint.setStyle(Style.FILL);
-    }
-
-    private void initShaders() {
-        backgroundBitmapShader = new BitmapShader(Bitmap.createBitmap(normalBitmap),
-                BitmapShader.TileMode.REPEAT,
-                BitmapShader.TileMode.REPEAT);
-        clearingFillPaint.setShader(backgroundBitmapShader);
     }
 
     @Override
     public void dispose() {
-        normalBitmap.recycle();
+        getBitmap().recycle();
     }
 
     @Override
@@ -176,10 +155,8 @@ public class RainbowGraphics2D extends RainbowGraphics {
     public synchronized void endDraw() {
         if (primarySurface) {
             Canvas screen = parent.getDrawingView().lockCanvas();
-            if (screen != null) {
-                screen.drawBitmap(normalBitmap, 0, 0, null);
-                parent.getDrawingView().unlockCanvasAndPost(screen);
-            }
+            screen.drawBitmap(getBitmap(), 0, 0, null);
+            parent.getDrawingView().unlockCanvasAndPost(screen);
         } else {
             loadPixels();
         }
@@ -190,7 +167,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
         if ((pixels == null) || (pixels.length != width * height)) {
             pixels = new int[width * height];
         }
-        normalBitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+        getBitmap().getPixels(pixels, 0, width, 0, 0, width, height);
     }
 
     @Override
@@ -392,7 +369,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
         if ((x < 0) || (y < 0) || (x >= width) || (y >= height)) {
             return;
         }
-        normalBitmap.setPixel(x, y, argb);
+        getBitmap().setPixel(x, y, argb);
     }
 
     @Override
@@ -431,7 +408,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     public Paint getFillPaint() {
-        return isFillClear ? clearingFillPaint : fillPaint;
+        return fillPaint;
     }
 
     @Override
@@ -636,7 +613,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
         smooth = true;
         strokePaint.setAntiAlias(true);
         fillPaint.setAntiAlias(true);
-        clearingFillPaint.setAntiAlias(true);
     }
 
     @Override
@@ -644,7 +620,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
         smooth = false;
         strokePaint.setAntiAlias(false);
         fillPaint.setAntiAlias(false);
-        clearingFillPaint.setAntiAlias(false);
     }
 
     /**
@@ -878,20 +853,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
         tintPaint.setColorFilter(new PorterDuffColorFilter(tintColor, PorterDuff.Mode.MULTIPLY));
     }
 
-    public void fill(int rgb) {
-        fill(rgb, 255);
-    }
-
-    public void fill(int rgb, float alpha) {
-        if (rgb == CLEAR) {
-            isFillClear = true;
-            clearingFillPaint.setAlpha((int) alpha);
-        } else {
-            isFillClear = false;
-            super.fill(rgb, alpha);
-        }
-    }
-
     @Override
     protected void fillFromCalc() {
         super.fillFromCalc();
@@ -937,7 +898,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
      */
     @Override
     public void updatePixels() {
-        normalBitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+        getBitmap().setPixels(pixels, 0, width, 0, 0, width, height);
     }
 
     @Override
@@ -951,7 +912,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
         if ((x < 0) || (y < 0) || (x >= width) || (y >= height)) {
             return 0;
         }
-        return normalBitmap.getPixel(x, y);
+        return getBitmap().getPixel(x, y);
     }
 
     @Override
@@ -1000,6 +961,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
     public void copy(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh) {
         rect.set(sx, sy, sx + sw, sy + sh);
         Rect src = new Rect(dx, dy, dx + dw, dy + dh);
-        getCanvas().drawBitmap(normalBitmap, src, rect, null);
+        getCanvas().drawBitmap(getBitmap(), src, rect, null);
     }
 }
