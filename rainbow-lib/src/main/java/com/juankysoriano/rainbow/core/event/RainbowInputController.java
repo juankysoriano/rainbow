@@ -18,6 +18,7 @@ public class RainbowInputController {
     private float px, py;
     private boolean screenTouched;
     private boolean fingerMoving;
+
     private List<AsyncTask> runningInputEventTasks;
 
     public RainbowInputController() {

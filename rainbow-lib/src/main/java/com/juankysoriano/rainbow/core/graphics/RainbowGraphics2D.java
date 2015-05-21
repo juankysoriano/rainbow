@@ -34,6 +34,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 
+import com.juankysoriano.rainbow.core.drawing.RainbowTextureView;
 import com.juankysoriano.rainbow.core.matrix.RMatrix;
 import com.juankysoriano.rainbow.core.matrix.RMatrix2D;
 import com.juankysoriano.rainbow.core.matrix.RMatrix3D;
@@ -154,9 +155,10 @@ public class RainbowGraphics2D extends RainbowGraphics {
     @Override
     public synchronized void endDraw() {
         if (primarySurface) {
-            Canvas screen = parent.getDrawingView().lockCanvas();
+            RainbowTextureView sketchView = parent.getDrawingView();
+            Canvas screen = sketchView.lockCanvas();
             screen.drawBitmap(getBitmap(), 0, 0, null);
-            parent.getDrawingView().unlockCanvasAndPost(screen);
+            sketchView.unlockCanvasAndPost(screen);
         } else {
             loadPixels();
         }
