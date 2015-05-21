@@ -142,7 +142,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     }
 
     private float getArea() {
-        return Math.abs(getWidth() * getHeight());
+        return getWidth() * getHeight();
     }
 
     @Override
