@@ -154,7 +154,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public synchronized void endDraw() {
-        if (primarySurface) {
+        if (primarySurface && hasBitmap()) {
             RainbowTextureView sketchView = parent.getDrawingView();
             Canvas screen = sketchView.lockCanvas();
             screen.drawBitmap(getBitmap(), 0, 0, null);
@@ -162,6 +162,10 @@ public class RainbowGraphics2D extends RainbowGraphics {
         } else {
             loadPixels();
         }
+    }
+
+    private boolean hasBitmap() {
+        return getBitmap() != null;
     }
 
     @Override
