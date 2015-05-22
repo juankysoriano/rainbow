@@ -7,6 +7,7 @@ import android.view.TextureView;
 import android.view.TextureView.SurfaceTextureListener;
 import android.view.ViewGroup;
 
+import com.juankysoriano.rainbow.R;
 import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.core.event.RainbowInputController;
 
@@ -26,9 +27,33 @@ public class RainbowTextureView extends TextureView implements SurfaceTextureLis
     public boolean onTouchEvent(@NonNull final MotionEvent event) {
         RainbowInputController rainbowInputController = rainbow.getRainbowInputController();
         if (rainbowInputController != null) {
-            rainbowInputController.postEvent(event, rainbow.getRainbowDrawer());
+            splitIntoMultipleEventsAndPost(event, rainbowInputController);
         }
         return true;
+    }
+
+    private void splitIntoMultipleEventsAndPost(@NonNull MotionEvent event, RainbowInputController rainbowInputController) {
+        float px = rainbowInputController.getX();
+        float py = rainbowInputController.getY();
+        float diffX = event.getX() - px;
+        float diffY = event.getY() - py;
+        int divisions = getDivisionsFor(event);
+        for (int i = 1; i <= divisions; i++) {
+            float newEventX = px + diffX * i / divisions;
+            float newEventY = py + diffY * i / divisions;
+            MotionEvent subEvent = obtainEventWithNewPosition(event, newEventX, newEventY);
+            rainbowInputController.postEvent(subEvent, rainbow.getRainbowDrawer());
+        }
+    }
+
+    private int getDivisionsFor(MotionEvent event) {
+        return event.getAction() != MotionEvent.ACTION_MOVE ? 1 : getContext().getResources().getInteger(R.integer.dragging_divisions);
+    }
+
+    private MotionEvent obtainEventWithNewPosition(@NonNull MotionEvent event, float newEventX, float newEventY) {
+        MotionEvent motionEvent = MotionEvent.obtain(event);
+        motionEvent.setLocation(newEventX, newEventY);
+        return motionEvent;
     }
 
     @Override

@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 
+import com.juankysoriano.rainbow.R;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.drawing.RainbowTextureView;
 import com.juankysoriano.rainbow.core.event.RainbowInputController;
@@ -53,6 +54,7 @@ public class Rainbow implements InputEventListener {
 
     public void injectInto(ViewGroup viewGroup) {
         this.drawingView = new RainbowTextureView(viewGroup, this);
+        this.frameRate = frameRate * viewGroup.getContext().getResources().getInteger(R.integer.dragging_divisions);
         addOnPreDrawListener();
     }
 
