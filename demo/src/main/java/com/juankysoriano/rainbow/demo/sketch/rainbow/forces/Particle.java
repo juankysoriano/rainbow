@@ -34,16 +34,12 @@ public class Particle {
 
     public static Particle newInstance() {
         Resources resources = LibraryApplication.getContext().getResources();
-        return new Particle(resources.getColor(RAINBOW[RainbowMath.random(RAINBOW.length)]));
+        return new Particle(resources.getColor(RAINBOW[((int) RainbowMath.random(RAINBOW.length))]));
     }
 
     public void updateWith(Nucleus nucleus) {
         updateGravityWith(nucleus);
         updatePosition();
-    }
-
-    public RVector getLocation() {
-        return location;
     }
 
     private void updateGravityWith(Nucleus nucleus) {

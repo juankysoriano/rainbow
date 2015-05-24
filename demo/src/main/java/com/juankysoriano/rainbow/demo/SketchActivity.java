@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.demo.sketch.rainbow.LibraryApplication;
-import com.juankysoriano.rainbow.demo.sketch.rainbow.forces.RainbowParticleSystem;
+import com.juankysoriano.rainbow.demo.sketch.rainbow.detection.RainbowBlobDetection;
 
 public class SketchActivity extends Activity {
 
@@ -17,7 +17,7 @@ public class SketchActivity extends Activity {
         super.onCreate(savedInstanceState);
         LibraryApplication.setContext(getApplicationContext());
         setContentView(R.layout.sketch);
-        sketch = new RainbowParticleSystem(getSketchView());
+        sketch = new RainbowBlobDetection(getSketchView());
     }
 
     private ViewGroup getSketchView() {
