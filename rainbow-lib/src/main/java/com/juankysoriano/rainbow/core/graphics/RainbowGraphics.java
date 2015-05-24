@@ -916,6 +916,16 @@ public abstract class RainbowGraphics extends RainbowImage {
         endShape();
     }
 
+    public void point(float... vertex) {
+    }
+
+    public void line(float x1, float y1, float x2, float y2) {
+
+    }
+
+    public void line(float... vertex) {
+    }
+
     /**
      * Start a new shape.
      * <p/>
@@ -1017,12 +1027,6 @@ public abstract class RainbowGraphics extends RainbowImage {
     }
 
     public void endShape(int mode) {
-    }
-
-    public void point(float... vertex) {
-    }
-
-    public void line(float... vertex) {
     }
 
     public void triangle(float x1, float y1, float x2, float y2, float x3, float y3) {

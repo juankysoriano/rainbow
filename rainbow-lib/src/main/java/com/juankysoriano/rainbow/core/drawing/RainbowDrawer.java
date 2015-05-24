@@ -598,6 +598,10 @@ public class RainbowDrawer {
         graphics.line(vertex);
     }
 
+    public void line(float x1, float y1, float x2, float y2) {
+        graphics.line(x1, y1, x2, y2);
+    }
+
     /**
      * Explores a imaginary line in order to seek for line points. When a line point is found a listener is notified.
      *

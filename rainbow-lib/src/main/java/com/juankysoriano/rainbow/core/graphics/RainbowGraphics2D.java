@@ -485,9 +485,23 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     @Override
+    public void point(float x, float y) {
+        if (stroke) {
+            getCanvas().drawPoint(x, y, getStrokePaint());
+        }
+    }
+
+    @Override
     public void line(float... vertex) {
         if (stroke) {
             getCanvas().drawLines(vertex, getStrokePaint());
+        }
+    }
+
+    @Override
+    public void line(float x1, float y1, float x2, float y2) {
+        if (stroke) {
+            getCanvas().drawLine(x1, y1, x2, y2, getStrokePaint());
         }
     }
 
