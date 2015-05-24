@@ -586,6 +586,10 @@ public class RainbowDrawer {
         graphics.point(x, y);
     }
 
+    public void point(float... points) {
+        graphics.point(points);
+    }
+
     public void point(final float x, final float y, final float z) {
         graphics.point(x, y, z);
     }

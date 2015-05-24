@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class ParticleWorld {
 
-    private static final int NUMBER_PARTICLES = 100;
+    private static final int NUMBER_PARTICLES = 500;
     private static final int NUCLEUS_DIAMETER = 40;
     private static final float HALF = 0.5f;
 
@@ -45,10 +45,17 @@ public class ParticleWorld {
     }
 
     public void updateAndDisplay(RainbowDrawer rainbowDrawer) {
+        float[] points = new float[particles.size()*2];
+        int point = 0;
         for (Particle current : particles) {
             current.updateWith(nucleus);
-            current.displayWith(rainbowDrawer);
+            RVector location = current.getLocation();
+            points[point++] = location.x;
+            points[point++] = location.y;
         }
+
+        rainbowDrawer.stroke(100,60,60, 128);
+        rainbowDrawer.point(points);
     }
 
     public void moveNucleusTo(float x, float y) {

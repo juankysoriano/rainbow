@@ -48,7 +48,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         super.onSketchSetup();
         getRainbowDrawer().noFill();
         getRainbowDrawer().background(0, 0, 0);
-        getRainbowDrawer().loadImage(R.drawable.girl,
+        getRainbowDrawer().loadImage(R.drawable.gatito,
                 getWidth() / RESIZE_FACTOR,
                 getHeight() / RESIZE_FACTOR,
                 RainbowImage.LOAD_CENTER_CROP, new RainbowImage.LoadPictureListener() {
