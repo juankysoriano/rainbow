@@ -129,12 +129,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void dispose() {
-        getBitmap().recycle();
-    }
-
-    @Override
-    public Bitmap getBitmap() {
-        return super.getBitmap();
+        recycle();
     }
 
     @Override
@@ -155,9 +150,10 @@ public class RainbowGraphics2D extends RainbowGraphics {
     @Override
     public synchronized void endDraw() {
         if (primarySurface && hasBitmap()) {
+            Bitmap sketchBitmap = getBitmap();
             RainbowTextureView sketchView = parent.getDrawingView();
             Canvas screen = sketchView.lockCanvas();
-            screen.drawBitmap(getBitmap(), 0, 0, null);
+            screen.drawBitmap(sketchBitmap, 0, 0, null);
             sketchView.unlockCanvasAndPost(screen);
         } else {
             loadPixels();

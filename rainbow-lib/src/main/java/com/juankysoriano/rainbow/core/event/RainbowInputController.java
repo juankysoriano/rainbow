@@ -116,7 +116,7 @@ public class RainbowInputController {
     }
 
     public boolean isFingerMoving() {
-        return fingerMoving;
+        return fingerMoving && !runningInputEventTasks.isEmpty();
     }
 
     private void postHandleEvent(MotionEvent event) {
@@ -255,8 +255,7 @@ public class RainbowInputController {
         @Override
         protected void onPostExecute(MotionEvent motionEvent) {
             postHandleEvent(motionEvent);
+            runningInputEventTasks.remove(this);
         }
-
-
     }
 }
