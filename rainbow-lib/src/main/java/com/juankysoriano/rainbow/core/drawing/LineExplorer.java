@@ -2,7 +2,7 @@ package com.juankysoriano.rainbow.core.drawing;
 
 import com.juankysoriano.rainbow.utils.RainbowMath;
 
-public class LineExplorer {
+class LineExplorer {
     private static final float NO_PREVIOUS = -1;
     private final int precision;
     private final RainbowDrawer rainbowDrawer;
