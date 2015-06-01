@@ -50,7 +50,7 @@ public class BlobDetection {
 
         for (int x = 0; x < luminanceMap.getWidth(); x++) {
             for (int y = 0; y < luminanceMap.getHeight(); y++) {
-                if (hasToPaintMoreBlobs()) {
+                if (hasToDetectMoreBlobs()) {
                     findBlobAt(x, y, onBlobDetectedCallback);
                 } else {
                     return;
@@ -59,7 +59,7 @@ public class BlobDetection {
         }
     }
 
-    private boolean hasToPaintMoreBlobs() {
+    private boolean hasToDetectMoreBlobs() {
         return numberOfBlobsDetected < maxNumberOfBlobs;
     }
 

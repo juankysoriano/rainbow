@@ -22,13 +22,13 @@ public class LuminanceMap {
         return new LuminanceMap(width, height, luminanceValues, visitedPixels);
     }
 
-    private static void computeLuminance(float[] luminances, RainbowImage rainbowImage) {
+    private static void computeLuminance(float[] luminance, RainbowImage rainbowImage) {
         for (int x = 0; x < rainbowImage.getWidth(); x++) {
             for (int y = 0; y < rainbowImage.getHeight(); y++) {
                 int color = rainbowImage.get(x, y);
                 int index = x + rainbowImage.getWidth() * y;
                 // http://www.songho.ca/dsp/luminance/luminance.html
-                luminances[index] = 3 * (2 * Color.red(color) + 5 * Color.green(color) + Color.blue(color)) / 8;
+                luminance[index] = 3 * (2 * Color.red(color) + 5 * Color.green(color) + Color.blue(color)) / 8;
             }
         }
     }
