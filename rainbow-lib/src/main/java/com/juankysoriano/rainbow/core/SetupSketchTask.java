@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 
 import java.lang.ref.WeakReference;
 
-public class SetupSketchTask {
+class SetupSketchTask {
     private final WeakReference<Rainbow> rainbowWeakReference;
     private AsyncTask<Void, Void, Void> task;
 

@@ -3,11 +3,11 @@ package com.juankysoriano.rainbow.core;
 import java.lang.ref.WeakReference;
 import java.util.TimerTask;
 
-public class DrawingTask extends TimerTask {
+class ScreenUpdateTask extends TimerTask {
 
     private final WeakReference<Rainbow> weakRainbow;
 
-    DrawingTask(Rainbow rainbow) {
+    ScreenUpdateTask(Rainbow rainbow) {
         this.weakRainbow = new WeakReference<>(rainbow);
     }
 
@@ -15,7 +15,7 @@ public class DrawingTask extends TimerTask {
     public void run() {
         Rainbow rainbow = weakRainbow.get();
         if (rainbow != null && !rainbow.isPaused()) {
-            rainbow.performStep();
+            rainbow.invalidate();
         }
     }
 }

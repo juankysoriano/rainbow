@@ -1,9 +1,10 @@
 package com.juankysoriano.rainbow.core;
 
 import android.content.Context;
+import android.graphics.SurfaceTexture;
+import android.view.TextureView;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.view.ViewTreeObserver;
 
 import com.juankysoriano.rainbow.R;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
@@ -12,15 +13,9 @@ import com.juankysoriano.rainbow.core.event.RainbowInputController;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics2D;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-public class Rainbow implements InputEventListener {
-    private static final int DEFAULT_FRAME_RATE = 60;
-    private static final long TIMEOUT = 10;
-    private static final long SECOND = 1000;
-    private float frameRate = DEFAULT_FRAME_RATE;
+public class Rainbow {
+    public static final int DEFAULT_FRAME_RATE = 60;
+    private int frameRate = DEFAULT_FRAME_RATE;
     private boolean surfaceReady;
     private int width;
     private int height;
@@ -34,10 +29,12 @@ public class Rainbow implements InputEventListener {
     private final RainbowDrawer rainbowDrawer;
     private RainbowTextureView drawingView;
     private SetupSketchTask setupSketchTask;
-    private ScheduledExecutorService drawingScheduler;
+    private RainbowTaskScheduler rainbowTaskScheduler;
 
     protected Rainbow(ViewGroup viewGroup) {
-        this(new RainbowDrawer(), new RainbowInputController());
+        this.rainbowDrawer = new RainbowDrawer();
+        this.rainbowInputController = RainbowInputController.newInstance();
+        this.setupSketchTask = SetupSketchTask.newInstance(this);
         injectInto(viewGroup);
     }
 
@@ -59,21 +56,29 @@ public class Rainbow implements InputEventListener {
     }
 
     private void addOnPreDrawListener() {
-        drawingView.getViewTreeObserver().addOnPreDrawListener(onPreDrawListener);
+        drawingView.setSurfaceTextureListener(onSurfaceTextureListener);
     }
 
-    private ViewTreeObserver.OnPreDrawListener onPreDrawListener = new ViewTreeObserver.OnPreDrawListener() {
+    private TextureView.SurfaceTextureListener onSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
-        public boolean onPreDraw() {
-            removeOnPreDrawListener();
-
-            rainbowInputController.setInputEventListener(Rainbow.this);
+        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+            drawingView.setSurfaceTextureListener(null);
             setupSketch();
-            return true;
         }
 
-        private void removeOnPreDrawListener() {
-            drawingView.getViewTreeObserver().removeOnPreDrawListener(this);
+        @Override
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+            //no-op
+        }
+
+        @Override
+        public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+            return false;
+        }
+
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+            //no-op
         }
     };
 
@@ -81,7 +86,7 @@ public class Rainbow implements InputEventListener {
         return drawingView.getContext();
     }
 
-    private void setupSketch() {
+    protected void setupSketch() {
         initDimensions();
         setupSketchTask.start();
         isSetup = true;
@@ -91,10 +96,23 @@ public class Rainbow implements InputEventListener {
     private void initDimensions() {
         width = drawingView.getMeasuredWidth();
         height = drawingView.getMeasuredHeight();
-        initGraphics(width, height);
+
+        RainbowGraphics2D.releasePrimeryBitmap();
+        initPeriodicGraphics(width, height);
+        initInputControllerGraphics(width, height);
     }
 
-    private void initGraphics(int width, int height) {
+    private void initInputControllerGraphics(int width, int height) {
+        RainbowGraphics graphics = new RainbowGraphics2D();
+        graphics.setParent(Rainbow.this);
+        graphics.setPrimary(true);
+        if (width > 0 && height > 0) {
+            graphics.setSize(width, height);
+            rainbowInputController.getRainbowDrawer().setGraphics(graphics);
+        }
+    }
+
+    private void initPeriodicGraphics(int width, int height) {
         RainbowGraphics graphics = new RainbowGraphics2D();
         graphics.setParent(Rainbow.this);
         graphics.setPrimary(true);
@@ -108,7 +126,7 @@ public class Rainbow implements InputEventListener {
     }
 
     public void start() {
-        if (!isStarted() || drawingScheduler.isTerminated()) {
+        if (!isStarted() || rainbowTaskScheduler.isTerminated()) {
             onDrawingStart();
             started = true;
             stopped = false;
@@ -129,19 +147,15 @@ public class Rainbow implements InputEventListener {
             onDrawingResume();
             resumed = true;
             paused = false;
-            if (!hasDrawingScheduler()) {
-                drawingScheduler = Executors.newSingleThreadScheduledExecutor();
-                drawingScheduler.scheduleAtFixedRate(new DrawingTask(this), SECOND, getDelay(), TimeUnit.MILLISECONDS);
+            if(!hasScheduler()) {
+                rainbowTaskScheduler = RainbowTaskScheduler.newInstance(this);
+                rainbowTaskScheduler.schedule(frameRate);
             }
         }
     }
 
-    private long getDelay() {
-        return Math.max(1, (long) (SECOND / frameRate));
-    }
-
-    private boolean hasDrawingScheduler() {
-        return drawingScheduler != null;
+    private boolean hasScheduler() {
+        return rainbowTaskScheduler != null;
     }
 
     public boolean isResumed() {
@@ -156,8 +170,7 @@ public class Rainbow implements InputEventListener {
         return rainbowDrawer != null
                 && rainbowDrawer.hasGraphics()
                 && surfaceReady
-                && isSetup
-                && !rainbowInputController.isFingerMoving();
+                && isSetup;
     }
 
     private void handleDraw() {
@@ -168,17 +181,12 @@ public class Rainbow implements InputEventListener {
 
     private void performDrawingStep() {
         frameCount++;
-        if (hasToPaintIntoBuffer()) {
-            onDrawingStep();
-        } else {
-            rainbowDrawer.beginDraw();
-            onDrawingStep();
-            rainbowDrawer.endDraw();
-        }
+        onDrawingStep();
+
     }
 
     private boolean hasToPaintIntoBuffer() {
-        return frameCount % 3 != 0;
+        return frameCount % 2 != 0;
     }
 
     public void onDrawingStep() {
@@ -188,18 +196,12 @@ public class Rainbow implements InputEventListener {
         handleDraw();
     }
 
-    @Override
-    public void onInputEvent() {
-        performDrawingStep();
-    }
-
     public void pause() {
         if (!isPaused()) {
             paused = true;
             resumed = false;
             shutDownExecutioner();
             onDrawingPause();
-
         }
     }
 
@@ -223,9 +225,8 @@ public class Rainbow implements InputEventListener {
 
     private void shutDownExecutioner() {
         try {
-            drawingScheduler.shutdownNow();
-            drawingScheduler.awaitTermination(TIMEOUT, TimeUnit.SECONDS);
-            drawingScheduler = null;
+            rainbowTaskScheduler.shutdown();
+            rainbowTaskScheduler = null;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -297,7 +298,7 @@ public class Rainbow implements InputEventListener {
         return frameCount;
     }
 
-    public void frameRate(final float newRateTarget) {
+    public void frameRate(final int newRateTarget) {
         frameRate = newRateTarget;
         if (!isPaused()) {
             pause();
@@ -328,4 +329,8 @@ public class Rainbow implements InputEventListener {
         surfaceReady = true;
     }
 
+    public void invalidate() {
+        rainbowDrawer.beginDraw();
+        rainbowDrawer.endDraw();
+    }
 }
