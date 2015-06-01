@@ -147,7 +147,6 @@ public abstract class RainbowGraphics extends RainbowImage {
     public int strokeCap = DEFAULT_STROKE_CAP;
     public int strokeJoin = DEFAULT_STROKE_JOIN;
     public float strokeWeight = DEFAULT_STROKE_WEIGHT;
-    public int pixelCount;
     public boolean smooth = false;
     /**
      * True if tint() is enabled (read-only).
