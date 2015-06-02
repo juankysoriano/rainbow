@@ -147,9 +147,9 @@ public class Rainbow {
             onDrawingResume();
             resumed = true;
             paused = false;
-            if(!hasScheduler()) {
+            if (!hasScheduler()) {
                 rainbowTaskScheduler = RainbowTaskScheduler.newInstance(this);
-                rainbowTaskScheduler.schedule(frameRate);
+                rainbowTaskScheduler.scheduleAt(frameRate);
             }
         }
     }
