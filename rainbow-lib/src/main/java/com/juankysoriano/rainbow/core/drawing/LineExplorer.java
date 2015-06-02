@@ -10,7 +10,7 @@ class LineExplorer {
     private float previousDetectedX = NO_PREVIOUS;
     private float previousDetectedY = NO_PREVIOUS;
 
-    public LineExplorer(Precision precision, RainbowDrawer rainbowDrawer, RainbowDrawer.PointDetectedListener listener) {
+    public LineExplorer(RainbowDrawer.Precision precision, RainbowDrawer rainbowDrawer, RainbowDrawer.PointDetectedListener listener) {
         this.precision = precision.getValue();
         this.rainbowDrawer = rainbowDrawer;
         this.listener = listener;
@@ -84,22 +84,6 @@ class LineExplorer {
     private void processVerticalLineGoingUp(float x, float y, float py, RainbowDrawer rainbowDrawer, RainbowDrawer.PointDetectedListener listener) {
         for (float i = RainbowMath.max(y, py); i >= RainbowMath.min(y, py); i -= precision) {
             doProcessOnPoint(x, i, rainbowDrawer, listener);
-        }
-    }
-
-    public enum Precision {
-        HIGH(4),
-        NORMAL(16),
-        LOW(32);
-
-        private final int precision;
-
-        Precision(int precision) {
-            this.precision = precision;
-        }
-
-        public int getValue() {
-            return precision;
         }
     }
 }

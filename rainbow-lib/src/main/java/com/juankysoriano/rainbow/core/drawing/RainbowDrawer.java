@@ -615,7 +615,7 @@ public class RainbowDrawer {
                             float y1,
                             float x2,
                             float y2,
-                            LineExplorer.Precision precision,
+                            RainbowDrawer.Precision precision,
                             final PointDetectedListener listener) {
         LineExplorer lineExplorer = new LineExplorer(precision, this, listener);
         lineExplorer.exploreLine(x1, y1, x2, y2);
@@ -1810,4 +1810,19 @@ public class RainbowDrawer {
         void onPointDetected(float px, float py, float x, float y, RainbowDrawer rainbowDrawer);
     }
 
+    public enum Precision {
+        HIGH(4),
+        NORMAL(16),
+        LOW(32);
+
+        private final int precision;
+
+        Precision(int precision) {
+            this.precision = precision;
+        }
+
+        public int getValue() {
+            return precision;
+        }
+    }
 }
