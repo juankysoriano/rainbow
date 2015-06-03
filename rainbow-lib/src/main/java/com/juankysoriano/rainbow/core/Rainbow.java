@@ -7,7 +7,6 @@ import android.view.TextureView;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
-import com.juankysoriano.rainbow.R;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.drawing.RainbowTextureView;
 import com.juankysoriano.rainbow.core.event.RainbowInputController;
@@ -53,7 +52,6 @@ public class Rainbow {
 
     public void injectInto(ViewGroup viewGroup) {
         this.drawingView = new RainbowTextureView(viewGroup, this);
-        this.frameRate = frameRate * viewGroup.getContext().getResources().getInteger(R.integer.dragging_divisions);
         addOnPreDrawListener();
     }
 
@@ -189,10 +187,6 @@ public class Rainbow {
     private void performDrawingStep() {
         frameCount++;
         onDrawingStep();
-    }
-
-    private boolean hasToPaintIntoBuffer() {
-        return frameCount % 2 != 0;
     }
 
     public void onDrawingStep() {

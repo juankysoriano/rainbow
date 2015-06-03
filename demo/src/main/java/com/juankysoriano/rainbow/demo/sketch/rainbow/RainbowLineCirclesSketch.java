@@ -4,8 +4,8 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.core.Rainbow;
-import com.juankysoriano.rainbow.core.drawing.LineExplorer;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
+import com.juankysoriano.rainbow.core.drawing.RainbowDrawer.Precision;
 import com.juankysoriano.rainbow.core.event.RainbowInputController;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
 
@@ -15,7 +15,7 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputCon
 
         @Override
         public void onPointDetected(float px, float py, float x, float y, RainbowDrawer rainbowDrawer) {
-            drawEllipse(x, y, 50, 50, rainbowDrawer);
+            drawEllipse(x, y, 200, 200, rainbowDrawer);
         }
 
         private void drawEllipse(float x, float y, float radius, int color, RainbowDrawer rainbowDrawer) {
@@ -68,7 +68,7 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputCon
 
     private void drawEllipsedLine(float x1, float y1, float x2, float y2) {
         final RainbowDrawer drawer = getRainbowDrawer();
-        drawer.exploreLine(x1, y1, x2, y2, LineExplorer.Precision.NORMAL, pointDetectedListener);
+        drawer.exploreLine(x1, y1, x2, y2, Precision.HIGH, pointDetectedListener);
     }
 
     @Override

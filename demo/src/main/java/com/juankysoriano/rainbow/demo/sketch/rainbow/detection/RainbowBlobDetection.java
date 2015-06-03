@@ -48,7 +48,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         super.onSketchSetup();
         getRainbowDrawer().noFill();
         getRainbowDrawer().background(0, 0, 0);
-        getRainbowDrawer().loadImage(R.drawable.girl,
+        getRainbowDrawer().loadImage(R.drawable.gatito,
                 getWidth() / RESIZE_FACTOR,
                 getHeight() / RESIZE_FACTOR,
                 RainbowImage.LOAD_CENTER_CROP, new RainbowImage.LoadPictureListener() {
@@ -97,16 +97,18 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     }
 
     private void paintNextBlob() {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                if (!blobList.isEmpty()) {
-                    Blob blob = blobList.remove(0);
-                    paintBlob(blob);
-                }
-            }
-        });
+        executor.execute(paintBlobTask);
     }
+
+    private final Runnable paintBlobTask = new Runnable() {
+        @Override
+        public void run() {
+            if (!blobList.isEmpty()) {
+                Blob blob = blobList.remove(0);
+                paintBlob(blob);
+            }
+        }
+    };
 
     private void paintBackgroundLines() {
         for (int i = 0; i < 10; i++) {
@@ -200,7 +202,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     }
 
     private void releaseBlobDetection() {
-        if (blobDetection != null) {
+        if(blobDetection != null) {
             blobDetection.cancel();
             blobDetection = null;
         }
