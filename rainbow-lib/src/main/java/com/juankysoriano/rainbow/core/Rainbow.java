@@ -2,6 +2,7 @@ package com.juankysoriano.rainbow.core;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.view.Surface;
 import android.view.TextureView;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -27,6 +28,7 @@ public class Rainbow {
     private boolean isSetup = false;
     private final RainbowInputController rainbowInputController;
     private final RainbowDrawer rainbowDrawer;
+    private Surface surface;
     private RainbowTextureView drawingView;
     private SetupSketchTask setupSketchTask;
     private RainbowTaskScheduler rainbowTaskScheduler;
@@ -61,7 +63,8 @@ public class Rainbow {
 
     private TextureView.SurfaceTextureListener onSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
-        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+        public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
+            surface = new Surface(surfaceTexture);
             drawingView.setSurfaceTextureListener(null);
             setupSketch();
         }
@@ -84,6 +87,10 @@ public class Rainbow {
 
     public Context getContext() {
         return drawingView.getContext();
+    }
+
+    public Surface getSurface() {
+        return surface;
     }
 
     protected void setupSketch() {
@@ -182,7 +189,6 @@ public class Rainbow {
     private void performDrawingStep() {
         frameCount++;
         onDrawingStep();
-
     }
 
     private boolean hasToPaintIntoBuffer() {
@@ -327,10 +333,5 @@ public class Rainbow {
             graphics.setSize(width, height);
         }
         surfaceReady = true;
-    }
-
-    public void invalidate() {
-        rainbowDrawer.beginDraw();
-        rainbowDrawer.endDraw();
     }
 }

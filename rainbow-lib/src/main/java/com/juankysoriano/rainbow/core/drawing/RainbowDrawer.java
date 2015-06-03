@@ -389,7 +389,7 @@ public class RainbowDrawer {
     /**
      * Prepares rainbow sketch for draw.
      */
-    public void beginDraw() {
+    public synchronized void beginDraw() {
         drawing = true;
         if (graphics != null) {
             graphics.beginDraw();
@@ -403,7 +403,7 @@ public class RainbowDrawer {
     /**
      * Ends synchronous draw. Makes drawing effective
      */
-    public void endDraw() {
+    public synchronized void endDraw() {
         if (graphics != null) {
             graphics.endDraw();
         }
@@ -1804,6 +1804,11 @@ public class RainbowDrawer {
      */
     public void blend(final RainbowImage src, final int sx, final int sy, final int sw, final int sh, final int dx, final int dy, final int dw, final int dh, final int mode) {
         graphics.blend(src, sx, sy, sw, sh, dx, dy, dw, dh, mode);
+    }
+
+    public void invalidate() {
+        beginDraw();
+        endDraw();
     }
 
     public interface PointDetectedListener {

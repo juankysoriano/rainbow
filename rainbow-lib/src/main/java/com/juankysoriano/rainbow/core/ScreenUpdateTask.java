@@ -15,7 +15,7 @@ class ScreenUpdateTask extends TimerTask {
     public void run() {
         Rainbow rainbow = weakRainbow.get();
         if (rainbow != null && !rainbow.isPaused()) {
-            rainbow.invalidate();
+            rainbow.getRainbowDrawer().invalidate();
         }
     }
 }

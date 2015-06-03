@@ -33,8 +33,8 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.view.Surface;
 
-import com.juankysoriano.rainbow.core.drawing.RainbowTextureView;
 import com.juankysoriano.rainbow.core.matrix.RMatrix;
 import com.juankysoriano.rainbow.core.matrix.RMatrix2D;
 import com.juankysoriano.rainbow.core.matrix.RMatrix3D;
@@ -170,21 +170,17 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void resetMatrix() {
-        getCanvas().setMatrix(new android.graphics.Matrix());
-    }
-
-    Canvas getCanvas() {
-        return canvas;
+        canvas.setMatrix(new android.graphics.Matrix());
     }
 
     @Override
     public void endDraw() {
         if (primarySurface) {
-            RainbowTextureView sketchView = parent.getDrawingView();
-            Canvas screen = sketchView.lockCanvas();
-            if (hasBitmap() && screen != null) {
+            Surface surface = parent.getSurface();
+            Canvas screen = surface.lockCanvas(null);
+            if (hasBitmap()) {
                 screen.drawBitmap(getBitmap(), 0, 0, null);
-                sketchView.unlockCanvasAndPost(screen);
+                surface.unlockCanvasAndPost(screen);
             }
         } else {
             loadPixels();
@@ -360,7 +356,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     private void endPointsShape() {
-        android.graphics.Matrix m = getCanvas().getMatrix();
+        android.graphics.Matrix m = canvas.getMatrix();
         if (strokeWeight == 1 && m.isIdentity()) {
             if (screenPoint == null) {
                 screenPoint = new float[2];
@@ -377,14 +373,14 @@ public class RainbowGraphics2D extends RainbowGraphics {
         } else {
             float sw = strokeWeight / 2;
             // temporarily use the stroke Paint as a fill
-            getStrokePaint().setStyle(Style.FILL);
+            strokePaint.setStyle(Style.FILL);
             for (int i = 0; i < vertexCount; i++) {
                 float x = vertices[i][X];
                 float y = vertices[i][Y];
                 rect.set(x - sw, y - sw, x + sw, y + sw);
-                getCanvas().drawOval(rect, getStrokePaint());
+                canvas.drawOval(rect, strokePaint);
             }
-            getStrokePaint().setStyle(Style.STROKE);
+            strokePaint.setStyle(Style.STROKE);
         }
     }
 
@@ -412,7 +408,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
         }
         screenPoint[0] = x;
         screenPoint[1] = y;
-        getCanvas().getMatrix().mapPoints(screenPoint);
+        canvas.getMatrix().mapPoints(screenPoint);
         return screenPoint[0];
     }
 
@@ -423,25 +419,17 @@ public class RainbowGraphics2D extends RainbowGraphics {
         }
         screenPoint[0] = x;
         screenPoint[1] = y;
-        getCanvas().getMatrix().mapPoints(screenPoint);
+        canvas.getMatrix().mapPoints(screenPoint);
         return screenPoint[1];
-    }
-
-    public Paint getStrokePaint() {
-        return strokePaint;
     }
 
     void drawPath() {
         if (fill) {
-            getCanvas().drawPath(path, getFillPaint());
+            canvas.drawPath(path, fillPaint);
         }
         if (stroke) {
-            getCanvas().drawPath(path, getStrokePaint());
+            canvas.drawPath(path, strokePaint);
         }
-    }
-
-    public Paint getFillPaint() {
-        return fillPaint;
     }
 
     @Override
@@ -511,28 +499,28 @@ public class RainbowGraphics2D extends RainbowGraphics {
     @Override
     public void point(float... vertex) {
         if (stroke) {
-            getCanvas().drawPoints(vertex, getStrokePaint());
+            canvas.drawPoints(vertex, strokePaint);
         }
     }
 
     @Override
     public void point(float x, float y) {
         if (stroke) {
-            getCanvas().drawPoint(x, y, getStrokePaint());
+            canvas.drawPoint(x, y, strokePaint);
         }
     }
 
     @Override
     public void line(float... vertex) {
         if (stroke) {
-            getCanvas().drawLines(vertex, getStrokePaint());
+            canvas.drawLines(vertex, strokePaint);
         }
     }
 
     @Override
     public void line(float x1, float y1, float x2, float y2) {
         if (stroke) {
-            getCanvas().drawLine(x1, y1, x2, y2, getStrokePaint());
+            canvas.drawLine(x1, y1, x2, y2, strokePaint);
         }
     }
 
@@ -560,10 +548,10 @@ public class RainbowGraphics2D extends RainbowGraphics {
     @Override
     protected void rectImpl(float x1, float y1, float x2, float y2) {
         if (fill) {
-            getCanvas().drawRect(x1, y1, x2, y2, getFillPaint());
+            canvas.drawRect(x1, y1, x2, y2, fillPaint);
         }
         if (stroke) {
-            getCanvas().drawRect(x1, y1, x2, y2, getStrokePaint());
+            canvas.drawRect(x1, y1, x2, y2, strokePaint);
         }
     }
 
@@ -593,27 +581,27 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
             if (mode == 0) {
                 if (fill) {
-                    getCanvas().drawArc(rect, start, sweep, true, getFillPaint());
+                    canvas.drawArc(rect, start, sweep, true, fillPaint);
                 }
                 if (stroke) {
-                    getCanvas().drawArc(rect, start, sweep, false, getStrokePaint());
+                    canvas.drawArc(rect, start, sweep, false, strokePaint);
                 }
             } else if (mode == OPEN) {
                 if (fill) {
                     showMissingWarning("arc");
                 }
                 if (stroke) {
-                    getCanvas().drawArc(rect, start, sweep, false, getStrokePaint());
+                    canvas.drawArc(rect, start, sweep, false, strokePaint);
                 }
             } else if (mode == CHORD) {
                 showMissingWarning("arc");
 
             } else if (mode == PIE) {
                 if (fill) {
-                    getCanvas().drawArc(rect, start, sweep, true, getFillPaint());
+                    canvas.drawArc(rect, start, sweep, true, fillPaint);
                 }
                 if (stroke) {
-                    getCanvas().drawArc(rect, start, sweep, true, getStrokePaint());
+                    canvas.drawArc(rect, start, sweep, true, strokePaint);
                 }
 
             }
@@ -624,10 +612,10 @@ public class RainbowGraphics2D extends RainbowGraphics {
     protected void ellipseImpl(float x, float y, float w, float h) {
         rect.set(x, y, x + w, y + h);
         if (fill) {
-            getCanvas().drawOval(rect, getFillPaint());
+            canvas.drawOval(rect, fillPaint);
         }
         if (stroke) {
-            getCanvas().drawOval(rect, getStrokePaint());
+            canvas.drawOval(rect, strokePaint);
         }
     }
 
@@ -706,27 +694,27 @@ public class RainbowGraphics2D extends RainbowGraphics {
             imageImplDstRect.set(x1, y1, x2, y2);
         }
 
-        getCanvas().drawBitmap(src.getBitmap(), imageImplSrcRect, imageImplDstRect, tint ? tintPaint : null);
+        canvas.drawBitmap(src.getBitmap(), imageImplSrcRect, imageImplDstRect, tint ? tintPaint : null);
     }
 
     @Override
     public void pushMatrix() {
-        getCanvas().save(Canvas.MATRIX_SAVE_FLAG);
+        canvas.save(Canvas.MATRIX_SAVE_FLAG);
     }
 
     @Override
     public void popMatrix() {
-        getCanvas().restore();
+        canvas.restore();
     }
 
     @Override
     public void translate(float tx, float ty) {
-        getCanvas().translate(tx, ty);
+        canvas.translate(tx, ty);
     }
 
     @Override
     public void rotate(float angle) {
-        getCanvas().rotate(angle * RainbowMath.RAD_TO_DEG);
+        canvas.rotate(angle * RainbowMath.RAD_TO_DEG);
     }
 
     @Override
@@ -751,12 +739,12 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void scale(float s) {
-        getCanvas().scale(s, s);
+        canvas.scale(s, s);
     }
 
     @Override
     public void scale(float sx, float sy) {
-        getCanvas().scale(sx, sy);
+        canvas.scale(sx, sy);
     }
 
     @Override
@@ -766,19 +754,19 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void shearX(float angle) {
-        getCanvas().skew((float) Math.tan(angle), 0);
+        canvas.skew((float) Math.tan(angle), 0);
     }
 
     @Override
     public void shearY(float angle) {
-        getCanvas().skew(0, (float) Math.tan(angle));
+        canvas.skew(0, (float) Math.tan(angle));
     }
 
     @Override
     public void applyMatrix(float n00, float n01, float n02, float n10, float n11, float n12) {
         android.graphics.Matrix m = new android.graphics.Matrix();
         m.setValues(new float[]{n00, n01, n02, n10, n11, n12, 0, 0, 1});
-        getCanvas().concat(m);
+        canvas.concat(m);
     }
 
     @Override
@@ -813,7 +801,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
         }
 
         android.graphics.Matrix m = new android.graphics.Matrix();
-        getCanvas().getMatrix(m);
+        canvas.getMatrix(m);
         m.getValues(transform);
         target.set(transform[0], transform[1], transform[2], transform[3], transform[4], transform[5]);
         return target;
@@ -823,7 +811,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     public void setMatrix(RMatrix2D source) {
         android.graphics.Matrix matrix = new android.graphics.Matrix();
         matrix.setValues(new float[]{source.m00, source.m01, source.m02, source.m10, source.m11, source.m12, 0, 0, 1});
-        getCanvas().setMatrix(matrix);
+        canvas.setMatrix(matrix);
     }
 
     @Override
@@ -860,11 +848,11 @@ public class RainbowGraphics2D extends RainbowGraphics {
         super.strokeCap(cap);
 
         if (strokeCap == ROUND) {
-            getStrokePaint().setStrokeCap(Paint.Cap.ROUND);
+            strokePaint.setStrokeCap(Paint.Cap.ROUND);
         } else if (strokeCap == PROJECT) {
-            getStrokePaint().setStrokeCap(Paint.Cap.SQUARE);
+            strokePaint.setStrokeCap(Paint.Cap.SQUARE);
         } else {
-            getStrokePaint().setStrokeCap(Paint.Cap.BUTT);
+            strokePaint.setStrokeCap(Paint.Cap.BUTT);
         }
     }
 
@@ -873,25 +861,25 @@ public class RainbowGraphics2D extends RainbowGraphics {
         super.strokeJoin(join);
 
         if (strokeJoin == MITER) {
-            getStrokePaint().setStrokeJoin(Paint.Join.MITER);
+            strokePaint.setStrokeJoin(Paint.Join.MITER);
         } else if (strokeJoin == ROUND) {
-            getStrokePaint().setStrokeJoin(Paint.Join.ROUND);
+            strokePaint.setStrokeJoin(Paint.Join.ROUND);
         } else {
-            getStrokePaint().setStrokeJoin(Paint.Join.BEVEL);
+            strokePaint.setStrokeJoin(Paint.Join.BEVEL);
         }
     }
 
     @Override
     public void strokeWeight(float weight) {
         super.strokeWeight(weight);
-        getStrokePaint().setStrokeWidth(weight);
+        strokePaint.setStrokeWidth(weight);
     }
 
     @Override
     protected void strokeFromCalc() {
         super.strokeFromCalc();
-        getStrokePaint().setColor(strokeColor);
-        getStrokePaint().setShader(null);
+        strokePaint.setColor(strokeColor);
+        strokePaint.setShader(null);
     }
 
     @Override
@@ -903,13 +891,13 @@ public class RainbowGraphics2D extends RainbowGraphics {
     @Override
     protected void fillFromCalc() {
         super.fillFromCalc();
-        getFillPaint().setColor(fillColor);
-        getFillPaint().setShader(null);
+        fillPaint.setColor(fillColor);
+        fillPaint.setShader(null);
     }
 
     @Override
     public void backgroundImpl() {
-        getCanvas().drawColor(backgroundColor);
+        canvas.drawColor(backgroundColor);
     }
 
     @Override
@@ -974,7 +962,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
         }
 
         if (src.getBitmap() == null) {
-            getCanvas().drawBitmap(src.pixels, 0, src.width, x, y, src.width, src.height, false, null);
+            canvas.drawBitmap(src.pixels, 0, src.width, x, y, src.width, src.height, false, null);
         } else {
             if (src.width != src.getBitmap().getWidth() || src.height != src.getBitmap().getHeight()) {
                 src.setBitmap(Bitmap.createBitmap(src.width, src.height, Config.ARGB_4444));
@@ -987,10 +975,10 @@ public class RainbowGraphics2D extends RainbowGraphics {
                 src.getBitmap().setPixels(src.pixels, 0, src.width, 0, 0, src.width, src.height);
                 src.modified = false;
             }
-            getCanvas().save(Canvas.MATRIX_SAVE_FLAG);
-            getCanvas().setMatrix(null); // set to identity
-            getCanvas().drawBitmap(src.getBitmap(), x, y, null);
-            getCanvas().restore();
+            canvas.save(Canvas.MATRIX_SAVE_FLAG);
+            canvas.setMatrix(null); // set to identity
+            canvas.drawBitmap(src.getBitmap(), x, y, null);
+            canvas.restore();
         }
     }
 
@@ -1008,7 +996,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     public void copy(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh) {
         rect.set(sx, sy, sx + sw, sy + sh);
         Rect src = new Rect(dx, dy, dx + dw, dy + dh);
-        getCanvas().drawBitmap(getBitmap(), src, rect, null);
+        canvas.drawBitmap(getBitmap(), src, rect, null);
     }
 
     public static void releasePrimeryBitmap() {
@@ -1016,5 +1004,13 @@ public class RainbowGraphics2D extends RainbowGraphics {
             RainbowGraphics2D.primaryBitmap.recycle();
             RainbowGraphics2D.primaryBitmap = null;
         }
+    }
+
+    public Paint getFillPaint() {
+        return fillPaint;
+    }
+
+    public Paint getStrokePaint() {
+        return strokePaint;
     }
 }

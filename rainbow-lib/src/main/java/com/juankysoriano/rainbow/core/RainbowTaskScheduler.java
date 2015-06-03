@@ -13,7 +13,7 @@ class RainbowTaskScheduler {
     private final ScreenUpdateTask screenUpdateTask;
 
     public static RainbowTaskScheduler newInstance(Rainbow rainbow) {
-        ScheduledExecutorService drawingScheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
+        ScheduledExecutorService drawingScheduler = Executors.newSingleThreadScheduledExecutor();
         DrawingStepTask drawingStepTask = new DrawingStepTask(rainbow);
         ScheduledExecutorService screenUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
         ScreenUpdateTask screenUpdateTask = new ScreenUpdateTask(rainbow);
@@ -32,7 +32,7 @@ class RainbowTaskScheduler {
 
     public void scheduleAt(int frameRate) {
         drawingScheduler.scheduleAtFixedRate(drawingStepTask, SECOND, SECOND / frameRate, TimeUnit.MILLISECONDS);
-        screenUpdateScheduler.scheduleAtFixedRate(screenUpdateTask, SECOND, SECOND / Rainbow.DEFAULT_FRAME_RATE, TimeUnit.MILLISECONDS);
+        screenUpdateScheduler.scheduleAtFixedRate(screenUpdateTask, SECOND, SECOND / frameRate, TimeUnit.MILLISECONDS);
     }
 
     public boolean isTerminated() {
