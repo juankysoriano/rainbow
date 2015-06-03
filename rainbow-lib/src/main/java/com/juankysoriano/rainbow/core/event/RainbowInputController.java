@@ -1,106 +1,126 @@
 package com.juankysoriano.rainbow.core.event;
 
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.view.MotionEvent;
 
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RainbowInputController {
-    private final FingerPositionSmoother fingerPositionPredictor;
+    private static final int QUEUE_SIZE = 5;
+    private static final int DIVISIONS = 2;
+    private final List<AsyncTask> runningInputEventTasks;
     private final RainbowDrawer rainbowDrawer;
-    private RainbowInteractionListener rainbowInteractionListener;
+    private final FingerPositionSmoother fingerPositionPredictor;
     private float x, y;
     private float px, py;
+    private RainbowInteractionListener rainbowInteractionListener;
     private boolean screenTouched;
     private boolean fingerMoving;
-    private List<AsyncTask> runningTasks;
 
     public static RainbowInputController newInstance() {
-        return new RainbowInputController(new ArrayList<AsyncTask>(), new FingerPositionSmoother(), new RainbowDrawer());
+        List<AsyncTask> tasks = new ArrayList<>();
+        FingerPositionSmoother positionSmoother = new FingerPositionSmoother();
+        RainbowDrawer rainbowDrawer = new RainbowDrawer();
+        return new RainbowInputController(tasks,
+                positionSmoother,
+                rainbowDrawer);
     }
 
-    protected RainbowInputController(List<AsyncTask> tasks, FingerPositionSmoother predictor, RainbowDrawer drawer) {
-        runningTasks = tasks;
+    public RainbowInputController(List<AsyncTask> tasks,
+                                  FingerPositionSmoother predictor,
+                                  RainbowDrawer drawer) {
+        runningInputEventTasks = tasks;
         fingerPositionPredictor = predictor;
         rainbowDrawer = drawer;
         x = y = px = py = -1;
     }
 
-    public void postEvent(final MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_UP) {
-            cancelAllRunningTasks();
-            new RainbowInputEventTask(event).execute();
-        } else {
-            runningTasks.add(new RainbowInputEventTask(event).execute());
+    public void postEvent(final MotionEvent motionEvent) {
+        switch (motionEvent.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_UP:
+                cancelAllRunningTasks();
+                new RainbowInputEventTask(rainbowDrawer).execute(motionEvent);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (canProcessMoreEvents()) {
+                    runningInputEventTasks.add(new RainbowInputEventTask(rainbowDrawer).execute(motionEvent));
+                }
+                break;
         }
+    }
+
+    private boolean canProcessMoreEvents() {
+        return runningInputEventTasks.size() <= QUEUE_SIZE;
     }
 
     private void cancelAllRunningTasks() {
-        if (!runningTasks.isEmpty()) {
-            for (AsyncTask task : runningTasks) {
-                task.cancel(true);
-            }
-            runningTasks.clear();
+        for (AsyncTask asyncTask : runningInputEventTasks) {
+            asyncTask.cancel(true);
         }
+        runningInputEventTasks.clear();
     }
 
-    private void preHandleEvent(MotionEvent event) {
-        if ((event.getAction() == MotionEvent.ACTION_DOWN)
-                || (event.getAction() == MotionEvent.ACTION_UP)
-                || event.getAction() == MotionEvent.ACTION_MOVE) {
-            px = x;
-            py = y;
-            x = event.getX();
-            y = event.getY();
-        }
+    private void preHandleEvent(MotionEvent motionEvent) {
+        x = motionEvent.getX();
+        y = motionEvent.getY();
     }
 
-    private void handleEvent(final MotionEvent event) {
+    private void handleSketchEvent(final MotionEvent event, final RainbowDrawer rainbowDrawer) {
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 screenTouched = true;
                 fingerMoving = false;
-                performTouch(event);
+                performTouch(event, rainbowDrawer);
                 break;
             case MotionEvent.ACTION_UP:
                 screenTouched = false;
                 fingerMoving = false;
-                performRelease(event);
+                performRelease(event, rainbowDrawer);
                 break;
             case MotionEvent.ACTION_MOVE:
                 screenTouched = true;
                 fingerMoving = true;
-                performMove(event);
+                performMove(event, rainbowDrawer);
                 break;
         }
-        performMotion(event);
+
+        performMotion(event, rainbowDrawer);
     }
 
-    private void performTouch(MotionEvent event) {
-        fingerPositionPredictor.resetTo(x, y);
+    private void postHandleEvent() {
+        px = x;
+        py = y;
+    }
+
+    private void performTouch(MotionEvent event, RainbowDrawer rainbowDrawer) {
+        fingerPositionPredictor.resetTo(event.getX(), event.getY());
         if (hasInteractionListener()) {
             rainbowInteractionListener.onSketchTouched(event, rainbowDrawer);
         }
     }
 
-    private void performRelease(MotionEvent event) {
-        fingerPositionPredictor.resetTo(x, y);
+    private void performRelease(MotionEvent event, RainbowDrawer rainbowDrawer) {
+        fingerPositionPredictor.resetTo(event.getX(), event.getY());
         if (hasInteractionListener()) {
             rainbowInteractionListener.onSketchReleased(event, rainbowDrawer);
         }
     }
 
-    private void performMove(MotionEvent event) {
-        fingerPositionPredictor.moveTo(x, y);
+    private void performMove(MotionEvent event, RainbowDrawer rainbowDrawer) {
+        fingerPositionPredictor.moveTo(event.getX(), event.getY());
         if (hasInteractionListener()) {
             rainbowInteractionListener.onFingerDragged(event, rainbowDrawer);
         }
     }
 
-    private void performMotion(MotionEvent event) {
+    private void performMotion(MotionEvent event, RainbowDrawer rainbowDrawer) {
         if (hasInteractionListener()) {
             rainbowInteractionListener.onMotionEvent(event, rainbowDrawer);
         }
@@ -112,15 +132,6 @@ public class RainbowInputController {
 
     public boolean isFingerMoving() {
         return fingerMoving;
-    }
-
-    private void postHandleEvent(MotionEvent event) {
-        if ((event.getAction() == MotionEvent.ACTION_DOWN)
-                || (event.getAction() == MotionEvent.ACTION_UP)
-                || event.getAction() == MotionEvent.ACTION_MOVE) {
-            px = x;
-            py = y;
-        }
     }
 
     private boolean hasInteractionListener() {
@@ -152,19 +163,11 @@ public class RainbowInputController {
     }
 
     public float getPreviousX() {
-        if (px == -1) {
-            return x;
-        } else {
-            return px;
-        }
+        return px == -1 ? x : px;
     }
 
     public float getPreviousY() {
-        if (py == -1) {
-            return y;
-        } else {
-            return py;
-        }
+        return py == -1 ? y : py;
     }
 
     public MovementDirection getVerticalDirection() {
@@ -221,29 +224,51 @@ public class RainbowInputController {
         void onMotionEvent(final MotionEvent event, final RainbowDrawer rainbowDrawer);
     }
 
-    private class RainbowInputEventTask extends AsyncTask<Void, Void, Void> {
+    private class RainbowInputEventTask extends AsyncTask<MotionEvent, Void, MotionEvent> {
+        private final WeakReference<RainbowDrawer> rainbowDrawer;
 
-        private MotionEvent motionEvent;
-
-        public RainbowInputEventTask(MotionEvent motionEvent) {
-            this.motionEvent = motionEvent;
+        public RainbowInputEventTask(RainbowDrawer rainbowDrawer) {
+            this.rainbowDrawer = new WeakReference<>(rainbowDrawer);
         }
 
         @Override
-        protected void onPreExecute() {
+        protected MotionEvent doInBackground(MotionEvent... motionEvents) {
+            MotionEvent motionEvent = motionEvents[0];
+            if (this.rainbowDrawer.get() != null) {
+                splitIntoMultipleEvents(motionEvent);
+            }
+            return motionEvent;
+        }
+
+        private void process(MotionEvent motionEvent) {
             preHandleEvent(motionEvent);
+            handleSketchEvent(motionEvent, rainbowDrawer.get());
+            postHandleEvent();
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
-            handleEvent(motionEvent);
-            return null;
+        protected void onPostExecute(MotionEvent motionEvent) {
+            runningInputEventTasks.remove(this);
         }
 
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            postHandleEvent(motionEvent);
-            runningTasks.remove(this);
+        private void splitIntoMultipleEvents(@NonNull MotionEvent event) {
+            float px = getX();
+            float py = getY();
+            float diffX = event.getX() - px;
+            float diffY = event.getY() - py;
+
+            for (int i = 1; i <= DIVISIONS; i++) {
+                float newEventX = px + diffX * i / DIVISIONS;
+                float newEventY = py + diffY * i / DIVISIONS;
+                MotionEvent subEvent = obtainEventWithNewPosition(event, newEventX, newEventY);
+                process(subEvent);
+            }
+        }
+
+        private MotionEvent obtainEventWithNewPosition(@NonNull MotionEvent event, float newEventX, float newEventY) {
+            MotionEvent motionEvent = MotionEvent.obtain(event);
+            motionEvent.setLocation(newEventX, newEventY);
+            return motionEvent;
         }
     }
 }
