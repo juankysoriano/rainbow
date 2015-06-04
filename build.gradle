@@ -17,6 +17,6 @@ ext {
     TARGET_SDK = 17
     MIN_SDK = 16
     BUILD_TOOLS = '22.0.1'
-    VERSION_CODE = 1914097
+    VERSION_CODE = 1914099
     VERSION_NAME = "0.9.9"
 }
