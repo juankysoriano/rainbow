@@ -1,69 +1,83 @@
 package com.juankysoriano.rainbow.core.event;
 
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.view.MotionEvent;
 
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RainbowInputController {
-    private static final int QUEUE_SIZE = 5;
     private static final int DIVISIONS = 2;
-    private final List<AsyncTask> runningInputEventTasks;
     private final RainbowDrawer rainbowDrawer;
     private final FingerPositionSmoother fingerPositionPredictor;
     private float x, y;
     private float px, py;
+    private final ExecutorService executorService;
     private RainbowInteractionListener rainbowInteractionListener;
     private boolean screenTouched;
     private boolean fingerMoving;
 
     public static RainbowInputController newInstance() {
-        List<AsyncTask> tasks = new ArrayList<>();
+        ExecutorService service = Executors.newSingleThreadExecutor();
         FingerPositionSmoother positionSmoother = new FingerPositionSmoother();
         RainbowDrawer rainbowDrawer = new RainbowDrawer();
-        return new RainbowInputController(tasks,
+        return new RainbowInputController(service,
                 positionSmoother,
                 rainbowDrawer);
     }
 
-    public RainbowInputController(List<AsyncTask> tasks,
+    public RainbowInputController(ExecutorService executor,
                                   FingerPositionSmoother predictor,
                                   RainbowDrawer drawer) {
-        runningInputEventTasks = tasks;
+        executorService = executor;
         fingerPositionPredictor = predictor;
         rainbowDrawer = drawer;
         x = y = px = py = -1;
     }
 
     public void postEvent(final MotionEvent motionEvent) {
-        switch (motionEvent.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-            case MotionEvent.ACTION_UP:
-                cancelAllRunningTasks();
-                new RainbowInputEventTask(rainbowDrawer).execute(motionEvent);
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (canProcessMoreEvents()) {
-                    runningInputEventTasks.add(new RainbowInputEventTask(rainbowDrawer).execute(motionEvent));
+        executorService.execute(InputEventFor(motionEvent));
+    }
+
+    private Runnable InputEventFor(final MotionEvent motionEvent) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                    splitIntoMultipleEvents(motionEvent);
+                } else {
+                    process(motionEvent);
                 }
-                break;
+            }
+        };
+    }
+
+    private void process(MotionEvent motionEvent) {
+        preHandleEvent(motionEvent);
+        handleSketchEvent(motionEvent);
+        postHandleEvent();
+    }
+
+    private void splitIntoMultipleEvents(@NonNull MotionEvent event) {
+        float px = getX();
+        float py = getY();
+        float diffX = event.getX() - px;
+        float diffY = event.getY() - py;
+
+        for (int i = 1; i <= DIVISIONS; i++) {
+            float newEventX = px + diffX * i / DIVISIONS;
+            float newEventY = py + diffY * i / DIVISIONS;
+            MotionEvent subEvent = obtainEventWithNewPosition(event, newEventX, newEventY);
+            process(subEvent);
         }
     }
 
-    private boolean canProcessMoreEvents() {
-        return runningInputEventTasks.size() <= QUEUE_SIZE;
-    }
-
-    private void cancelAllRunningTasks() {
-        for (AsyncTask asyncTask : runningInputEventTasks) {
-            asyncTask.cancel(true);
-        }
-        runningInputEventTasks.clear();
+    private MotionEvent obtainEventWithNewPosition(@NonNull MotionEvent event, float newEventX, float newEventY) {
+        MotionEvent motionEvent = MotionEvent.obtain(event);
+        motionEvent.setLocation(newEventX, newEventY);
+        return motionEvent;
     }
 
     private void preHandleEvent(MotionEvent motionEvent) {
@@ -71,7 +85,7 @@ public class RainbowInputController {
         y = motionEvent.getY();
     }
 
-    private void handleSketchEvent(final MotionEvent event, final RainbowDrawer rainbowDrawer) {
+    private void handleSketchEvent(final MotionEvent event) {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -222,53 +236,5 @@ public class RainbowInputController {
         void onFingerDragged(final MotionEvent event, final RainbowDrawer rainbowDrawer);
 
         void onMotionEvent(final MotionEvent event, final RainbowDrawer rainbowDrawer);
-    }
-
-    private class RainbowInputEventTask extends AsyncTask<MotionEvent, Void, MotionEvent> {
-        private final WeakReference<RainbowDrawer> rainbowDrawer;
-
-        public RainbowInputEventTask(RainbowDrawer rainbowDrawer) {
-            this.rainbowDrawer = new WeakReference<>(rainbowDrawer);
-        }
-
-        @Override
-        protected MotionEvent doInBackground(MotionEvent... motionEvents) {
-            MotionEvent motionEvent = motionEvents[0];
-            if (this.rainbowDrawer.get() != null) {
-                splitIntoMultipleEvents(motionEvent);
-            }
-            return motionEvent;
-        }
-
-        private void process(MotionEvent motionEvent) {
-            preHandleEvent(motionEvent);
-            handleSketchEvent(motionEvent, rainbowDrawer.get());
-            postHandleEvent();
-        }
-
-        @Override
-        protected void onPostExecute(MotionEvent motionEvent) {
-            runningInputEventTasks.remove(this);
-        }
-
-        private void splitIntoMultipleEvents(@NonNull MotionEvent event) {
-            float px = getX();
-            float py = getY();
-            float diffX = event.getX() - px;
-            float diffY = event.getY() - py;
-
-            for (int i = 1; i <= DIVISIONS; i++) {
-                float newEventX = px + diffX * i / DIVISIONS;
-                float newEventY = py + diffY * i / DIVISIONS;
-                MotionEvent subEvent = obtainEventWithNewPosition(event, newEventX, newEventY);
-                process(subEvent);
-            }
-        }
-
-        private MotionEvent obtainEventWithNewPosition(@NonNull MotionEvent event, float newEventX, float newEventY) {
-            MotionEvent motionEvent = MotionEvent.obtain(event);
-            motionEvent.setLocation(newEventX, newEventY);
-            return motionEvent;
-        }
     }
 }
