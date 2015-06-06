@@ -34,7 +34,13 @@ class SetupSketchTask {
     }
 
     public void cancel() {
-        task.cancel(true);
+        if (hasTask()) {
+            task.cancel(true);
+        }
+    }
+
+    private boolean hasTask() {
+        return task != null;
     }
 
 }
