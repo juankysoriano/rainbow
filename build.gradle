@@ -18,5 +18,5 @@ ext {
     MIN_SDK = 16
     BUILD_TOOLS = '22.0.1'
     VERSION_CODE = 1914100
-    VERSION_NAME = "1.0.0-rc1"
+    VERSION_NAME = "1.0.0-rc2"
 }
