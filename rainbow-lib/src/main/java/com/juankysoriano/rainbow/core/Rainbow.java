@@ -78,7 +78,6 @@ public class Rainbow {
 
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-            drawingView.hide();
             return true;
         }
 
@@ -90,6 +89,7 @@ public class Rainbow {
     };
 
     private void restoreSketch() {
+        drawingView.hide();
         drawingView.animateShow();
     }
 
@@ -249,6 +249,7 @@ public class Rainbow {
         if (graphics != null) {
             graphics.dispose();
         }
+        isSetup = false;
         drawingView = null;
     }
 
