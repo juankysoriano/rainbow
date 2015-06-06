@@ -33,11 +33,10 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.view.Surface;
 
+import com.juankysoriano.rainbow.core.drawing.RainbowTextureView;
 import com.juankysoriano.rainbow.core.matrix.RMatrix;
 import com.juankysoriano.rainbow.core.matrix.RMatrix2D;
-import com.juankysoriano.rainbow.core.matrix.RMatrix3D;
 import com.juankysoriano.rainbow.utils.RainbowMath;
 
 /**
@@ -115,7 +114,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
         if (primarySurface) {
             paintParentBackground();
         }
-
     }
 
     private void paintParentBackground() {
@@ -176,11 +174,11 @@ public class RainbowGraphics2D extends RainbowGraphics {
     @Override
     public void endDraw() {
         if (primarySurface) {
-            Surface surface = parent.getSurface();
-            Canvas screen = surface.lockCanvas(null);
+            RainbowTextureView textureView = parent.getDrawingView();
+            Canvas screen = textureView.lockCanvas();
             if (hasBitmap()) {
                 screen.drawBitmap(getBitmap(), 0, 0, null);
-                surface.unlockCanvasAndPost(screen);
+                textureView.unlockCanvasAndPost(screen);
             }
         } else {
             loadPixels();
@@ -323,21 +321,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
         } else {
             path.lineTo(x, y);
         }
-    }
-
-    @Override
-    public void vertex(float x, float y, float z) {
-        showDepthWarningXYZ("vertex");
-    }
-
-    @Override
-    public void vertex(float x, float y, float u, float v) {
-        showVariationWarning("vertex(x, y, u, v)");
-    }
-
-    @Override
-    public void vertex(float x, float y, float z, float u, float v) {
-        showDepthWarningXYZ("vertex");
     }
 
     @Override
@@ -619,16 +602,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
         }
     }
 
-    @Override
-    public void box(float w, float h, float d) {
-        showMethodWarning("box");
-    }
-
-    @Override
-    public void sphere(float r) {
-        showMethodWarning("sphere");
-    }
-
     /**
      * Ignored (not needed)
      */
@@ -718,26 +691,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     @Override
-    public void rotateX(float angle) {
-        showDepthWarning("rotateX");
-    }
-
-    @Override
-    public void rotateY(float angle) {
-        showDepthWarning("rotateY");
-    }
-
-    @Override
-    public void rotateZ(float angle) {
-        showDepthWarning("rotateZ");
-    }
-
-    @Override
-    public void rotate(float angle, float vx, float vy, float vz) {
-        showVariationWarning("rotate");
-    }
-
-    @Override
     public void scale(float s) {
         canvas.scale(s, s);
     }
@@ -745,11 +698,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
     @Override
     public void scale(float sx, float sy) {
         canvas.scale(sx, sy);
-    }
-
-    @Override
-    public void scale(float sx, float sy, float sz) {
-        showDepthWarningXYZ("scale");
     }
 
     @Override
@@ -767,26 +715,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
         android.graphics.Matrix m = new android.graphics.Matrix();
         m.setValues(new float[]{n00, n01, n02, n10, n11, n12, 0, 0, 1});
         canvas.concat(m);
-    }
-
-    @Override
-    public void applyMatrix(float n00,
-                            float n01,
-                            float n02,
-                            float n03,
-                            float n10,
-                            float n11,
-                            float n12,
-                            float n13,
-                            float n20,
-                            float n21,
-                            float n22,
-                            float n23,
-                            float n30,
-                            float n31,
-                            float n32,
-                            float n33) {
-        showVariationWarning("applyMatrix");
     }
 
     @Override
@@ -812,35 +740,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
         android.graphics.Matrix matrix = new android.graphics.Matrix();
         matrix.setValues(new float[]{source.m00, source.m01, source.m02, source.m10, source.m11, source.m12, 0, 0, 1});
         canvas.setMatrix(matrix);
-    }
-
-    @Override
-    public void setMatrix(RMatrix3D source) {
-        showVariationWarning("setMatrix");
-    }
-
-    @Override
-    public RMatrix3D getMatrix(RMatrix3D target) {
-        showVariationWarning("getMatrix");
-        return target;
-    }
-
-    @Override
-    public float screenX(float x, float y, float z) {
-        showDepthWarningXYZ("screenX");
-        return 0;
-    }
-
-    @Override
-    public float screenY(float x, float y, float z) {
-        showDepthWarningXYZ("screenY");
-        return 0;
-    }
-
-    @Override
-    public float screenZ(float x, float y, float z) {
-        showDepthWarningXYZ("screenZ");
-        return 0;
     }
 
     @Override
@@ -898,16 +797,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
     @Override
     public void backgroundImpl() {
         canvas.drawColor(backgroundColor);
-    }
-
-    @Override
-    public void beginRaw(RainbowGraphics recorderRaw) {
-        showMethodWarning("beginRaw");
-    }
-
-    @Override
-    public void endRaw() {
-        showMethodWarning("endRaw");
     }
 
     /**
@@ -983,23 +872,13 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     @Override
-    public void mask(int alpha[]) {
-        showMethodWarning("mask");
-    }
-
-    @Override
-    public void mask(RainbowImage alpha) {
-        showMethodWarning("mask");
-    }
-
-    @Override
     public void copy(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh) {
         rect.set(sx, sy, sx + sw, sy + sh);
         Rect src = new Rect(dx, dy, dx + dw, dy + dh);
         canvas.drawBitmap(getBitmap(), src, rect, null);
     }
 
-    public static void releasePrimeryBitmap() {
+    public static void releasePrimaryBitmap() {
         if (RainbowGraphics2D.primaryBitmap != null) {
             RainbowGraphics2D.primaryBitmap.recycle();
             RainbowGraphics2D.primaryBitmap = null;

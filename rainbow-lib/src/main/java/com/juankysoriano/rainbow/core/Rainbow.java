@@ -2,10 +2,9 @@ package com.juankysoriano.rainbow.core;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
-import android.view.Surface;
 import android.view.TextureView;
+import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.drawing.RainbowTextureView;
@@ -27,7 +26,6 @@ public class Rainbow {
     private boolean isSetup = false;
     private final RainbowInputController rainbowInputController;
     private final RainbowDrawer rainbowDrawer;
-    private Surface surface;
     private RainbowTextureView drawingView;
     private SetupSketchTask setupSketchTask;
     private RainbowTaskScheduler rainbowTaskScheduler;
@@ -50,21 +48,27 @@ public class Rainbow {
         injectInto(viewGroup);
     }
 
-    public void injectInto(ViewGroup viewGroup) {
-        this.drawingView = new RainbowTextureView(viewGroup, this);
-        addOnPreDrawListener();
+    public Context getContext() {
+        return drawingView.getContext();
     }
 
-    private void addOnPreDrawListener() {
+    public void injectInto(ViewGroup viewGroup) {
+        drawingView = new RainbowTextureView(viewGroup, this);
+        addSurfaceTextureListener();
+    }
+
+    private void addSurfaceTextureListener() {
         drawingView.setSurfaceTextureListener(onSurfaceTextureListener);
     }
 
     private TextureView.SurfaceTextureListener onSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
-            surface = new Surface(surfaceTexture);
-            drawingView.setSurfaceTextureListener(null);
-            setupSketch();
+            if (isSetup) {
+                restoreSketch();
+            } else {
+                setupSketch();
+            }
         }
 
         @Override
@@ -74,24 +78,22 @@ public class Rainbow {
 
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-            return false;
+            drawingView.hide();
+            return true;
         }
 
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
             //no-op
         }
+
     };
 
-    public Context getContext() {
-        return drawingView.getContext();
+    private void restoreSketch() {
+        drawingView.animateShow();
     }
 
-    public Surface getSurface() {
-        return surface;
-    }
-
-    protected void setupSketch() {
+    private void setupSketch() {
         initDimensions();
         setupSketchTask.start();
         isSetup = true;
@@ -102,7 +104,7 @@ public class Rainbow {
         width = drawingView.getMeasuredWidth();
         height = drawingView.getMeasuredHeight();
 
-        RainbowGraphics2D.releasePrimeryBitmap();
+        RainbowGraphics2D.releasePrimaryBitmap();
         initPeriodicGraphics(width, height);
         initInputControllerGraphics(width, height);
     }
@@ -264,8 +266,8 @@ public class Rainbow {
     /**
      * @return the View where this rainbow sketch has been injected to
      */
-    public ViewParent getParentView() {
-        return drawingView.getParent();
+    public View getParentView() {
+        return (View) drawingView.getParent();
     }
 
     /**
