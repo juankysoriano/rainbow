@@ -1910,7 +1910,7 @@ public class RainbowImage implements Cloneable {
     }
 
     public Uri save(ContentResolver contentResolver, String title, String description) {
-        return CaptureSketchUtils.insertImage(contentResolver, bitmap, title, description);
+        return CaptureSketchUtils.insertImage(contentResolver, getBitmap(), title, description);
     }
 
     public int getWidth() {
