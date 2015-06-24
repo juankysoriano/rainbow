@@ -23,6 +23,7 @@ public class RainbowDrawer {
     private int width;
     private int height;
     private boolean drawing;
+    private boolean vSync;
 
     public RainbowDrawer() {
     }
@@ -1809,6 +1810,18 @@ public class RainbowDrawer {
     public void invalidate() {
         beginDraw();
         endDraw();
+    }
+
+    public void vSync() {
+        vSync = true;
+    }
+
+    public void noVSync() {
+        vSync = false;
+    }
+
+    public boolean isVSync() {
+        return vSync;
     }
 
     public interface PointDetectedListener {

@@ -16,6 +16,14 @@ class DrawingStepTask extends TimerTask {
         Rainbow rainbow = weakRainbow.get();
         if (rainbow != null && !rainbow.isPaused()) {
             rainbow.performStep();
+            updateScreenIfVSync();
+        }
+    }
+
+    private void updateScreenIfVSync() {
+        Rainbow rainbow = weakRainbow.get();
+        if (rainbow != null && rainbow.getRainbowDrawer().isVSync()) {
+            rainbow.getRainbowDrawer().invalidate();
         }
     }
 }
