@@ -18,7 +18,9 @@ With Rainbow you can easily draw graphics (interactive or not) in your Android a
 Import it on your **build.gradle**
 ```
 repositories {
-    mavenCentral()
+    maven {
+	    url "https://jitpack.io"
+    }
 }
 
 dependencies {
