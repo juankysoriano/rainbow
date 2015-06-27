@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-  compile 'com.github.paolorotolo:appintro:1.4.0'
+    compile 'com.github.juankysoriano:rainbow:v1.0.0-rc2'
 }
 ```
 
