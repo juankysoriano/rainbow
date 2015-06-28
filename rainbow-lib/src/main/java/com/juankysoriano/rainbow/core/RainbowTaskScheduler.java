@@ -1,6 +1,7 @@
 package com.juankysoriano.rainbow.core;
 
-import java.util.concurrent.Executors;
+import com.juankysoriano.rainbow.SafeScheduledExecutor;
+
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -13,9 +14,9 @@ class RainbowTaskScheduler {
     private final ScreenUpdateTask screenUpdateTask;
 
     public static RainbowTaskScheduler newInstance(Rainbow rainbow) {
-        ScheduledExecutorService drawingScheduler = Executors.newSingleThreadScheduledExecutor();
+        ScheduledExecutorService drawingScheduler = SafeScheduledExecutor.newInstance();
         DrawingStepTask drawingStepTask = new DrawingStepTask(rainbow);
-        ScheduledExecutorService screenUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
+        ScheduledExecutorService screenUpdateScheduler = SafeScheduledExecutor.newInstance();
         ScreenUpdateTask screenUpdateTask = new ScreenUpdateTask(rainbow);
         return new RainbowTaskScheduler(drawingScheduler, drawingStepTask, screenUpdateScheduler, screenUpdateTask);
     }
