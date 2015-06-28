@@ -85,12 +85,10 @@ public class Rainbow {
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
             //no-op
         }
-
     };
 
     private void restoreSketch() {
-        drawingView.hide();
-        drawingView.animateShow();
+        drawingView.restoreAnimated();
     }
 
     private void setupSketch() {
@@ -104,7 +102,6 @@ public class Rainbow {
         width = drawingView.getMeasuredWidth();
         height = drawingView.getMeasuredHeight();
 
-        RainbowGraphics2D.releasePrimaryBitmap();
         initPeriodicGraphics(width, height);
         initInputControllerGraphics(width, height);
     }

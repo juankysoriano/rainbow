@@ -3,10 +3,10 @@ package com.juankysoriano.rainbow.core.event;
 import android.support.annotation.NonNull;
 import android.view.MotionEvent;
 
+import com.juankysoriano.rainbow.SafeScheduledExecutor;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class RainbowInputController {
     private static final int DIVISIONS = 2;
@@ -20,7 +20,7 @@ public class RainbowInputController {
     private boolean fingerMoving;
 
     public static RainbowInputController newInstance() {
-        ExecutorService service = Executors.newSingleThreadExecutor();
+        ExecutorService service = SafeScheduledExecutor.newInstance();
         FingerPositionSmoother positionSmoother = new FingerPositionSmoother();
         RainbowDrawer rainbowDrawer = new RainbowDrawer();
         return new RainbowInputController(service,
@@ -38,17 +38,22 @@ public class RainbowInputController {
     }
 
     public void postEvent(final MotionEvent motionEvent) {
-        executorService.execute(InputEventFor(motionEvent));
+        executorService.execute(inputEventFor(MotionEvent.obtain(motionEvent)));
     }
 
-    private Runnable InputEventFor(final MotionEvent motionEvent) {
+    private Runnable inputEventFor(final MotionEvent motionEvent) {
         return new Runnable() {
             @Override
             public void run() {
-                if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
-                    splitIntoMultipleEvents(motionEvent);
-                } else {
-                    process(motionEvent);
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_DOWN:
+                        process(motionEvent);
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        splitIntoMultipleEvents(motionEvent);
+                        break;
+                    default://no-op
                 }
             }
         };

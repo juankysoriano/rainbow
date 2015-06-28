@@ -74,7 +74,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     private Paint strokePaint;
     private Paint fillPaint;
 
-    private static Bitmap primaryBitmap;
+    private Bitmap primaryBitmap;
 
     private Canvas canvas;
 
@@ -176,13 +176,17 @@ public class RainbowGraphics2D extends RainbowGraphics {
         if (primarySurface) {
             RainbowTextureView textureView = parent.getDrawingView();
             Canvas screen = textureView.lockCanvas();
-            if (hasBitmap()) {
+            if (canPaint(screen)) {
                 screen.drawBitmap(getBitmap(), 0, 0, null);
                 textureView.unlockCanvasAndPost(screen);
             }
         } else {
             loadPixels();
         }
+    }
+
+    private boolean canPaint(Canvas screen) {
+        return screen != null && hasBitmap();
     }
 
     private boolean hasBitmap() {
@@ -878,10 +882,10 @@ public class RainbowGraphics2D extends RainbowGraphics {
         canvas.drawBitmap(getBitmap(), src, rect, null);
     }
 
-    public static void releasePrimaryBitmap() {
-        if (RainbowGraphics2D.primaryBitmap != null) {
-            RainbowGraphics2D.primaryBitmap.recycle();
-            RainbowGraphics2D.primaryBitmap = null;
+    public void releasePrimaryBitmap() {
+        if (primaryBitmap != null) {
+            primaryBitmap.recycle();
+            primaryBitmap = null;
         }
     }
 
