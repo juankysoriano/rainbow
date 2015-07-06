@@ -65,7 +65,7 @@ public class Rainbow {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
             if (isSetup) {
-                restoreSketch();
+                drawingView.restoreView();
             } else {
                 setupSketch();
             }
@@ -86,10 +86,6 @@ public class Rainbow {
             //no-op
         }
     };
-
-    private void restoreSketch() {
-        drawingView.restoreAnimated();
-    }
 
     private void setupSketch() {
         initDimensions();
