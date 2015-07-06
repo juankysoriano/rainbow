@@ -15,7 +15,20 @@ With Rainbow you can easily draw graphics (interactive or not) in your Android a
 
 * How to do it?
 
-Easy! Just extend `Rainbow` and attach it to one of your `ViewGroup`! Then you will `@Override` the methods in the `RainbowLifeCycleCallback` to control your animations. ([Check the demo app!!][2])
+Import it on your **build.gradle**
+```
+repositories {
+    maven {
+	    url "https://jitpack.io"
+    }
+}
+
+dependencies {
+    compile 'com.github.juankysoriano:rainbow:v1.0.0-rc2'
+}
+```
+
+Once done it is very easy to integrate! Just extend `Rainbow` and attach it to one of your `ViewGroup`! Then you will `@Override` the methods in the `RainbowLifeCycleCallback` to control your animations. ([Check the demo app!!][2])
 
 Something like this:
 
