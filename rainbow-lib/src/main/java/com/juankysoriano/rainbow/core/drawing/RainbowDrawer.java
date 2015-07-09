@@ -165,6 +165,11 @@ public class RainbowDrawer {
         loadImage(bitmap, listener);
     }
 
+    public void loadImage(Uri uri, int width, int height, int mode, RainbowImage.LoadPictureListener listener) {
+        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), uri, width, height, mode);
+        loadImage(bitmap, listener);
+    }
+
     public final int color(int gray) {
         if (graphics == null) {
             if (gray > 255) {
