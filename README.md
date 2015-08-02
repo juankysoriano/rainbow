@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.juankysoriano:rainbow:v1.0.0-rc2'
+    compile 'com.github.juankysoriano:rainbow:v1.0.0-rc5'
 }
 ```
 
