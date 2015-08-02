@@ -202,7 +202,15 @@ public class SketchActivity extends Activity {
     }
 ```
 
+Proguard
+--------
 
+As rainbow uses third party libraries for now you would have to include this into your proguard properties:
+
+```
+-dontwarn com.squareup.picasso.**
+-dontwarn com.squareup.okhttp.**
+```
 
 License
 --------
