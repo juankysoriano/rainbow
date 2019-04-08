@@ -2,10 +2,14 @@ apply plugin: 'com.android.application'
 
 buildscript {
     repositories {
-        mavenCentral()
+        google()
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.2.3'
+        classpath 'com.android.tools.build:gradle:3.1.4'
     }
 }
 
@@ -38,5 +42,5 @@ android {
 }
 
 dependencies {
-    compile project(':rainbow-lib')
+    implementation project(':rainbow-lib')
 }

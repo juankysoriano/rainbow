@@ -1,12 +1,15 @@
 apply plugin: 'com.android.library'
-apply plugin: 'android-maven'
 
 buildscript {
     repositories {
-        mavenCentral()
+        google()
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.2.3'
+        classpath 'com.android.tools.build:gradle:3.1.4'
     }
 }
 
@@ -38,6 +41,6 @@ android {
 }
 
 dependencies {
-    compile group: 'com.squareup.picasso', name: 'picasso', version: '2.5.2'
-    compile 'com.android.support:support-annotations:22.1.1'
+    implementation group: 'com.squareup.picasso', name: 'picasso', version: '2.5.2'
+    implementation 'com.android.support:support-annotations:22.1.1'
 }
