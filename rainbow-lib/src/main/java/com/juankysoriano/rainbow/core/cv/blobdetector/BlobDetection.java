@@ -22,7 +22,7 @@ public class BlobDetection {
         this(rainbowImage, DEFAULT_MAX_NUMBER_OF_BLOBS);
     }
 
-    public BlobDetection(RainbowImage rainbowImage, int maxNumberOfBlobs) {
+    private BlobDetection(RainbowImage rainbowImage, int maxNumberOfBlobs) {
         this.luminanceMap = LuminanceMap.newInstance(rainbowImage);
         this.maxNumberOfBlobs = maxNumberOfBlobs;
     }
@@ -119,7 +119,7 @@ public class BlobDetection {
         findVertexes(newBlob, x, y + 1);
     }
 
-    public boolean isBlobEdge(int x, int y) {
+    private boolean isBlobEdge(int x, int y) {
         boolean isLeftPixelInsideBlob = isInsideBlob(x - 1, y);
         boolean isRightPixelInsideBlob = isInsideBlob(x + 1, y);
         boolean isUpPixelInsideBlob = isInsideBlob(x, y - 1);
@@ -133,7 +133,7 @@ public class BlobDetection {
         return !noNeighbourInsideBlob && !allNeighboursInsideBlob;
     }
 
-    public boolean isInsideBlob(int x, int y) {
+    private boolean isInsideBlob(int x, int y) {
         return luminanceMap.getLuminanceAt(x, y) <= luminanceThreshold;
     }
 

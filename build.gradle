@@ -7,19 +7,18 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath 'com.android.tools.build:gradle:3.3.2'
     }
 }
 
-repositories {
-    mavenCentral()
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
 }
 
 ext {
-    COMPILE_SDK = 22
-    TARGET_SDK = 17
-    MIN_SDK = 16
-    BUILD_TOOLS = '29.0.0-rc2'
     VERSION_CODE = 1914100
     VERSION_NAME = "1.0.0-rc2"
 }

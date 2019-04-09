@@ -18,7 +18,6 @@ public class RainbowTextureView extends TextureView {
         super(parent.getContext());
         this.rainbow = rainbow;
         parent.addView(this, 0, MATCH_PARENT_PARAMS);
-        setBackground(parent.getBackground());
     }
 
     @Override
@@ -29,8 +28,6 @@ public class RainbowTextureView extends TextureView {
     }
 
     public void restoreView() {
-        ViewGroup parent = (ViewGroup) getParent();
-        setBackground(parent.getBackground());
         rainbow.getRainbowDrawer().beginDraw();
         rainbow.onDrawingStep();
         rainbow.getRainbowDrawer().endDraw();

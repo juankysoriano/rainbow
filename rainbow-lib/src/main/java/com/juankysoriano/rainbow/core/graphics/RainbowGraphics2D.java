@@ -676,7 +676,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void pushMatrix() {
-        canvas.save(Canvas.MATRIX_SAVE_FLAG);
+        canvas.save();
     }
 
     @Override
@@ -868,7 +868,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
                 src.getBitmap().setPixels(src.pixels, 0, src.width, 0, 0, src.width, src.height);
                 src.modified = false;
             }
-            canvas.save(Canvas.MATRIX_SAVE_FLAG);
+            canvas.save();
             canvas.setMatrix(null); // set to identity
             canvas.drawBitmap(src.getBitmap(), x, y, null);
             canvas.restore();
