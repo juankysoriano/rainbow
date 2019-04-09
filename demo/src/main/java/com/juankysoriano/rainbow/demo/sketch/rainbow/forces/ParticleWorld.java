@@ -6,9 +6,9 @@ import com.juankysoriano.rainbow.core.matrix.RVector;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParticleWorld {
+class ParticleWorld {
 
-    private static final int NUMBER_PARTICLES = 26;
+    private static final int NUMBER_PARTICLES = 50;
     private static final int NUCLEUS_DIAMETER = 40;
     private static final float HALF = 0.5f;
 
@@ -16,23 +16,23 @@ public class ParticleWorld {
     private final Nucleus nucleus;
     private final float[] points;
 
-    ParticleWorld(Nucleus nucleus, List<Particle> particles) {
+    private ParticleWorld(Nucleus nucleus, List<Particle> particles) {
         this.nucleus = nucleus;
         this.particles = particles;
         this.points = new float[NUMBER_PARTICLES * 2];
     }
 
-    public static ParticleWorld newInstance(int width, int height) {
+    static ParticleWorld newInstance(int width, int height) {
         RVector nucleusCoordinates = new RVector(width * HALF, height * HALF);
         Nucleus nucleus = new Nucleus(nucleusCoordinates, NUCLEUS_DIAMETER);
-        List<Particle> particles = generateParticles(nucleus, NUMBER_PARTICLES);
+        List<Particle> particles = generateParticles(nucleus);
 
         return new ParticleWorld(nucleus, particles);
     }
 
-    private static List<Particle> generateParticles(Nucleus nucleus, int numberOfParticles) {
-        List<Particle> particles = new ArrayList<>(numberOfParticles);
-        for (int i = 0; i < numberOfParticles; i++) {
+    private static List<Particle> generateParticles(Nucleus nucleus) {
+        List<Particle> particles = new ArrayList<>(ParticleWorld.NUMBER_PARTICLES);
+        for (int i = 0; i < ParticleWorld.NUMBER_PARTICLES; i++) {
             Particle particle = Particle.newInstance();
             particle.resetTo(nucleus);
             particles.add(particle);
@@ -40,7 +40,7 @@ public class ParticleWorld {
         return particles;
     }
 
-    public void updateAndDisplay(final RainbowDrawer rainbowDrawer) {
+    void updateAndDisplay(final RainbowDrawer rainbowDrawer) {
         for (int i = 0; i < NUMBER_PARTICLES; i++) {
             setPointFor(i);
             particles.get(i).updateWith(nucleus);
@@ -68,7 +68,7 @@ public class ParticleWorld {
         points[particleIndex * 2 + 1] = particleLocation.y;
     }
 
-    public void moveNucleusTo(float x, float y) {
+    void moveNucleusTo(float x, float y) {
         this.nucleus.getPosition().set(x, y, 0);
     }
 }

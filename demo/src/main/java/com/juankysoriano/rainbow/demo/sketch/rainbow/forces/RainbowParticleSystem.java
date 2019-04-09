@@ -17,7 +17,7 @@ public class RainbowParticleSystem extends Rainbow implements RainbowInputContro
     @Override
     public void onSketchSetup() {
         super.onSketchSetup();
-        frameRate(120);
+        frameRate(500);
         getRainbowDrawer().smooth();
         getRainbowDrawer().noFill();
         getRainbowDrawer().background(255);
@@ -60,7 +60,7 @@ public class RainbowParticleSystem extends Rainbow implements RainbowInputContro
 
     @Override
     public void onSketchTouched(MotionEvent event, RainbowDrawer rainbowDrawer) {
-        if(event.getEventTime()%6==0) {
+        if (event.getEventTime() % 6 == 0) {
             float x = event.getX();
             float y = event.getY();
             float px = getRainbowInputController().getPreviousX();

@@ -31,6 +31,14 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputCon
     }
 
     @Override
+    public void onSketchSetup() {
+        frameRate(500);
+        getRainbowDrawer().background(255);
+        getRainbowDrawer().smooth();
+        getRainbowDrawer().noFill();
+    }
+
+    @Override
     public void onDrawingStart() {
         getRainbowInputController().setRainbowInteractionListener(this);
     }

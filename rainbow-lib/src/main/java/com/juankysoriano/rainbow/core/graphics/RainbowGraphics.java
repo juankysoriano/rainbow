@@ -141,7 +141,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         }
     }
 
-    private final WeakHashMap<RainbowImage, Object> cacheMap = new WeakHashMap<RainbowImage, Object>();
+    private final WeakHashMap<RainbowImage, Object> cacheMap = new WeakHashMap<>();
     private final RMatrix3D bezierBasisMatrix = new RMatrix3D(-1, 3, -3, 1, 3, -6, 3, 0, -3, 3, 0, 0, 1, 0, 0, 0);
     private final float[] cacheHsbValue = new float[3];
     public int strokeCap = DEFAULT_STROKE_CAP;
