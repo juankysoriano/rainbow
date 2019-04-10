@@ -29,9 +29,9 @@ public abstract class CaptureSketchUtils {
      * @see android.provider.MediaStore.Images.Media#insertImage(ContentResolver, Bitmap, String, String)
      */
     public static Uri insertImage(ContentResolver cr,
-                                           Bitmap source,
-                                           String title,
-                                           String description) {
+                                  Bitmap source,
+                                  String title,
+                                  String description) {
 
         ContentValues values = new ContentValues();
         values.put(Images.Media.TITLE, title);
@@ -58,7 +58,7 @@ public abstract class CaptureSketchUtils {
                 // Wait until MINI_KIND thumbnail is generated.
                 Bitmap miniThumb = Images.Thumbnails.getThumbnail(cr, id, Images.Thumbnails.MINI_KIND, null);
                 // This is for backward compatibility.
-                storeThumbnail(cr, miniThumb, id, 50F, 50F, Images.Thumbnails.MICRO_KIND);
+                storeThumbnail(cr, miniThumb, id);
             } else {
                 cr.delete(uri, null, null);
                 uri = null;
@@ -80,45 +80,43 @@ public abstract class CaptureSketchUtils {
      *
      * @see android.provider.MediaStore.Images.Media (StoreThumbnail private method)
      */
-    private static Bitmap storeThumbnail(
+    private static void storeThumbnail(
             ContentResolver cr,
             Bitmap source,
-            long id,
-            float width,
-            float height,
-            int kind) {
+            long id) {
 
         // create the matrix to scale it
         Matrix matrix = new Matrix();
 
-        float scaleX = width / source.getWidth();
-        float scaleY = height / source.getHeight();
+        float scaleX = 50F / source.getWidth();
+        float scaleY = 50F / source.getHeight();
 
         matrix.setScale(scaleX, scaleY);
 
         Bitmap thumb = Bitmap.createBitmap(source, 0, 0,
-                source.getWidth(),
-                source.getHeight(), matrix,
-                true
+                                           source.getWidth(),
+                                           source.getHeight(), matrix,
+                                           true
         );
 
         ContentValues values = new ContentValues(4);
-        values.put(Images.Thumbnails.KIND, kind);
+        values.put(Images.Thumbnails.KIND, Images.Thumbnails.MICRO_KIND);
         values.put(Images.Thumbnails.IMAGE_ID, (int) id);
         values.put(Images.Thumbnails.HEIGHT, thumb.getHeight());
         values.put(Images.Thumbnails.WIDTH, thumb.getWidth());
 
         Uri url = cr.insert(Images.Thumbnails.EXTERNAL_CONTENT_URI, values);
 
-        try {
-            OutputStream thumbOut = cr.openOutputStream(url);
-            thumb.compress(Bitmap.CompressFormat.JPEG, 100, thumbOut);
-            thumbOut.close();
-            return thumb;
-        } catch (FileNotFoundException ex) {
-            return null;
-        } catch (IOException ex) {
-            return null;
+        if (url != null) {
+            try {
+                OutputStream thumbOut = cr.openOutputStream(url);
+                thumb.compress(Bitmap.CompressFormat.JPEG, 100, thumbOut);
+                if (thumbOut != null) {
+                    thumbOut.close();
+                }
+            } catch (FileNotFoundException ignored) {
+            } catch (IOException ignored) {
+            }
         }
     }
 }

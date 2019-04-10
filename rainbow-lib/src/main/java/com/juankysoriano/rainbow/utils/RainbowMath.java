@@ -26,25 +26,25 @@ public abstract class RainbowMath {
     public static final float HALF_PI = PI / 2.0f;
     public static final float THIRD_PI = PI / 3.0f;
     public static final float EPSILON = 0.0001f;
-    static final String ERROR_MIN_MAX = "Cannot use min() or max() on an empty array.";
-    static final int PERLIN_YWRAPB = 4;
-    static final int PERLIN_YWRAP = 1 << RainbowMath.PERLIN_YWRAPB;
-    static final int PERLIN_ZWRAPB = 8;
-    static final int PERLIN_ZWRAP = 1 << RainbowMath.PERLIN_ZWRAPB;
-    static final int PERLIN_SIZE = 4095;
-    protected static HashMap<String, Pattern> matchPatterns;
-    static Random internalRandom;
-    static int perlin_octaves = 4; // default to medium smooth
-    static float perlin_amp_falloff = 0.5f; // 50% reduction/octave
+    private static final String ERROR_MIN_MAX = "Cannot use min() or max() on an empty array.";
+    private static final int PERLIN_YWRAPB = 4;
+    private static final int PERLIN_YWRAP = 1 << RainbowMath.PERLIN_YWRAPB;
+    private static final int PERLIN_ZWRAPB = 8;
+    private static final int PERLIN_ZWRAP = 1 << RainbowMath.PERLIN_ZWRAPB;
+    private static final int PERLIN_SIZE = 4095;
+    private static HashMap<String, Pattern> matchPatterns;
+    private static Random internalRandom;
+    private static int perlin_octaves = 4; // default to medium smooth
+    private static float perlin_amp_falloff = 0.5f; // 50% reduction/octave
     // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // [toxi 031112]
     // new vars needed due to recent change of cos table in PGraphics
-    static int perlin_TWOPI;
-    static int perlin_PI;
-    static float[] perlin_cosTable;
-    static float[] perlin;
+    private static int perlin_TWOPI;
+    private static int perlin_PI;
+    private static float[] perlin_cosTable;
+    private static float[] perlin;
     // ////////////////////////////////////////////////////////////
-    static Random perlinRandom;
+    private static Random perlinRandom;
     /**
      * Integer number formatter.
      */
@@ -55,39 +55,39 @@ public abstract class RainbowMath {
     private static int float_nf_left, float_nf_right;
     private static boolean float_nf_commas;
 
-    public static final float abs(final float n) {
+    public static float abs(final float n) {
         return (n < 0) ? -n : n;
     }
 
-    public static final int abs(final int n) {
+    public static int abs(final int n) {
         return (n < 0) ? -n : n;
     }
 
-    public static final float log(final float a) {
+    public static float log(final float a) {
         return (float) Math.log(a);
     }
 
-    public static final float exp(final float a) {
+    public static float exp(final float a) {
         return (float) Math.exp(a);
     }
 
-    public static final float pow(final float a, final float b) {
+    public static float pow(final float a, final float b) {
         return (float) Math.pow(a, b);
     }
 
-    public static final int max(final int a, final int b) {
+    public static int max(final int a, final int b) {
         return (a > b) ? a : b;
     }
 
-    public static final float max(final float a, final float b) {
+    public static float max(final float a, final float b) {
         return (a > b) ? a : b;
     }
 
-    public static final int max(final int a, final int b, final int c) {
+    public static int max(final int a, final int b, final int c) {
         return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
     }
 
-    public static final float max(final float a, final float b, final float c) {
+    public static float max(final float a, final float b, final float c) {
         return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
     }
 

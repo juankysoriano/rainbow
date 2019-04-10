@@ -27,7 +27,7 @@ public class RainbowBitmapUtils {
         return getMutableBitmap(drawable);
     }
 
-    public static Bitmap getMutableBitmap(Drawable drawable) {
+    private static Bitmap getMutableBitmap(Drawable drawable) {
         if(drawable == null) {
             return null;
         }
