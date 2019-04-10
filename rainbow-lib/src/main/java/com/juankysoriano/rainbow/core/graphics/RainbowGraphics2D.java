@@ -410,7 +410,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
         return screenPoint[1];
     }
 
-    void drawPath() {
+    private void drawPath() {
         if (fill) {
             canvas.drawPath(path, fillPaint);
         }

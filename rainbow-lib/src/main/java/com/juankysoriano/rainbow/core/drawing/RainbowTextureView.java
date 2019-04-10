@@ -20,6 +20,7 @@ public class RainbowTextureView extends TextureView {
         parent.addView(this, 0, MATCH_PARENT_PARAMS);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(@NonNull final MotionEvent event) {
         rainbow.getRainbowInputController().postEvent(event);

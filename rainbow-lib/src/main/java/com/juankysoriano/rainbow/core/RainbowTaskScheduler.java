@@ -21,26 +21,26 @@ class RainbowTaskScheduler {
         return new RainbowTaskScheduler(drawingScheduler, drawingStepTask, screenUpdateScheduler, screenUpdateTask);
     }
 
-    protected RainbowTaskScheduler(ScheduledExecutorService drawingScheduler,
-                                   DrawingStepTask drawingStepTask,
-                                   ScheduledExecutorService screenUpdateScheduler,
-                                   ScreenUpdateTask screenUpdateTask) {
+    private RainbowTaskScheduler(ScheduledExecutorService drawingScheduler,
+                                 DrawingStepTask drawingStepTask,
+                                 ScheduledExecutorService screenUpdateScheduler,
+                                 ScreenUpdateTask screenUpdateTask) {
         this.drawingScheduler = drawingScheduler;
         this.drawingStepTask = drawingStepTask;
         this.screenUpdateScheduler = screenUpdateScheduler;
         this.screenUpdateTask = screenUpdateTask;
     }
 
-    public void scheduleAt(int frameRate) {
+    void scheduleAt(int frameRate) {
         drawingScheduler.scheduleAtFixedRate(drawingStepTask, SECOND, SECOND / frameRate, TimeUnit.MILLISECONDS);
         screenUpdateScheduler.scheduleAtFixedRate(screenUpdateTask, SECOND, SECOND / Rainbow.DEFAULT_FRAME_RATE, TimeUnit.MILLISECONDS);
     }
 
-    public boolean isTerminated() {
+    boolean isTerminated() {
         return drawingScheduler.isTerminated() && screenUpdateScheduler.isTerminated();
     }
 
-    public void shutdown() throws InterruptedException {
+    void shutdown() throws InterruptedException {
         drawingScheduler.shutdownNow();
         drawingScheduler.awaitTermination(TIMEOUT, TimeUnit.SECONDS);
         screenUpdateScheduler.shutdownNow();

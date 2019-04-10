@@ -28,9 +28,9 @@ public class RainbowInputController {
                 rainbowDrawer);
     }
 
-    public RainbowInputController(ExecutorService executor,
-                                  FingerPositionSmoother predictor,
-                                  RainbowDrawer drawer) {
+    private RainbowInputController(ExecutorService executor,
+                                   FingerPositionSmoother predictor,
+                                   RainbowDrawer drawer) {
         executorService = executor;
         fingerPositionPredictor = predictor;
         rainbowDrawer = drawer;

@@ -35,17 +35,17 @@ public class SafeScheduledExecutor extends ScheduledThreadPoolExecutor {
     }
 
     private class LogOnExceptionRunnable implements Runnable {
-        private Runnable theRunnable;
+        private Runnable runnable;
 
-        public LogOnExceptionRunnable(Runnable theRunnable) {
+        LogOnExceptionRunnable(Runnable runnable) {
             super();
-            this.theRunnable = theRunnable;
+            this.runnable = runnable;
         }
 
         @Override
         public void run() {
             try {
-                theRunnable.run();
+                runnable.run();
             } catch (Exception e) {
                 Log.e("Rainbow:", e.getMessage());
                 e.printStackTrace();

@@ -816,7 +816,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         }
     }
 
-    void bezierVertexCheck(int shape, int vertexCount) {
+    private void bezierVertexCheck(int shape, int vertexCount) {
         if (shape == 0 || shape != POLYGON) {
             throw new RuntimeException("beginShape() or beginShape(POLYGON) " + "must be used before bezierVertex() or quadraticVertex()");
         }
@@ -825,13 +825,13 @@ public abstract class RainbowGraphics extends RainbowImage {
         }
     }
 
-    void bezierInitCheck() {
+    private void bezierInitCheck() {
         if (!bezierInited) {
             bezierInit();
         }
     }
 
-    void bezierInit() {
+    private void bezierInit() {
         bezierDetail(bezierDetail);
         bezierInited = true;
     }

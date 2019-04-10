@@ -10,16 +10,16 @@ class LineExplorer {
     private float previousDetectedX = NO_PREVIOUS;
     private float previousDetectedY = NO_PREVIOUS;
 
-    public LineExplorer(RainbowDrawer.Precision precision, RainbowDrawer rainbowDrawer, RainbowDrawer.PointDetectedListener listener) {
+    LineExplorer(RainbowDrawer.Precision precision, RainbowDrawer rainbowDrawer, RainbowDrawer.PointDetectedListener listener) {
         this.precision = precision.getValue();
         this.rainbowDrawer = rainbowDrawer;
         this.listener = listener;
     }
 
-    public void exploreLine(float px,
-                            float py,
-                            float x,
-                            float y) {
+    void exploreLine(float px,
+                     float py,
+                     float x,
+                     float y) {
         previousDetectedX = x;
         previousDetectedY = y;
         float dx = x - px;

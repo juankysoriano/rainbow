@@ -20,15 +20,15 @@ class FingerPositionSmoother {
         return y;
     }
 
-    public float getOldX() {
+    float getOldX() {
         return xOld;
     }
 
-    public float getOldY() {
+    float getOldY() {
         return yOld;
     }
 
-    public void moveTo(float x, float y) {
+    void moveTo(float x, float y) {
         backupPosition();
         updateVelocity(x, y);
         updatePosition();
@@ -52,14 +52,14 @@ class FingerPositionSmoother {
         y += yVel;
     }
 
-    public void resetTo(float x, float y) {
+    void resetTo(float x, float y) {
         this.x = x;
         this.y = y;
         this.xOld = x;
         this.yOld = y;
     }
 
-    public float getFingerVelocity() {
+    float getFingerVelocity() {
         return RainbowMath.dist(0, 0, xVel, yVel);
     }
 }

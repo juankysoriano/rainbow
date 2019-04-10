@@ -13,7 +13,7 @@ import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics2D;
 
 public class Rainbow {
-    public static final int DEFAULT_FRAME_RATE = 60;
+    static final int DEFAULT_FRAME_RATE = 60;
     private int frameRate = DEFAULT_FRAME_RATE;
     private boolean surfaceReady;
     private int width;
@@ -52,7 +52,7 @@ public class Rainbow {
         return drawingView.getContext();
     }
 
-    public void injectInto(ViewGroup viewGroup) {
+    private void injectInto(ViewGroup viewGroup) {
         drawingView = new RainbowTextureView(viewGroup, this);
         addSurfaceTextureListener();
     }
