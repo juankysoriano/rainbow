@@ -48,15 +48,6 @@ public class RainbowDrawer {
         return RainbowImage.blendColor(c1, c2, mode);
     }
 
-    public static RainbowGraphics createStandaloneGraphics(final int width, final int height) {
-        RainbowGraphics pg = new RainbowGraphics2D();
-        pg.setParent(null);
-        pg.setPrimary(false);
-        pg.setSize(width, height);
-
-        return pg;
-    }
-
     public int[] getPixels() {
         return pixels;
     }
@@ -350,42 +341,6 @@ public class RainbowDrawer {
 
     public void updatePixels(final int x1, final int y1, final int x2, final int y2) {
         graphics.updatePixels(x1, y1, x2, y2);
-    }
-
-    /**
-     * Store data of some kind for the renderer that requires extra metadata of
-     * some kind. Usually this is a renderer-specific representation of the
-     * image data, for instance a BufferedImage with tint() settings applied for
-     * PGraphicsJava2D, or resized image data and OpenGL texture indices for
-     * PGraphicsOpenGL.
-     *
-     * @param image   The PGraphics renderer associated to the image
-     * @param storage The metadata required by the renderer
-     */
-    public void setCache(final RainbowImage image, final Object storage) {
-        graphics.setCache(image, storage);
-    }
-
-    /**
-     * Get cache storage data for the specified renderer. Because each renderer
-     * will cache data in different formats, it's necessary to store cache data
-     * keyed by the renderer object. Otherwise, attempting to draw the same
-     * image to both a PGraphicsJava2D and a PGraphicsOpenGL will cause errors.
-     *
-     * @param image The PGraphics renderer associated to the image
-     * @return metadata stored for the specified renderer
-     */
-    public Object getCache(final RainbowImage image) {
-        return graphics.getCache(image);
-    }
-
-    /**
-     * Remove information associated with this renderer from the cache, if any.
-     *
-     * @param image The PGraphics renderer whose cache data should be removed
-     */
-    public void removeCache(final RainbowImage image) {
-        graphics.removeCache(image);
     }
 
     protected void flush() {

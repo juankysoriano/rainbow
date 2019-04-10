@@ -37,7 +37,7 @@ import java.util.WeakHashMap;
 
 public abstract class RainbowGraphics extends RainbowImage {
 
-    public static final int VERTEX_FIELD_COUNT = 37;
+    static final int VERTEX_FIELD_COUNT = 37;
     public static final float cosLUT[];
     public static final int R = 3;
     public static final int G = 4;
@@ -379,7 +379,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      */
     private static void showWarning(String msg) { // ignore
         if (warnings == null) {
-            warnings = new HashMap<String, Object>();
+            warnings = new HashMap<>();
         }
         if (!warnings.containsKey(msg)) {
             System.err.println(msg);
@@ -393,7 +393,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      *
      * @param method The method name (no parentheses)
      */
-    public static void showDepthWarningXYZ(String method) {
+    static void showDepthWarningXYZ(String method) {
         showWarning(method + "() with x, y, and z coordinates " + "can only be used with a renderer that " + "supports 3D, such as P3D or OPENGL. " + "Use a version without a z-coordinate instead.");
     }
 
@@ -402,17 +402,8 @@ public abstract class RainbowGraphics extends RainbowImage {
      * other variations are). For instance, if vertex(x, y, u, v) is not
      * available, but vertex(x, y) is just fine.
      */
-    public static void showVariationWarning(String str) {
+    static void showVariationWarning(String str) {
         showWarning(str + " is not available with this renderer.");
-    }
-
-    /**
-     * Show an renderer-related exception that halts the program. Currently just
-     * wraps the message as a RuntimeException and throws it, but might do
-     * something more specific might be used in the future.
-     */
-    public static void showException(String msg) { // ignore
-        throw new RuntimeException(msg);
     }
 
     public void setParent(Rainbow parent) { // ignore
@@ -458,43 +449,7 @@ public abstract class RainbowGraphics extends RainbowImage {
     protected void allocate() {
     }
 
-    /**
-     * Store data of some kind for the renderer that requires extra metadata of
-     * some kind. Usually this is a renderer-specific representation of the
-     * image data, for instance a BufferedImage with tint() settings applied for
-     * PGraphicsJava2D, or resized image data and OpenGL texture indices for
-     * PGraphicsOpenGL.
-     *
-     * @param image   The PGraphics renderer associated to the image
-     * @param storage The metadata required by the renderer
-     */
-    public void setCache(RainbowImage image, Object storage) {
-        cacheMap.put(image, storage);
-    }
-
-    /**
-     * Get cache storage data for the specified renderer. Because each renderer
-     * will cache data in different formats, it's necessary to store cache data
-     * keyed by the renderer object. Otherwise, attempting to draw the same
-     * image to both a PGraphicsJava2D and a PGraphicsOpenGL will cause errors.
-     *
-     * @param image The PGraphics renderer associated to the image
-     * @return metadata stored for the specified renderer
-     */
-    public Object getCache(RainbowImage image) {
-        return cacheMap.get(image);
-    }
-
-    /**
-     * Remove information associated with this renderer from the cache, if any.
-     *
-     * @param image The PGraphics renderer whose cache data should be removed
-     */
-    public void removeCache(RainbowImage image) {
-        cacheMap.remove(image);
-    }
-
-    protected void checkSettings() {
+    void checkSettings() {
         if (!settingsInited) {
             defaultSettings();
         }
@@ -540,7 +495,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      * size(), which is safely called from inside beginDraw(). And it cannot be
      * called before defaultSettings(), so we should be safe.
      */
-    protected void reapplySettings() {
+    void reapplySettings() {
         if (!settingsInited) {
             return;
         }
