@@ -348,7 +348,7 @@ public class RainbowDrawer {
     }
 
     /**
-     * Prepares rainbow sketch for draw.
+     * Prepares rainbow rainbow for draw.
      */
     public synchronized void beginDraw() {
         drawing = true;
@@ -507,16 +507,8 @@ public class RainbowDrawer {
         graphics.endShape(mode);
     }
 
-    public void clip(final float a, final float b, final float c, final float d) {
-        graphics.clip(a, b, c, d);
-    }
-
     public void noClip() {
         graphics.noClip();
-    }
-
-    public void blendMode(final int mode) {
-        graphics.blendMode(mode);
     }
 
     public void bezierVertex(final float x2, final float y2, final float x3, final float y3, final float x4, final float y4) {
@@ -671,7 +663,7 @@ public class RainbowDrawer {
      * <p/>
      * [toxi 031223] updated sphere code (removed modulos)
      * and introduced sphereAt(x,y,z,r)
-     * to avoid additional translate()'s on the user/sketch side
+     * to avoid additional translate()'s on the user/rainbow side
      * <p/>
      * [davbol 080801] now using separate sphereDetailU/V
      * </PRE>
@@ -1505,7 +1497,7 @@ public class RainbowDrawer {
 
     /**
      * Takes an RGB or ARGB image and sets it as the background. The width and
-     * height of the image must be the same size as the sketch. Use
+     * height of the image must be the same size as the rainbow. Use
      * image.resize(width, height) to make short work of such a task.
      * <p/>
      * Note that even if the image is set as RGB, the high 8 bits of each pixel

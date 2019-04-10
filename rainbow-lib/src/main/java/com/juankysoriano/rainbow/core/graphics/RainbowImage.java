@@ -31,6 +31,7 @@ import android.net.Uri;
 
 import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.utils.CaptureSketchUtils;
+import com.juankysoriano.rainbow.utils.RainbowMath;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -118,6 +119,7 @@ public class RainbowImage implements Cloneable {
      * modified portion of the image
      */
     protected boolean modified;
+    protected int mx1, my1, mx2, my2;
     /**
      * Use ImageIO functions from Java 1.4 and later to handle image save.
      * Various formats are supported, typically jpeg, png, bmp, and wbmp. To get
@@ -613,8 +615,24 @@ public class RainbowImage implements Cloneable {
      * structured this way in the hope of being able to use this to speed things
      * up in the future.
      */
-    public void updatePixels(int x, int y, int w, int h) { // ignore
+    public void updatePixels(int x, int y, int w, int h) {
+        int x2 = x + w;
+        int y2 = y + h;
+
         setModified();
+        if (x < mx1) mx1 = RainbowMath.max(0, x);
+        //if (x > mx2) mx2 = RainbowMath.min(width - 1, x);
+        if (x > mx2) mx2 = RainbowMath.min(width, x);
+        if (y < my1) my1 = RainbowMath.max(0, y);
+        //if (y > my2) my2 = y;
+        if (y > my2) my2 = RainbowMath.min(height, y);
+
+        if (x2 < mx1) mx1 = RainbowMath.max(0, x2);
+        //if (x2 > mx2) mx2 = RainbowMath.min(width - 1, x2);
+        if (x2 > mx2) mx2 = RainbowMath.min(width, x2);
+        if (y2 < my1) my1 = RainbowMath.max(0, y2);
+        //if (y2 > my2) my2 = RainbowMath.min(height - 1, y2);
+        if (y2 > my2) my2 = RainbowMath.min(height, y2);
     }
 
     public void setModified() { // ignore
@@ -749,7 +767,7 @@ public class RainbowImage implements Cloneable {
      * Mark all pixels as needing update.
      */
     public void updatePixels() { // ignore
-        setModified();
+        updatePixels(0, 0, width, height);
     }
 
     public boolean isLoaded() { // ignore
@@ -1828,6 +1846,30 @@ public class RainbowImage implements Cloneable {
         return a | r | g | b;
     }
 
+    public boolean isModified() {  // ignore
+        return modified;
+    }
+
+    public void setModified(boolean m) {  // ignore
+        modified = m;
+    }
+
+    public int getModifiedX1() {  // ignore
+        return mx1;
+    }
+
+    public int getModifiedX2() {  // ignore
+        return mx2;
+    }
+
+    public int getModifiedY1() {  // ignore
+        return my1;
+    }
+
+    public int getModifiedY2() {  // ignore
+        return my2;
+    }
+
     /**
      * Copies area of one image into another PImage object.
      */
@@ -1848,7 +1890,7 @@ public class RainbowImage implements Cloneable {
      * Save this image to disk.
      * <p/>
      * As of revision 0100, this function requires an absolute path, in order to
-     * avoid confusion. To save inside the sketch folder, use the function
+     * avoid confusion. To save inside the rainbow folder, use the function
      * savePath() from Imagine, or use saveFrame() instead. As of revision 0116,
      * savePath() is not needed if this object has been created (as recommended)
      * via createImage() or createGraphics() or one of its neighbors.

@@ -32,8 +32,8 @@ class RainbowTaskScheduler {
     }
 
     void scheduleAt(int frameRate) {
-        drawingScheduler.scheduleAtFixedRate(drawingStepTask, SECOND, SECOND / frameRate, TimeUnit.MILLISECONDS);
-        screenUpdateScheduler.scheduleAtFixedRate(screenUpdateTask, SECOND, SECOND / Rainbow.DEFAULT_FRAME_RATE, TimeUnit.MILLISECONDS);
+       // drawingScheduler.scheduleAtFixedRate(drawingStepTask, SECOND, SECOND / frameRate, TimeUnit.MILLISECONDS);
+       // screenUpdateScheduler.scheduleAtFixedRate(screenUpdateTask, SECOND, SECOND / Rainbow.DEFAULT_FRAME_RATE, TimeUnit.MILLISECONDS);
     }
 
     boolean isTerminated() {

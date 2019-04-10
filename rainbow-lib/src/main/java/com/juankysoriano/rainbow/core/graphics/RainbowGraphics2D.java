@@ -35,6 +35,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 
 import com.juankysoriano.rainbow.core.drawing.RainbowTextureView;
+import com.juankysoriano.rainbow.core.graphics.opengl.RainbowShader;
 import com.juankysoriano.rainbow.core.matrix.RMatrix;
 import com.juankysoriano.rainbow.core.matrix.RMatrix2D;
 import com.juankysoriano.rainbow.utils.RainbowMath;
@@ -83,6 +84,16 @@ public class RainbowGraphics2D extends RainbowGraphics {
         path = new Path();
         rect = new RectF();
         initPaints();
+    }
+
+    @Override
+    public boolean is2D() {
+        return true;
+    }
+
+    @Override
+    public boolean is3D() {
+        return false;
     }
 
     /**
@@ -266,7 +277,8 @@ public class RainbowGraphics2D extends RainbowGraphics {
                     x,
                     y,
                     vertices[vertexCount - 3][X],
-                    vertices[vertexCount - 3][Y]);
+                    vertices[vertexCount - 3][Y]
+            );
         }
     }
 
@@ -280,7 +292,8 @@ public class RainbowGraphics2D extends RainbowGraphics {
                     vertices[vertexCount - 2][X],
                     vertices[vertexCount - 2][Y],
                     x,
-                    y);
+                    y
+            );
             vertexCount = 0;
         }
     }
@@ -294,9 +307,10 @@ public class RainbowGraphics2D extends RainbowGraphics {
     private void vertexTriangleStrip(float x, float y) {
         if (vertexCount >= 3) {
             triangle(vertices[vertexCount - 2][X], vertices[vertexCount - 2][Y], x,
-                    y,
-                    vertices[vertexCount - 3][X],
-                    vertices[vertexCount - 3][Y]);
+                     y,
+                     vertices[vertexCount - 3][X],
+                     vertices[vertexCount - 3][Y]
+            );
         }
     }
 
@@ -896,4 +910,42 @@ public class RainbowGraphics2D extends RainbowGraphics {
     public Paint getStrokePaint() {
         return strokePaint;
     }
+
+    @Override
+    public RainbowShader loadShader(String fragFilename) {
+        showMissingWarning("Load shader not implemented");
+        return null;
+    }
+
+    @Override
+    public RainbowShader loadShader(String fragFilename, String vertFilename) {
+        showMissingWarning("Load shader not implemented");
+        return null;
+    }
+
+    @Override
+    public void shader(RainbowShader shader) {
+        showMissingWarning("shader not implemented");
+    }
+
+    @Override
+    public void shader(RainbowShader shader, int kind) {
+        showMissingWarning("shader not implemented");
+    }
+
+    @Override
+    public void resetShader() {
+        showMissingWarning("Reset shader not implemented");
+    }
+
+    @Override
+    public void resetShader(int kind) {
+        showMissingWarning("Reset shader not implemented");
+    }
+
+    @Override
+    public void filter(RainbowShader shader) {
+        showMissingWarning("shader not implemented");
+    }
+
 }

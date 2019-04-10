@@ -19,13 +19,14 @@ public class RainbowInputController {
     private boolean screenTouched;
     private boolean fingerMoving;
 
-    public static RainbowInputController newInstance() {
+    public static RainbowInputController newInstance(RainbowDrawer rainbowDrawer) {
         ExecutorService service = SafeScheduledExecutor.newInstance();
         FingerPositionSmoother positionSmoother = new FingerPositionSmoother();
-        RainbowDrawer rainbowDrawer = new RainbowDrawer();
-        return new RainbowInputController(service,
+        return new RainbowInputController(
+                service,
                 positionSmoother,
-                rainbowDrawer);
+                rainbowDrawer
+        );
     }
 
     private RainbowInputController(ExecutorService executor,

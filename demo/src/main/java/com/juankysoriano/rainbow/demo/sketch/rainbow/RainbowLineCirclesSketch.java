@@ -15,14 +15,7 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputCon
 
         @Override
         public void onPointDetected(float px, float py, float x, float y, RainbowDrawer rainbowDrawer) {
-            drawEllipse(x, y, 200, 200, rainbowDrawer);
-        }
-
-        private void drawEllipse(float x, float y, float radius, int color, RainbowDrawer rainbowDrawer) {
-            rainbowDrawer.stroke(0, 30);
-            rainbowDrawer.fill(0, 0);
-            rainbowDrawer.ellipseMode(RainbowGraphics.CENTER);
-            rainbowDrawer.ellipse(x, y, radius, radius);
+            drawEllipse(x, y, rainbowDrawer);
         }
     };
 
@@ -55,7 +48,7 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputCon
 
     @Override
     public void onSketchTouched(MotionEvent event, RainbowDrawer rainbowDrawer) {
-        //no-op
+        drawEllipse(getRainbowInputController().getX(), getRainbowInputController().getY(), rainbowDrawer);
     }
 
     @Override
@@ -82,5 +75,12 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputCon
     @Override
     public void onMotionEvent(MotionEvent event, RainbowDrawer rainbowDrawer) {
 
+    }
+
+    private void drawEllipse(float x, float y, RainbowDrawer rainbowDrawer) {
+        rainbowDrawer.stroke(0, 30);
+        rainbowDrawer.fill(0, 0);
+        rainbowDrawer.ellipseMode(RainbowGraphics.CENTER);
+        rainbowDrawer.ellipse(x, y, (float) 200, (float) 200);
     }
 }

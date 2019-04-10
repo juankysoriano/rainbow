@@ -8,7 +8,7 @@ import java.util.List;
 
 class ParticleWorld {
 
-    private static final int NUMBER_PARTICLES = 50;
+    private static final int NUMBER_PARTICLES = 3;
     private static final int NUCLEUS_DIAMETER = 40;
     private static final float HALF = 0.5f;
 
@@ -57,9 +57,9 @@ class ParticleWorld {
     }
 
     private void drawLinesBetweenParticles(RainbowDrawer rainbowDrawer) {
-        rainbowDrawer.strokeWeight(1);
-        rainbowDrawer.stroke(35, 3, 3, 60);
-        rainbowDrawer.line(points);
+        //rainbow.strokeWeight(1);
+        //rainbow.stroke(35, 3, 3, 60);
+        //rainbow.line(points);
     }
 
     private void setPointFor(int particleIndex) {

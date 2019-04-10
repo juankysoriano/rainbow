@@ -10,7 +10,7 @@ import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.drawing.RainbowTextureView;
 import com.juankysoriano.rainbow.core.event.RainbowInputController;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
-import com.juankysoriano.rainbow.core.graphics.RainbowGraphics2D;
+import com.juankysoriano.rainbow.core.graphics.opengl.RainbowGraphics2DX;
 
 public class Rainbow {
     static final int DEFAULT_FRAME_RATE = 60;
@@ -32,7 +32,7 @@ public class Rainbow {
 
     protected Rainbow(ViewGroup viewGroup) {
         this.rainbowDrawer = new RainbowDrawer();
-        this.rainbowInputController = RainbowInputController.newInstance();
+        this.rainbowInputController = RainbowInputController.newInstance(rainbowDrawer);
         this.setupSketchTask = SetupSketchTask.newInstance(this);
         injectInto(viewGroup);
     }
@@ -98,23 +98,8 @@ public class Rainbow {
         width = drawingView.getMeasuredWidth();
         height = drawingView.getMeasuredHeight();
 
-        initPeriodicGraphics(width, height);
-        initInputControllerGraphics(width, height);
-    }
-
-    private void initInputControllerGraphics(int width, int height) {
-        RainbowGraphics graphics = new RainbowGraphics2D();
-        graphics.setParent(Rainbow.this);
-        graphics.setPrimary(true);
-        if (width > 0 && height > 0) {
-            graphics.setSize(width, height);
-            rainbowInputController.getRainbowDrawer().setGraphics(graphics);
-        }
-    }
-
-    private void initPeriodicGraphics(int width, int height) {
-        RainbowGraphics graphics = new RainbowGraphics2D();
-        graphics.setParent(Rainbow.this);
+        RainbowGraphics graphics = new RainbowGraphics2DX();
+        graphics.setParent(this);
         graphics.setPrimary(true);
         if (width > 0 && height > 0) {
             graphics.setSize(width, height);
@@ -258,7 +243,7 @@ public class Rainbow {
     }
 
     /**
-     * @return the View where this rainbow sketch has been injected to
+     * @return the View where this rainbow rainbow has been injected to
      */
     public View getParentView() {
         return (View) drawingView.getParent();
@@ -268,19 +253,19 @@ public class Rainbow {
      * Used to retrieve a RainbowDrawer object.
      * <p/>
      * If you need to call this manually, probably you will also need need to call
-     * rainbowDrawer.beginDraw() and rainbowDrawer.endDraw() to make your drawing effective.
+     * rainbow.beginDraw() and rainbow.endDraw() to make your drawing effective.
      * <p/>
      * Also, be aware of drawing offline. Drawing outside of the UI thread is allowed here,
      * and long running drawings will block the UI thread.
      *
-     * @return RainbowDrawer, used to draw into the rainbow sketch
+     * @return RainbowDrawer, used to draw into the rainbow rainbow
      */
     public RainbowDrawer getRainbowDrawer() {
         return rainbowDrawer;
     }
 
     /**
-     * @return RainbowInputController, used to control user interaction with the rainbow sketch
+     * @return RainbowInputController, used to control user interaction with the rainbow rainbow
      */
     public RainbowInputController getRainbowInputController() {
         return rainbowInputController;

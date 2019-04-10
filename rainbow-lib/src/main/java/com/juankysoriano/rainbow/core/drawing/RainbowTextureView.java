@@ -3,13 +3,13 @@ package com.juankysoriano.rainbow.core.drawing;
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.view.MotionEvent;
-import android.view.TextureView;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.core.Rainbow;
+import com.juankysoriano.rainbow.core.graphics.opengl.GLTextureView;
 
 @SuppressLint("ViewConstructor")
-public class RainbowTextureView extends TextureView {
+public class RainbowTextureView extends GLTextureView {
     private static final int MATCH_PARENT = ViewGroup.LayoutParams.MATCH_PARENT;
     private static final ViewGroup.LayoutParams MATCH_PARENT_PARAMS = new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT);
     private final Rainbow rainbow;
