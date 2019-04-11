@@ -17,8 +17,9 @@ public class RainbowParticleSystem extends Rainbow implements RainbowInputContro
     @Override
     public void onSketchSetup() {
         super.onSketchSetup();
-        frameRate(500);
-        getRainbowDrawer().smooth();
+        frameRate(300);
+        getRainbowDrawer().noVSync();
+        getRainbowDrawer().noSmooth();
         getRainbowDrawer().noFill();
         getRainbowDrawer().background(255);
         particleWorld = ParticleWorld.newInstance(getRainbowDrawer().getWidth(), getRainbowDrawer().getHeight());
@@ -60,16 +61,13 @@ public class RainbowParticleSystem extends Rainbow implements RainbowInputContro
 
     @Override
     public void onSketchTouched(MotionEvent event, RainbowDrawer rainbowDrawer) {
-        if (event.getEventTime() % 6 == 0) {
-            float x = event.getX();
-            float y = event.getY();
-            float px = getRainbowInputController().getPreviousX();
-            float py = getRainbowInputController().getPreviousY();
-            if (x != px || y != py) {
-                particleWorld.moveNucleusTo(x, y);
-            }
+        float x = event.getX();
+        float y = event.getY();
+        float px = getRainbowInputController().getPreviousX();
+        float py = getRainbowInputController().getPreviousY();
+        if (x != px || y != py) {
+            particleWorld.moveNucleusTo(x, y);
         }
-
     }
 
     @Override

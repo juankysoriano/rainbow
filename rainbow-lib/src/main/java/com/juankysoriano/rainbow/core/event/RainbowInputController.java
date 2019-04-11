@@ -182,11 +182,11 @@ public class RainbowInputController {
     }
 
     public float getPreviousX() {
-        return px == -1 ? x : px;
+        return px;
     }
 
     public float getPreviousY() {
-        return py == -1 ? y : py;
+        return py;
     }
 
     public MovementDirection getVerticalDirection() {
