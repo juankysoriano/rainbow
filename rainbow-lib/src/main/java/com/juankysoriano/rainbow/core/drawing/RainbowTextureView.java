@@ -6,16 +6,16 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.core.Rainbow;
-import com.juankysoriano.rainbow.core.graphics.opengl.GLTextureView;
+import com.juankysoriano.rainbow.core.graphics.opengl.SurfaceViewGLES;
 
 @SuppressLint("ViewConstructor")
-public class RainbowTextureView extends GLTextureView {
+public class RainbowTextureView extends SurfaceViewGLES {
     private static final int MATCH_PARENT = ViewGroup.LayoutParams.MATCH_PARENT;
     private static final ViewGroup.LayoutParams MATCH_PARENT_PARAMS = new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT);
     private final Rainbow rainbow;
 
     public RainbowTextureView(ViewGroup parent, Rainbow rainbow) {
-        super(parent.getContext());
+        super(parent.getContext(), rainbow);
         this.rainbow = rainbow;
         parent.addView(this, 0, MATCH_PARENT_PARAMS);
     }

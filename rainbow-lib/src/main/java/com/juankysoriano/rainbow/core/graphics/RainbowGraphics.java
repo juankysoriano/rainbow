@@ -1921,6 +1921,10 @@ public abstract class RainbowGraphics extends RainbowImage {
         smooth = false;
     }
 
+    public boolean isSmooth() {
+        return smooth;
+    }
+
     /**
      * The mode can only be set to CORNERS, CORNER, and CENTER.
      * <p/>

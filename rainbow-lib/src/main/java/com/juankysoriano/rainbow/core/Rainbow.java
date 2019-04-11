@@ -23,7 +23,7 @@ public class Rainbow {
     private boolean started = false;
     private boolean paused = true;
     private boolean resumed = false;
-    private boolean isSetup = false;
+    boolean isSetup = false;
     private final RainbowInputController rainbowInputController;
     private final RainbowDrawer rainbowDrawer;
     private RainbowTextureView drawingView;
@@ -58,7 +58,7 @@ public class Rainbow {
     }
 
     private void addSurfaceTextureListener() {
-        drawingView.setSurfaceTextureListener(onSurfaceTextureListener);
+        //drawingView.setSurfaceTextureListener(onSurfaceTextureListener);
     }
 
     private TextureView.SurfaceTextureListener onSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
@@ -87,9 +87,9 @@ public class Rainbow {
         }
     };
 
-    private void setupSketch() {
+    public void setupSketch() {
         initDimensions();
-        setupSketchTask.start();
+        //setupSketchTask.start();
         isSetup = true;
         surfaceReady = true;
     }
@@ -98,7 +98,7 @@ public class Rainbow {
         width = drawingView.getMeasuredWidth();
         height = drawingView.getMeasuredHeight();
 
-        RainbowGraphics graphics = new RainbowGraphics2DX();
+        RainbowGraphics2DX graphics = new RainbowGraphics2DX();
         graphics.setParent(this);
         graphics.setPrimary(true);
         if (width > 0 && height > 0) {

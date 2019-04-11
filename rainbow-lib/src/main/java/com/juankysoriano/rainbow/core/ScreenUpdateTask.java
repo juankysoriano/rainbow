@@ -14,7 +14,7 @@ class ScreenUpdateTask extends TimerTask {
     @Override
     public void run() {
         Rainbow rainbow = weakRainbow.get();
-        if (rainbow != null && !rainbow.isPaused() && isVSyncDisabled()) {
+        if (rainbow != null && !rainbow.isPaused() && isVSyncDisabled() && rainbow.isSetup) {
             rainbow.getRainbowDrawer().invalidate();
         }
     }

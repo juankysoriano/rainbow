@@ -857,6 +857,9 @@ public class RainbowDrawer {
         graphics.noSmooth();
     }
 
+    public boolean isSmooth() {
+        return graphics.isSmooth();
+    }
     /**
      * The mode can only be set to CORNERS, CORNER, and CENTER.
      * <p/>

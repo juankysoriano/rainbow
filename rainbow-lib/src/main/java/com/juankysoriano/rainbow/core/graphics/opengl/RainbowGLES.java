@@ -25,6 +25,7 @@
 package com.juankysoriano.rainbow.core.graphics.opengl;
 
 import android.opengl.GLES20;
+import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 
 import com.juankysoriano.rainbow.core.graphics.opengl.tess.RainbowGLU;
@@ -54,7 +55,7 @@ public class RainbowGLES extends RainbowGL {
   public EGLContext context;
 
   /** The current surface view */
-  public GLTextureView glview;
+  public GLSurfaceView glview;
 
   // ........................................................
 
@@ -106,7 +107,7 @@ public class RainbowGLES extends RainbowGL {
 
 
   @Override
-  public GLTextureView getNative() {
+  public GLSurfaceView getNative() {
     return glview;
   }
 

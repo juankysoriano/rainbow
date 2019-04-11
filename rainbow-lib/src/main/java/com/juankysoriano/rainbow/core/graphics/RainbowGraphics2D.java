@@ -33,6 +33,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.view.SurfaceHolder;
 
 import com.juankysoriano.rainbow.core.drawing.RainbowTextureView;
 import com.juankysoriano.rainbow.core.graphics.opengl.RainbowShader;
@@ -119,7 +120,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     private void initBitmaps() {
-        setBitmap(parent.getDrawingView().getBitmap());
+        setBitmap(Bitmap.createBitmap(width, height, Config.ARGB_8888));
         canvas = new Canvas(getBitmap());
 
         if (primarySurface) {
@@ -186,10 +187,11 @@ public class RainbowGraphics2D extends RainbowGraphics {
     public void endDraw() {
         if (primarySurface) {
             RainbowTextureView textureView = parent.getDrawingView();
-            Canvas screen = textureView.lockCanvas();
+            SurfaceHolder holder = textureView.getHolder();
+            Canvas screen = holder.lockCanvas(null);
             if (canPaint(screen)) {
                 screen.drawBitmap(getBitmap(), 0, 0, null);
-                textureView.unlockCanvasAndPost(screen);
+                holder.unlockCanvasAndPost(screen);
             }
         } else {
             loadPixels();

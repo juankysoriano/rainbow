@@ -78,8 +78,8 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputCon
     }
 
     private void drawEllipse(float x, float y, RainbowDrawer rainbowDrawer) {
-        rainbowDrawer.stroke(0, 30);
-        rainbowDrawer.fill(0, 0);
+        rainbowDrawer.stroke(0, 255);
+        rainbowDrawer.fill(255, 0);
         rainbowDrawer.ellipseMode(RainbowGraphics.CENTER);
         rainbowDrawer.ellipse(x, y, (float) 200, (float) 200);
     }
