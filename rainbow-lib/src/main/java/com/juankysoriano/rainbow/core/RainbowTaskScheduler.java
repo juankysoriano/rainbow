@@ -1,7 +1,6 @@
 package com.juankysoriano.rainbow.core;
 
-import com.juankysoriano.rainbow.SafeScheduledExecutor;
-
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -14,11 +13,11 @@ class RainbowTaskScheduler {
     private final ScreenUpdateTask screenUpdateTask;
 
     public static RainbowTaskScheduler newInstance(Rainbow rainbow) {
-        Progress progress = new Progress();
-        ScheduledExecutorService drawingScheduler = SafeScheduledExecutor.newInstance();
-        DrawingStepTask drawingStepTask = new DrawingStepTask(rainbow, progress);
-        ScheduledExecutorService screenUpdateScheduler = SafeScheduledExecutor.newInstance();
-        ScreenUpdateTask screenUpdateTask = new ScreenUpdateTask(rainbow, progress);
+        ScreenUpdate screenUpdate = new ScreenUpdate();
+        ScheduledExecutorService drawingScheduler = Executors.newSingleThreadScheduledExecutor();
+        DrawingStepTask drawingStepTask = new DrawingStepTask(rainbow, screenUpdate);
+        ScheduledExecutorService screenUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
+        ScreenUpdateTask screenUpdateTask = new ScreenUpdateTask(rainbow, screenUpdate);
         return new RainbowTaskScheduler(drawingScheduler, drawingStepTask, screenUpdateScheduler, screenUpdateTask);
     }
 
@@ -48,32 +47,19 @@ class RainbowTaskScheduler {
         screenUpdateScheduler.awaitTermination(TIMEOUT, TimeUnit.SECONDS);
     }
 
-    static class Progress {
-        private boolean paintLocked = true;
-        private boolean stepLocked = false;
+    static class ScreenUpdate {
+        private boolean pending;
 
-        boolean isUpdatingScreen() {
-            return stepLocked;
+        void pending() {
+            pending = true;
         }
 
-        void performingStep() {
-            paintLocked = true;
+        boolean isPending() {
+            return pending;
         }
 
-        void stepPerformed() {
-            paintLocked = false;
-        }
-
-        boolean isDrawingStep() {
-            return paintLocked;
-        }
-
-        void drawingScreen() {
-            stepLocked = true;
-        }
-
-        void screenDrawn() {
-            stepLocked = false;
+        void notPending() {
+            pending = false;
         }
     }
 }

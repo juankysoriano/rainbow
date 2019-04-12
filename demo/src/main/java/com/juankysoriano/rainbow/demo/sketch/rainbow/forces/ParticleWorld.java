@@ -9,7 +9,7 @@ import java.util.List;
 
 class ParticleWorld {
 
-    private static final int NUMBER_PARTICLES = 13000;
+    private static final int NUMBER_PARTICLES = 5000;
     private static final int NUCLEUS_DIAMETER = 40;
     private static final float HALF = 0.5f;
 
