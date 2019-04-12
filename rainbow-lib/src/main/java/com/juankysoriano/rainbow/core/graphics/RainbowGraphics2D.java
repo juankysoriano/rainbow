@@ -108,7 +108,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     private void initBitmaps() {
-        setBitmap(parent.getDrawingView().getBitmap());
+        setBitmap(Bitmap.createBitmap(parent.getWidth(), parent.getHeight(), Config.ARGB_4444));
         canvas = new Canvas(getBitmap());
 
         if (primarySurface) {

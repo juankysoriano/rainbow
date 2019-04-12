@@ -6,21 +6,30 @@ import java.util.TimerTask;
 class ScreenUpdateTask extends TimerTask {
 
     private final WeakReference<Rainbow> weakRainbow;
+    private final RainbowTaskScheduler.Progress progress;
 
-    ScreenUpdateTask(Rainbow rainbow) {
+    ScreenUpdateTask(Rainbow rainbow, RainbowTaskScheduler.Progress progress) {
         this.weakRainbow = new WeakReference<>(rainbow);
+        this.progress = progress;
     }
 
     @Override
     public void run() {
         Rainbow rainbow = weakRainbow.get();
-        if (rainbow != null && !rainbow.isPaused() && isVSyncDisabled()) {
+        if (rainbow != null && !rainbow.isPaused()) {
+            if (rainbow.isVSync()) {
+                waitForDrawingStep();
+            }
+
+            progress.drawingScreen();
             rainbow.getRainbowDrawer().invalidate();
+            progress.screenDrawn();
         }
     }
 
-    private boolean isVSyncDisabled() {
-        Rainbow rainbow = weakRainbow.get();
-        return rainbow != null && !rainbow.getRainbowDrawer().isVSync();
+    @SuppressWarnings({"LoopConditionNotUpdatedInsideLoop", "StatementWithEmptyBody"})
+    private void waitForDrawingStep() {
+        while (progress.isDrawingStep()) {
+        }
     }
 }

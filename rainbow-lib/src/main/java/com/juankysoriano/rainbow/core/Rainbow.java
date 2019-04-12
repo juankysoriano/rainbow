@@ -13,12 +13,14 @@ import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics2D;
 
 public class Rainbow {
-    static final int DEFAULT_FRAME_RATE = 60;
+    private static final int DEFAULT_FRAME_RATE = 60;
     private int frameRate = DEFAULT_FRAME_RATE;
+    private int frameCount;
+    private int vSyncRate = DEFAULT_FRAME_RATE;
+    private boolean vSync = false;
     private boolean surfaceReady;
     private int width;
     private int height;
-    private int frameCount;
     private boolean stopped = true;
     private boolean started = false;
     private boolean paused = true;
@@ -149,7 +151,7 @@ public class Rainbow {
             paused = false;
             if (!hasScheduler()) {
                 rainbowTaskScheduler = RainbowTaskScheduler.newInstance(this);
-                rainbowTaskScheduler.scheduleAt(frameRate);
+                rainbowTaskScheduler.scheduleAt(frameRate, vSyncRate);
             }
         }
     }
@@ -296,10 +298,36 @@ public class Rainbow {
 
     public void frameRate(final int newRateTarget) {
         frameRate = newRateTarget;
+        restart();
+    }
+
+    private void restart() {
         if (!isPaused()) {
             pause();
             resume();
         }
+    }
+
+    public void vSync() {
+        vSync = true;
+        vSyncRate = DEFAULT_FRAME_RATE;
+        restart();
+    }
+
+    public void vSync(int vSyncRate) {
+        vSync = true;
+        this.vSyncRate = vSyncRate;
+        restart();
+    }
+
+    public void noVSync() {
+        vSync = false;
+        vSyncRate = DEFAULT_FRAME_RATE;
+        restart();
+    }
+
+    public boolean isVSync() {
+        return vSync;
     }
 
     public int getWidth() {

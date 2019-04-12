@@ -14,7 +14,7 @@ import static com.juankysoriano.rainbow.utils.RainbowMath.*;
 public class Particle {
     public static final float PARTICLE_DIAMETER = 3;
     private static final int[] RAINBOW = {R.color.red, R.color.orange, R.color.yellow, R.color.green, R.color.blue, R.color.purple, R.color.white};
-    private static final float GRAVITY_CONSTANT = 0.0035f;
+    private static final float GRAVITY_CONSTANT = 0.035f;
     private static final float MAX_GRAVITY_AMPLITUDE = 0.015f;
     private static int nextColor;
 

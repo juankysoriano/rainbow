@@ -1,5 +1,6 @@
 package com.juankysoriano.rainbow.demo.sketch.rainbow.forces;
 
+import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.matrix.RVector;
 
@@ -8,7 +9,7 @@ import java.util.List;
 
 class ParticleWorld {
 
-    private static final int NUMBER_PARTICLES = 50;
+    private static final int NUMBER_PARTICLES = 13000;
     private static final int NUCLEUS_DIAMETER = 40;
     private static final float HALF = 0.5f;
 
@@ -40,19 +41,20 @@ class ParticleWorld {
         return particles;
     }
 
-    void updateAndDisplay(final RainbowDrawer rainbowDrawer) {
+    void updateAndDisplay(final Rainbow rainbow) {
         for (int i = 0; i < NUMBER_PARTICLES; i++) {
             setPointFor(i);
             particles.get(i).updateWith(nucleus);
         }
 
-        drawParticles(rainbowDrawer);
-        drawLinesBetweenParticles(rainbowDrawer);
+        drawParticles(rainbow.getRainbowDrawer());
+
+        //drawLinesBetweenParticles(rainbowDrawer);
     }
 
     private void drawParticles(RainbowDrawer rainbowDrawer) {
-        rainbowDrawer.strokeWeight(Particle.PARTICLE_DIAMETER);
-        rainbowDrawer.stroke(200, 10, 10, 60);
+        rainbowDrawer.strokeWeight(0);
+        rainbowDrawer.stroke(200);
         rainbowDrawer.point(points);
     }
 
