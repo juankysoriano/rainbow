@@ -19,8 +19,8 @@ class DrawingStepTask extends TimerTask {
         if (rainbow != null && !rainbow.isPaused()) {
             rainbow.performStep();
             if (rainbow.isVSync() && screenUpdate.isPending()){
-                screenUpdate.notPending();
                 rainbow.getRainbowDrawer().invalidate();
+                screenUpdate.notPending();
             }
         }
     }

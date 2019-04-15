@@ -23,14 +23,11 @@
 
 package com.juankysoriano.rainbow.core.graphics;
 
-import android.content.ContentResolver;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
-import android.net.Uri;
 
 import com.juankysoriano.rainbow.core.Rainbow;
-import com.juankysoriano.rainbow.utils.CaptureSketchUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -1907,10 +1904,6 @@ public class RainbowImage implements Cloneable {
             System.err.println("Could not write the image to " + path);
         }
         return success;
-    }
-
-    public Uri save(ContentResolver contentResolver, String title, String description) {
-        return CaptureSketchUtils.insertImage(contentResolver, getBitmap(), title, description);
     }
 
     public int getWidth() {

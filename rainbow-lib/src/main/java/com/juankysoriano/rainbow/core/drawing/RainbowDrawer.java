@@ -1,6 +1,5 @@
 package com.juankysoriano.rainbow.core.drawing;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Shader;
 import android.net.Uri;
@@ -88,75 +87,48 @@ public class RainbowDrawer {
         return image;
     }
 
-    public Uri save(final String title, final String description) {
-        return graphics.save(getContext().getContentResolver(), title, description);
-    }
-
-    public Context getContext() {
-        return graphics.parent.getContext();
-    }
-
     public void loadImage(String path, int mode, RainbowImage.LoadPictureListener listener) {
-        Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), path, width, height, mode);
+        Bitmap bitmap = RainbowBitmapUtils.getBitmap(path, width, height, mode);
         loadImage(bitmap, listener);
     }
 
-    public void loadImage(Bitmap bitmap, RainbowImage.LoadPictureListener listener) {
+    private void loadImage(Bitmap bitmap, RainbowImage.LoadPictureListener listener) {
         if (bitmap == null) {
             listener.onLoadFail();
+        } else {
+            final RainbowImage image = new RainbowImage(bitmap);
+            image.parent = graphics.parent;
+            listener.onLoadSucceed(image);
         }
-        final RainbowImage image = new RainbowImage(bitmap);
-        image.parent = graphics.parent;
-        listener.onLoadSucceed(image);
-    }
-
-    public void loadImage(String path, int width, int height, RainbowImage.LoadPictureListener listener) {
-        Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), path, width, height);
-        loadImage(bitmap, listener);
     }
 
     public void loadImage(String path, int width, int height, int mode, RainbowImage.LoadPictureListener listener) {
-        Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), path, width, height, mode);
+        Bitmap bitmap = RainbowBitmapUtils.getBitmap(path, width, height, mode);
         loadImage(bitmap, listener);
     }
 
     public void loadImage(int resID, int mode, RainbowImage.LoadPictureListener listener) {
-        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), resID, width, height, mode);
-        loadImage(bitmap, listener);
-    }
-
-    public void loadImage(int resID, int width, int height, RainbowImage.LoadPictureListener listener) {
-        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), resID, width, height);
+        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(resID, width, height, mode);
         loadImage(bitmap, listener);
     }
 
     public void loadImage(int resID, int width, int height, int mode, RainbowImage.LoadPictureListener listener) {
-        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), resID, width, height, mode);
+        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(resID, width, height, mode);
         loadImage(bitmap, listener);
     }
 
     public void loadImage(File file, int mode, RainbowImage.LoadPictureListener listener) {
-        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), file, width, height, mode);
-        loadImage(bitmap, listener);
-    }
-
-    public void loadImage(File file, int width, int height, RainbowImage.LoadPictureListener listener) {
-        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), file, width, height);
+        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(file, width, height, mode);
         loadImage(bitmap, listener);
     }
 
     public void loadImage(Uri uri, int mode, RainbowImage.LoadPictureListener listener) {
-        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), uri, width, height, mode);
+        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(uri, width, height, mode);
         loadImage(bitmap, listener);
     }
-
-    public void loadImage(Uri uri, int width, int height, RainbowImage.LoadPictureListener listener) {
-        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), uri, width, height);
-        loadImage(bitmap, listener);
-    }
-
+    
     public void loadImage(Uri uri, int width, int height, int mode, RainbowImage.LoadPictureListener listener) {
-        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(getContext(), uri, width, height, mode);
+        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(uri, width, height, mode);
         loadImage(bitmap, listener);
     }
 
