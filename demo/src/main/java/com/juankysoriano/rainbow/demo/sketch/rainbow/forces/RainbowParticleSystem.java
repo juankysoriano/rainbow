@@ -17,8 +17,7 @@ public class RainbowParticleSystem extends Rainbow implements RainbowInputContro
     @Override
     public void onSketchSetup() {
         super.onSketchSetup();
-        frameRate(1000);
-        vSync(30);
+        frameRate(60);
         getRainbowDrawer().noSmooth();
         getRainbowDrawer().noFill();
         getRainbowDrawer().background(0);
@@ -34,8 +33,10 @@ public class RainbowParticleSystem extends Rainbow implements RainbowInputContro
     @Override
     public void onDrawingStep() {
         super.onDrawingStep();
-        getRainbowDrawer().background(0);
-        particleWorld.updateAndDisplay(this);
+        getRainbowDrawer().background(255);
+        if (particleWorld != null) {
+            particleWorld.updateAndDisplay(this);
+        }
     }
 
     @Override

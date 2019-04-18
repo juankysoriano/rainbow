@@ -3,10 +3,13 @@ package com.juankysoriano.rainbow.core.event;
 import android.support.annotation.NonNull;
 import android.view.MotionEvent;
 
-import com.juankysoriano.rainbow.SafeScheduledExecutor;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadFactory;
+
+import io.reactivex.Scheduler;
+import io.reactivex.internal.schedulers.RxThreadFactory;
+import io.reactivex.internal.schedulers.SingleScheduler;
 
 public class RainbowInputController {
     private static final int DIVISIONS = 2;
@@ -14,31 +17,34 @@ public class RainbowInputController {
     private final FingerPositionSmoother fingerPositionPredictor;
     private float x, y;
     private float px, py;
-    private final ExecutorService executorService;
+    private final Scheduler scheduler;
     private RainbowInteractionListener rainbowInteractionListener;
     private boolean screenTouched;
     private boolean fingerMoving;
 
     public static RainbowInputController newInstance() {
-        ExecutorService service = SafeScheduledExecutor.newInstance();
         FingerPositionSmoother positionSmoother = new FingerPositionSmoother();
         RainbowDrawer rainbowDrawer = new RainbowDrawer();
-        return new RainbowInputController(service,
+        ThreadFactory threadFactory = new RxThreadFactory("RainbowController", Thread.NORM_PRIORITY, true);
+        SingleScheduler scheduler = new SingleScheduler(threadFactory);
+        return new RainbowInputController(
+                scheduler,
                 positionSmoother,
-                rainbowDrawer);
+                rainbowDrawer
+        );
     }
 
-    private RainbowInputController(ExecutorService executor,
+    private RainbowInputController(Scheduler scheduler,
                                    FingerPositionSmoother predictor,
                                    RainbowDrawer drawer) {
-        executorService = executor;
+        this.scheduler = scheduler;
         fingerPositionPredictor = predictor;
         rainbowDrawer = drawer;
         x = y = px = py = -1;
     }
 
     public void postEvent(final MotionEvent motionEvent) {
-        executorService.execute(inputEventFor(MotionEvent.obtain(motionEvent)));
+        scheduler.scheduleDirect(inputEventFor(MotionEvent.obtain(motionEvent)));
     }
 
     private Runnable inputEventFor(final MotionEvent motionEvent) {

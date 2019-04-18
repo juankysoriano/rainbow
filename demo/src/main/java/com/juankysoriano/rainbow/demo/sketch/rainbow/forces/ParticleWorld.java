@@ -4,39 +4,36 @@ import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.matrix.RVector;
 
-import java.util.ArrayList;
-import java.util.List;
-
 class ParticleWorld {
 
-    private static final int NUMBER_PARTICLES = 5000;
+    private static final int NUMBER_PARTICLES = 200000;
     private static final int NUCLEUS_DIAMETER = 40;
     private static final float HALF = 0.5f;
 
-    private final List<Particle> particles;
+    private final Particle[] particles;
     private final Nucleus nucleus;
     private final float[] points;
 
-    private ParticleWorld(Nucleus nucleus, List<Particle> particles) {
+    static ParticleWorld newInstance(int width, int height) {
+        RVector nucleusCoordinates = new RVector(width * HALF, height * HALF);
+        Nucleus nucleus = new Nucleus(nucleusCoordinates, NUCLEUS_DIAMETER);
+        Particle[] particles = generateParticles(nucleus);
+
+        return new ParticleWorld(nucleus, particles);
+    }
+
+    private ParticleWorld(Nucleus nucleus, Particle[] particles) {
         this.nucleus = nucleus;
         this.particles = particles;
         this.points = new float[NUMBER_PARTICLES * 2];
     }
 
-    static ParticleWorld newInstance(int width, int height) {
-        RVector nucleusCoordinates = new RVector(width * HALF, height * HALF);
-        Nucleus nucleus = new Nucleus(nucleusCoordinates, NUCLEUS_DIAMETER);
-        List<Particle> particles = generateParticles(nucleus);
-
-        return new ParticleWorld(nucleus, particles);
-    }
-
-    private static List<Particle> generateParticles(Nucleus nucleus) {
-        List<Particle> particles = new ArrayList<>(ParticleWorld.NUMBER_PARTICLES);
+    private static Particle[] generateParticles(Nucleus nucleus) {
+        Particle[] particles = new Particle[ParticleWorld.NUMBER_PARTICLES];
         for (int i = 0; i < ParticleWorld.NUMBER_PARTICLES; i++) {
             Particle particle = Particle.newInstance();
             particle.resetTo(nucleus);
-            particles.add(particle);
+            particles[i] = particle;
         }
         return particles;
     }
@@ -44,28 +41,17 @@ class ParticleWorld {
     void updateAndDisplay(final Rainbow rainbow) {
         for (int i = 0; i < NUMBER_PARTICLES; i++) {
             setPointFor(i);
-            particles.get(i).updateWith(nucleus);
+            particles[i].updateWith(nucleus);
         }
 
-        drawParticles(rainbow.getRainbowDrawer());
-
-        //drawLinesBetweenParticles(rainbowDrawer);
-    }
-
-    private void drawParticles(RainbowDrawer rainbowDrawer) {
+        RainbowDrawer rainbowDrawer = rainbow.getRainbowDrawer();
         rainbowDrawer.strokeWeight(0);
-        rainbowDrawer.stroke(200);
+        rainbowDrawer.stroke(50);
         rainbowDrawer.point(points);
     }
 
-    private void drawLinesBetweenParticles(RainbowDrawer rainbowDrawer) {
-        rainbowDrawer.strokeWeight(1);
-        rainbowDrawer.stroke(35, 3, 3, 60);
-        rainbowDrawer.line(points);
-    }
-
     private void setPointFor(int particleIndex) {
-        RVector particleLocation = particles.get(particleIndex).getLocation();
+        RVector particleLocation = particles[particleIndex].getLocation();
         points[particleIndex * 2] = particleLocation.x;
         points[particleIndex * 2 + 1] = particleLocation.y;
     }

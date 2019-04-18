@@ -1,6 +1,5 @@
 package com.juankysoriano.rainbow.core;
 
-import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.view.TextureView;
 import android.view.View;
@@ -12,12 +11,12 @@ import com.juankysoriano.rainbow.core.event.RainbowInputController;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics2D;
 
+import io.reactivex.Scheduler;
+import io.reactivex.schedulers.Schedulers;
+
 public class Rainbow {
-    private static final int DEFAULT_FRAME_RATE = 60;
-    private int frameRate = DEFAULT_FRAME_RATE;
+    private int frameRate = 60;
     private int frameCount;
-    private int vSyncRate = DEFAULT_FRAME_RATE;
-    private boolean vSync = false;
     private boolean surfaceReady;
     private int width;
     private int height;
@@ -31,27 +30,26 @@ public class Rainbow {
     private RainbowTextureView drawingView;
     private SetupSketchTask setupSketchTask;
     private RainbowTaskScheduler rainbowTaskScheduler;
+    private Scheduler setupScheduler;
 
     protected Rainbow(ViewGroup viewGroup) {
         this.rainbowDrawer = new RainbowDrawer();
         this.rainbowInputController = RainbowInputController.newInstance();
-        this.setupSketchTask = SetupSketchTask.newInstance(this);
+        this.setupSketchTask = new SetupSketchTask(this);
+        this.setupScheduler = Schedulers.newThread();
         injectInto(viewGroup);
     }
 
     protected Rainbow(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
         this.rainbowInputController = rainbowInputController;
         this.rainbowDrawer = rainbowDrawer;
-        this.setupSketchTask = SetupSketchTask.newInstance(this);
+        this.setupSketchTask = new SetupSketchTask(this);
+        this.setupScheduler = Schedulers.newThread();
     }
 
     protected Rainbow(ViewGroup viewGroup, RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
         this(rainbowDrawer, rainbowInputController);
         injectInto(viewGroup);
-    }
-
-    public Context getContext() {
-        return drawingView.getContext();
     }
 
     private void injectInto(ViewGroup viewGroup) {
@@ -91,7 +89,7 @@ public class Rainbow {
 
     private void setupSketch() {
         initDimensions();
-        setupSketchTask.start();
+        setupScheduler.scheduleDirect(setupSketchTask);
         isSetup = true;
         surfaceReady = true;
     }
@@ -151,7 +149,7 @@ public class Rainbow {
             paused = false;
             if (!hasScheduler()) {
                 rainbowTaskScheduler = RainbowTaskScheduler.newInstance(this);
-                rainbowTaskScheduler.scheduleAt(frameRate, vSyncRate);
+                rainbowTaskScheduler.scheduleAt(frameRate);
             }
         }
     }
@@ -194,10 +192,10 @@ public class Rainbow {
     }
 
     public void pause() {
-        if (!isPaused()) {
+        if (isResumed()) {
             paused = true;
             resumed = false;
-            shutDownExecutioner();
+            shutdownTasks();
             onDrawingPause();
         }
     }
@@ -214,18 +212,20 @@ public class Rainbow {
         if (!isStopped()) {
             pause();
             onDrawingStop();
-            setupSketchTask.cancel();
             stopped = true;
             started = false;
         }
     }
 
-    private void shutDownExecutioner() {
-        try {
+    private void shutdownTasks() {
+        if (rainbowTaskScheduler != null) {
             rainbowTaskScheduler.shutdown();
             rainbowTaskScheduler = null;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        }
+
+        if (setupScheduler != null) {
+            setupScheduler.shutdown();
+            setupScheduler = null;
         }
     }
 
@@ -302,32 +302,10 @@ public class Rainbow {
     }
 
     private void restart() {
-        if (!isPaused()) {
+        if (isResumed()) {
             pause();
             resume();
         }
-    }
-
-    public void vSync() {
-        vSync = true;
-        vSyncRate = DEFAULT_FRAME_RATE;
-        restart();
-    }
-
-    public void vSync(int vSyncRate) {
-        vSync = true;
-        this.vSyncRate = vSyncRate;
-        restart();
-    }
-
-    public void noVSync() {
-        vSync = false;
-        vSyncRate = DEFAULT_FRAME_RATE;
-        restart();
-    }
-
-    public boolean isVSync() {
-        return vSync;
     }
 
     public int getWidth() {

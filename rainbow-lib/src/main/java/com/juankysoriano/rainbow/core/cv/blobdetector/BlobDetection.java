@@ -2,13 +2,18 @@ package com.juankysoriano.rainbow.core.cv.blobdetector;
 
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;
 
+import java.util.concurrent.ThreadFactory;
+
+import io.reactivex.internal.schedulers.RxThreadFactory;
+import io.reactivex.internal.schedulers.SingleScheduler;
+
 /**
  * “It's still magic even if you know how it's done.”
  *
  * - Terry Pratchet, A Hat Full of Sky
  */
 public class BlobDetection {
-    private static final int DEFAULT_MAX_NUMBER_OF_BLOBS = 750;
+    private static final int DEFAULT_MAX_NUMBER_OF_BLOBS = 5000;
     private static final float MAX_ISO_VALUE = 3.0f * 255.0f;
 
     private final ThreadGroup threadGroup = new ThreadGroup("BLOB");
@@ -35,15 +40,16 @@ public class BlobDetection {
     }
 
     public void computeBlobs(final OnBlobDetectedCallback onBlobDetectedCallback) {
-        Thread thread = new Thread(threadGroup, new Runnable() {
+        ThreadFactory threadFactory = new RxThreadFactory("RainbowBlobDetectionSx", Thread.MAX_PRIORITY, true);
+        SingleScheduler scheduler = new SingleScheduler(threadFactory);
+        scheduler.scheduleDirect(new Runnable() {
             @Override
             public void run() {
                 luminanceMap.reset();
                 detectBlobs(onBlobDetectedCallback);
                 onBlobDetectedCallback.onBlobDetectionFinish();
             }
-        }, "blobDetection", 1024 * 1024);
-        thread.start();
+        });
     }
 
     private void detectBlobs(OnBlobDetectedCallback onBlobDetectedCallback) {

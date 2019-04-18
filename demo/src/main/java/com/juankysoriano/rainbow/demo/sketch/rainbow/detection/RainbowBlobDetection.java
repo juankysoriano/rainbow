@@ -16,13 +16,16 @@ import com.juankysoriano.rainbow.utils.RainbowMath;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
+import io.reactivex.Scheduler;
+import io.reactivex.internal.schedulers.IoScheduler;
+import io.reactivex.internal.schedulers.RxThreadFactory;
 
 public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallback {
 
     private static final int RESIZE_FACTOR = 2;
-    private static final int DEFAULT_ALPHA = 70;
+    private static final int[] ALPHAS = {70, 40, 20};
     private static final int MAX_ITERATIONS = 3;
     private static final float[] THRESHOLD_STEP = {0.09f, 0.045f, 0.0225f};
     private static final float[] MIN_DISCARD_BLOB_THRESHOLD = {0.125f, 0.015625f, 0.0005f};
@@ -34,13 +37,14 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     private BlobDetection blobDetection;
     private MediaPlayer mediaPlayer;
     private final List<Blob> blobList;
-    private final ExecutorService executor;
+    private final Scheduler scheduler;
 
     public RainbowBlobDetection(ViewGroup viewGroup) {
         super(viewGroup);
         blobList = new ArrayList<>();
         mediaPlayer = MediaPlayer.create(LibraryApplication.getContext(), R.raw.mozart);
-        executor = Executors.newSingleThreadExecutor();
+        ThreadFactory threadFactory = new RxThreadFactory("RainbowBlobDetection", Thread.MAX_PRIORITY, true);
+        scheduler = new IoScheduler(threadFactory);
     }
 
     @Override
@@ -49,9 +53,9 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         getRainbowDrawer().noFill();
         getRainbowDrawer().background(0, 0, 0);
         getRainbowDrawer().loadImage(R.drawable.gatito,
-                getWidth() / RESIZE_FACTOR,
-                getHeight() / RESIZE_FACTOR,
-                RainbowImage.LOAD_CENTER_CROP, new RainbowImage.LoadPictureListener() {
+                                     getWidth() / RESIZE_FACTOR,
+                                     getHeight() / RESIZE_FACTOR,
+                                     RainbowImage.LOAD_CENTER_CROP, new RainbowImage.LoadPictureListener() {
 
                     @Override
                     public void onLoadSucceed(RainbowImage image) {
@@ -66,7 +70,8 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
                     public void onLoadFail() {
                         //no-op
                     }
-                });
+                }
+        );
     }
 
     private void startNextBunchDetection() {
@@ -97,7 +102,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     }
 
     private void paintNextBlob() {
-        executor.execute(paintBlobTask);
+        scheduler.scheduleDirect(paintBlobTask);
     }
 
     private final Runnable paintBlobTask = new Runnable() {
@@ -124,8 +129,8 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     }
 
     private void paintBlob(Blob blob) {
-        for (int i = 0; i < blob.getEdgeCount(); i += 2) {
-            EdgeVertex start = blob.getEdgeVertex(i);
+        for (int i = 0; i < blob.getEdgeCount(); i++) {
+            EdgeVertex start = blob.getEdgeVertex(RainbowMath.random(blob.getEdgeCount()));
             EdgeVertex end = blob.getEdgeVertex(RainbowMath.random(blob.getEdgeCount()));
             drawLineWithDivisions(start, end, 2);
         }
@@ -190,7 +195,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         int x2 = (int) (end.x * getWidth());
         int y1 = (int) (start.y * getHeight());
         int y2 = (int) (end.y * getHeight());
-        rainbowDrawer.stroke(color, DEFAULT_ALPHA);
+        rainbowDrawer.stroke(color, ALPHAS[iteration]);
         rainbowDrawer.line(x1, y1, x2, y2);
     }
 
@@ -198,11 +203,11 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     public void onSketchDestroy() {
         releaseMediaPlayer();
         releaseBlobDetection();
-        executor.shutdown();
+        scheduler.shutdown();
     }
 
     private void releaseBlobDetection() {
-        if(blobDetection != null) {
+        if (blobDetection != null) {
             blobDetection.cancel();
             blobDetection = null;
         }

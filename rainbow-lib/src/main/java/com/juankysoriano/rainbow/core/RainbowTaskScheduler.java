@@ -1,65 +1,58 @@
 package com.juankysoriano.rainbow.core;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
+
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Scheduler;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.internal.schedulers.RxThreadFactory;
+import io.reactivex.internal.schedulers.SingleScheduler;
+
 class RainbowTaskScheduler {
-    private static final long TIMEOUT = 10;
-    private static final long SECOND = TimeUnit.SECONDS.toNanos(1);
-    private final ScheduledExecutorService drawingScheduler;
-    private final ScheduledExecutorService screenUpdateScheduler;
-    private final DrawingStepTask drawingStepTask;
-    private final ScreenUpdateTask screenUpdateTask;
+    private static final long SECOND = TimeUnit.SECONDS.toMillis(1);
+    private final DrawingTask.Step stepTask;
+    private final DrawingTask.Invalidate invalidateTask;
+    private final Scheduler scheduler;
+    private Disposable disposable;
 
     public static RainbowTaskScheduler newInstance(Rainbow rainbow) {
-        ScreenUpdate screenUpdate = new ScreenUpdate();
-        ScheduledExecutorService drawingScheduler = Executors.newSingleThreadScheduledExecutor();
-        DrawingStepTask drawingStepTask = new DrawingStepTask(rainbow, screenUpdate);
-        ScheduledExecutorService screenUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
-        ScreenUpdateTask screenUpdateTask = new ScreenUpdateTask(rainbow, screenUpdate);
-        return new RainbowTaskScheduler(drawingScheduler, drawingStepTask, screenUpdateScheduler, screenUpdateTask);
+        RainbowDrawer rainbowDrawer = rainbow.getRainbowDrawer();
+        DrawingTask.Step stepTask = new DrawingTask.Step(rainbow);
+        DrawingTask.Invalidate invalidateTask = new DrawingTask.Invalidate(rainbow, rainbowDrawer);
+        ThreadFactory threadFactory = new RxThreadFactory("RainbowDrawing", Thread.MAX_PRIORITY, true);
+        SingleScheduler scheduler = new SingleScheduler(threadFactory);
+        return new RainbowTaskScheduler(stepTask, invalidateTask, scheduler);
     }
 
-    private RainbowTaskScheduler(ScheduledExecutorService drawingScheduler,
-                                 DrawingStepTask drawingStepTask,
-                                 ScheduledExecutorService screenUpdateScheduler,
-                                 ScreenUpdateTask screenUpdateTask) {
-        this.drawingScheduler = drawingScheduler;
-        this.drawingStepTask = drawingStepTask;
-        this.screenUpdateScheduler = screenUpdateScheduler;
-        this.screenUpdateTask = screenUpdateTask;
+    private RainbowTaskScheduler(DrawingTask.Step stepTask,
+                                 DrawingTask.Invalidate invalidateTask,
+                                 Scheduler scheduler) {
+        this.stepTask = stepTask;
+        this.invalidateTask = invalidateTask;
+        this.scheduler = scheduler;
     }
 
-    void scheduleAt(int frameRate, int vSyncRate) {
-        drawingScheduler.scheduleAtFixedRate(drawingStepTask, SECOND, SECOND / frameRate, TimeUnit.NANOSECONDS);
-        screenUpdateScheduler.scheduleAtFixedRate(screenUpdateTask, SECOND, SECOND / vSyncRate, TimeUnit.NANOSECONDS);
+    void scheduleAt(int frameRate) {
+        if (isTerminated()) {
+            Disposable stepDisposable = scheduler.schedulePeriodicallyDirect(stepTask, SECOND, SECOND / frameRate, TimeUnit.MILLISECONDS);
+            Disposable invalidateDisposable = scheduler.schedulePeriodicallyDirect(invalidateTask, SECOND, SECOND / 60, TimeUnit.MILLISECONDS);
+            disposable = new CompositeDisposable(stepDisposable, invalidateDisposable);
+        }
+
     }
 
     boolean isTerminated() {
-        return drawingScheduler.isTerminated() && screenUpdateScheduler.isTerminated();
+        return disposable == null || disposable.isDisposed();
+
     }
 
-    void shutdown() throws InterruptedException {
-        drawingScheduler.shutdownNow();
-        drawingScheduler.awaitTermination(TIMEOUT, TimeUnit.SECONDS);
-        screenUpdateScheduler.shutdownNow();
-        screenUpdateScheduler.awaitTermination(TIMEOUT, TimeUnit.SECONDS);
-    }
-
-    static class ScreenUpdate {
-        private boolean pending;
-
-        void pending() {
-            pending = true;
-        }
-
-        boolean isPending() {
-            return pending;
-        }
-
-        void notPending() {
-            pending = false;
+    void shutdown() {
+        if (disposable != null) {
+            disposable.dispose();
         }
     }
+
 }
