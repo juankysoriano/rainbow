@@ -22,121 +22,113 @@
 
 package com.juankysoriano.rainbow.core.matrix;
 
-
 public interface RMatrix {
 
-    public void reset();
+    void reset();
 
     /**
      * Returns a copy of this PMatrix.
      */
-    public RMatrix get();
+    RMatrix get();
 
     /**
      * Copies the matrix contents into a float array.
      * If target is null (or not the correct size), a new array will be created.
      */
-    public float[] get(float[] target);
+    float[] get(float[] target);
 
-    public void set(RMatrix src);
+    void set(RMatrix src);
 
-    public void set(float[] source);
+    void set(float[] source);
 
-    public void set(float m00, float m01, float m02,
-                    float m10, float m11, float m12);
+    void set(float m00, float m01, float m02,
+             float m10, float m11, float m12);
 
-    public void set(float m00, float m01, float m02, float m03,
-                    float m10, float m11, float m12, float m13,
-                    float m20, float m21, float m22, float m23,
-                    float m30, float m31, float m32, float m33);
+    void set(float m00, float m01, float m02, float m03,
+             float m10, float m11, float m12, float m13,
+             float m20, float m21, float m22, float m23,
+             float m30, float m31, float m32, float m33);
 
-    public void translate(float tx, float ty);
+    void translate(float tx, float ty);
 
-    public void translate(float tx, float ty, float tz);
+    void translate(float tx, float ty, float tz);
 
-    public void rotate(float angle);
+    void rotate(float angle);
 
-    public void rotateX(float angle);
+    void rotateX(float angle);
 
-    public void rotateY(float angle);
+    void rotateY(float angle);
 
-    public void rotateZ(float angle);
+    void rotateZ(float angle);
 
-    public void rotate(float angle, float v0, float v1, float v2);
+    void rotate(float angle, float v0, float v1, float v2);
 
-    public void scale(float s);
+    void scale(float s);
 
-    public void scale(float sx, float sy);
+    void scale(float sx, float sy);
 
-    public void scale(float x, float y, float z);
+    void scale(float x, float y, float z);
 
-    public void shearX(float angle);
+    void shearX(float angle);
 
-    public void shearY(float angle);
+    void shearY(float angle);
 
     /**
      * Multiply this matrix by another.
      */
-    public void apply(RMatrix source);
+    void apply(RMatrix source);
 
-    public void apply(RMatrix2D source);
+    void apply(RMatrix2D source);
 
-    public void apply(RMatrix3D source);
+    void apply(RMatrix3D source);
 
-    public void apply(float n00, float n01, float n02,
-                      float n10, float n11, float n12);
+    void apply(float n00, float n01, float n02,
+               float n10, float n11, float n12);
 
-    public void apply(float n00, float n01, float n02, float n03,
-                      float n10, float n11, float n12, float n13,
-                      float n20, float n21, float n22, float n23,
-                      float n30, float n31, float n32, float n33);
+    void apply(float n00, float n01, float n02, float n03,
+               float n10, float n11, float n12, float n13,
+               float n20, float n21, float n22, float n23,
+               float n30, float n31, float n32, float n33);
 
     /**
      * Apply another matrix to the left of this one.
      */
-    public void preApply(RMatrix2D left);
+    void preApply(RMatrix2D left);
 
-    public void preApply(RMatrix3D left);
+    void preApply(RMatrix3D left);
 
-    public void preApply(float n00, float n01, float n02,
-                         float n10, float n11, float n12);
+    void preApply(float n00, float n01, float n02,
+                  float n10, float n11, float n12);
 
-    public void preApply(float n00, float n01, float n02, float n03,
-                         float n10, float n11, float n12, float n13,
-                         float n20, float n21, float n22, float n23,
-                         float n30, float n31, float n32, float n33);
+    void preApply(float n00, float n01, float n02, float n03,
+                  float n10, float n11, float n12, float n13,
+                  float n20, float n21, float n22, float n23,
+                  float n30, float n31, float n32, float n33);
 
     /**
      * Multiply a PVector by this matrix.
      */
-    public RVector mult(RVector source, RVector target);
+    RVector mult(RVector source, RVector target);
 
     /**
      * Multiply a multi-element vector against this matrix.
      */
-    public float[] mult(float[] source, float[] target);
-
-//  public float multX(float x, float y);
-//  public float multY(float x, float y);
-
-//  public float multX(float x, float y, float z);
-//  public float multY(float x, float y, float z);
-//  public float multZ(float x, float y, float z);  
+    float[] mult(float[] source, float[] target);
 
     /**
      * Transpose this matrix.
      */
-    public void transpose();
+    void transpose();
 
     /**
      * Invert this matrix.
      *
      * @return true if successful
      */
-    public boolean invert();
+    boolean invert();
 
     /**
      * @return the determinant of the matrix
      */
-    public float determinant();
+    float determinant();
 }

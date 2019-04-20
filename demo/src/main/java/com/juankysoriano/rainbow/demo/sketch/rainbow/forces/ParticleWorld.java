@@ -6,7 +6,7 @@ import com.juankysoriano.rainbow.core.matrix.RVector;
 
 class ParticleWorld {
 
-    private static final int NUMBER_PARTICLES = 200000;
+    private static final int NUMBER_PARTICLES = 150000;
     private static final int NUCLEUS_DIAMETER = 40;
     private static final float HALF = 0.5f;
 
@@ -46,7 +46,7 @@ class ParticleWorld {
 
         RainbowDrawer rainbowDrawer = rainbow.getRainbowDrawer();
         rainbowDrawer.strokeWeight(0);
-        rainbowDrawer.stroke(50);
+        rainbowDrawer.stroke(255, 70);
         rainbowDrawer.point(points);
     }
 

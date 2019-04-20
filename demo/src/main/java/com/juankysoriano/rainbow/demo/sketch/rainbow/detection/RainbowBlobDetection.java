@@ -50,6 +50,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     @Override
     public void onSketchSetup() {
         super.onSketchSetup();
+        getRainbowDrawer().smooth();
         getRainbowDrawer().noFill();
         getRainbowDrawer().background(0, 0, 0);
         getRainbowDrawer().loadImage(R.drawable.gatito,

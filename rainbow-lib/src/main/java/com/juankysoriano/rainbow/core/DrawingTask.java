@@ -6,7 +6,7 @@ interface DrawingTask extends Runnable {
     class Step implements DrawingTask {
         private final Rainbow rainbow;
 
-        public Step(Rainbow rainbow) {
+        Step(Rainbow rainbow) {
             this.rainbow = rainbow;
         }
 
@@ -22,7 +22,7 @@ interface DrawingTask extends Runnable {
         private final Rainbow rainbow;
         private final RainbowDrawer rainbowDrawer;
 
-        public Invalidate(Rainbow rainbow, RainbowDrawer rainbowDrawer) {
+        Invalidate(Rainbow rainbow, RainbowDrawer rainbowDrawer) {
             this.rainbow = rainbow;
             this.rainbowDrawer = rainbowDrawer;
         }
