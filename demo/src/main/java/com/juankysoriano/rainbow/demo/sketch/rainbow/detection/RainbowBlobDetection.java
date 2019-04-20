@@ -19,17 +19,17 @@ import java.util.List;
 import java.util.concurrent.ThreadFactory;
 
 import io.reactivex.Scheduler;
-import io.reactivex.internal.schedulers.IoScheduler;
+import io.reactivex.internal.schedulers.ComputationScheduler;
 import io.reactivex.internal.schedulers.RxThreadFactory;
 
 public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallback {
 
-    private static final int RESIZE_FACTOR = 2;
+    private static final int RESIZE_FACTOR = 1;
     private static final int[] ALPHAS = {70, 40, 20};
     private static final int MAX_ITERATIONS = 3;
-    private static final float[] THRESHOLD_STEP = {0.09f, 0.045f, 0.0225f};
-    private static final float[] MIN_DISCARD_BLOB_THRESHOLD = {0.125f, 0.015625f, 0.0005f};
-    private static final float[] MAX_DISCARD_BLOB_THRESHOLD = {1.0f, 0.125f, 0.015625f};
+    private static final float[] THRESHOLD_STEP = {0.09f / RESIZE_FACTOR, 0.045f / RESIZE_FACTOR, 0.0225f / RESIZE_FACTOR};
+    private static final float[] MIN_DISCARD_BLOB_THRESHOLD = {0.125f, 0.015625f, 0.00015f};
+    private static final float[] MAX_DISCARD_BLOB_THRESHOLD = {0.5f, 0.125f, 0.015625f};
     private float detectThreshold = 0.0f;
     private int iteration;
     private int painted = 0;
@@ -44,7 +44,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         blobList = new ArrayList<>();
         mediaPlayer = MediaPlayer.create(LibraryApplication.getContext(), R.raw.mozart);
         ThreadFactory threadFactory = new RxThreadFactory("RainbowBlobDetection", Thread.MAX_PRIORITY, true);
-        scheduler = new IoScheduler(threadFactory);
+        scheduler = new ComputationScheduler(threadFactory);
     }
 
     @Override
@@ -53,8 +53,8 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         getRainbowDrawer().noFill();
         getRainbowDrawer().background(0, 0, 0);
         getRainbowDrawer().loadImage(R.drawable.gatito,
-                                     getWidth() / RESIZE_FACTOR,
-                                     getHeight() / RESIZE_FACTOR,
+                                     (getWidth() / RESIZE_FACTOR),
+                                     (getHeight() / RESIZE_FACTOR),
                                      RainbowImage.LOAD_CENTER_CROP, new RainbowImage.LoadPictureListener() {
 
                     @Override
@@ -102,18 +102,21 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     }
 
     private void paintNextBlob() {
-        scheduler.scheduleDirect(paintBlobTask);
+        List<Blob> blobs = new ArrayList<>(blobList);
+        blobList.clear();
+        scheduler.scheduleDirect(paintBlobTask(blobs));
     }
 
-    private final Runnable paintBlobTask = new Runnable() {
-        @Override
-        public void run() {
-            if (!blobList.isEmpty()) {
-                Blob blob = blobList.remove(0);
-                paintBlob(blob);
+    private Runnable paintBlobTask(final List<Blob> blobs) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                for (Blob blob : blobs) {
+                    paintBlob(blob);
+                }
             }
-        }
-    };
+        };
+    }
 
     private void paintBackgroundLines() {
         for (int i = 0; i < 10; i++) {
@@ -129,10 +132,10 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     }
 
     private void paintBlob(Blob blob) {
-        for (int i = 0; i < blob.getEdgeCount(); i++) {
+        for (int i = 0; i < blob.getEdgeCount() / 2; i++) {
             EdgeVertex start = blob.getEdgeVertex(RainbowMath.random(blob.getEdgeCount()));
             EdgeVertex end = blob.getEdgeVertex(RainbowMath.random(blob.getEdgeCount()));
-            drawLineWithDivisions(start, end, 2);
+            drawLineWithDivisions(start, end, 3);
         }
     }
 

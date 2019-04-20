@@ -4,24 +4,22 @@ import com.juankysoriano.rainbow.core.graphics.RainbowImage;
 
 import java.util.concurrent.ThreadFactory;
 
-import io.reactivex.internal.schedulers.RxThreadFactory;
 import io.reactivex.internal.schedulers.SingleScheduler;
 
 /**
  * “It's still magic even if you know how it's done.”
- *
+ * <p>
  * - Terry Pratchet, A Hat Full of Sky
  */
 public class BlobDetection {
-    private static final int DEFAULT_MAX_NUMBER_OF_BLOBS = 5000;
-    private static final float MAX_ISO_VALUE = 3.0f * 255.0f;
+    private static final int DEFAULT_MAX_NUMBER_OF_BLOBS = 10000;
 
-    private final ThreadGroup threadGroup = new ThreadGroup("BLOB");
     private final int maxNumberOfBlobs;
     private final LuminanceMap luminanceMap;
 
     private int numberOfBlobsDetected;
-    private float luminanceThreshold;
+    private final SingleScheduler scheduler;
+    private boolean skipBlobDetection;
 
     public BlobDetection(RainbowImage rainbowImage) {
         this(rainbowImage, DEFAULT_MAX_NUMBER_OF_BLOBS);
@@ -30,18 +28,15 @@ public class BlobDetection {
     private BlobDetection(RainbowImage rainbowImage, int maxNumberOfBlobs) {
         this.luminanceMap = LuminanceMap.newInstance(rainbowImage);
         this.maxNumberOfBlobs = maxNumberOfBlobs;
+        ThreadFactory threadFactory = new BlobDetectionThreadFactory("blob detection");
+        scheduler = new SingleScheduler(threadFactory);
     }
 
     public void setThreshold(float value) {
-        if (value < 0 || value > 1) {
-            throw new IllegalArgumentException("Developer error, threshold should be a value between 0 and 1");
-        }
-        luminanceThreshold = value * MAX_ISO_VALUE;
+        luminanceMap.setThreshold(value);
     }
 
     public void computeBlobs(final OnBlobDetectedCallback onBlobDetectedCallback) {
-        ThreadFactory threadFactory = new RxThreadFactory("RainbowBlobDetectionSx", Thread.MAX_PRIORITY, true);
-        SingleScheduler scheduler = new SingleScheduler(threadFactory);
         scheduler.scheduleDirect(new Runnable() {
             @Override
             public void run() {
@@ -53,10 +48,10 @@ public class BlobDetection {
     }
 
     private void detectBlobs(OnBlobDetectedCallback onBlobDetectedCallback) {
-
         for (int x = 0; x < luminanceMap.getWidth(); x++) {
             for (int y = 0; y < luminanceMap.getHeight(); y++) {
                 if (hasToDetectMoreBlobs()) {
+                    skipBlobDetection = false;
                     findBlobAt(x, y, onBlobDetectedCallback);
                 } else {
                     return;
@@ -70,7 +65,7 @@ public class BlobDetection {
     }
 
     private void findBlobAt(int x, int y, OnBlobDetectedCallback onBlobDetectedCallback) {
-        if (isVisited(x, y) || !isBlobEdge(x, y)) {
+        if (luminanceMap.isVisited(x, y) || !isBlobEdge(x, y)) {
             return;
         }
 
@@ -83,24 +78,24 @@ public class BlobDetection {
         }
     }
 
-    private boolean isVisited(int x, int y) {
-        return luminanceMap.isVisited(x, y);
-    }
-
-    private void maskAsVisited(int x, int y) {
-        luminanceMap.visit(x, y);
-    }
-
     private void findVertexes(final Blob newBlob, final int x, final int y) {
-        if (isVisited(x, y)) {
+        if (skipBlobDetection || luminanceMap.isVisited(x, y)) {
             return;
         }
 
-        maskAsVisited(x, y);
+        luminanceMap.visit(x, y);
 
-        if(isBlobEdge(x, y)) {
+        if (isBlobEdge(x, y)) {
             addVertexToBlob(newBlob, x, y);
-            infallibleExploreNeighbours(newBlob, x, y);
+            safeExploreNeighbours(newBlob, x, y);
+        }
+    }
+
+    private void safeExploreNeighbours(Blob newBlob, int x, int y) {
+        try {
+            exploreNeighbours(newBlob, x, y);
+        } catch (StackOverflowError error) {
+            skipBlobDetection = true;
         }
     }
 
@@ -108,14 +103,6 @@ public class BlobDetection {
         float edgeX = x / (float) luminanceMap.getWidth();
         float edgeY = y / (float) luminanceMap.getHeight();
         newBlob.addEdgeVertex(new EdgeVertex(edgeX, edgeY));
-    }
-
-    private void infallibleExploreNeighbours(Blob newBlob, int x, int y) {
-        try {
-            exploreNeighbours(newBlob, x, y);
-        } catch (StackOverflowError e) {
-            exploreNeighbours(newBlob, x, y);
-        }
     }
 
     private void exploreNeighbours(Blob newBlob, int x, int y) {
@@ -126,10 +113,10 @@ public class BlobDetection {
     }
 
     private boolean isBlobEdge(int x, int y) {
-        boolean isLeftPixelInsideBlob = isInsideBlob(x - 1, y);
-        boolean isRightPixelInsideBlob = isInsideBlob(x + 1, y);
-        boolean isUpPixelInsideBlob = isInsideBlob(x, y - 1);
-        boolean isDownPixelInsideBlob = isInsideBlob(x, y + 1);
+        boolean isLeftPixelInsideBlob = luminanceMap.isInsideBlob(x - 1, y);
+        boolean isRightPixelInsideBlob = luminanceMap.isInsideBlob(x + 1, y);
+        boolean isUpPixelInsideBlob = luminanceMap.isInsideBlob(x, y - 1);
+        boolean isDownPixelInsideBlob = luminanceMap.isInsideBlob(x, y + 1);
         boolean allNeighboursInsideBlob = isLeftPixelInsideBlob && isRightPixelInsideBlob && isUpPixelInsideBlob && isDownPixelInsideBlob;
         boolean noNeighbourInsideBlob = !isLeftPixelInsideBlob && !isRightPixelInsideBlob && !isUpPixelInsideBlob && !isDownPixelInsideBlob;
 
@@ -139,12 +126,8 @@ public class BlobDetection {
         return !noNeighbourInsideBlob && !allNeighboursInsideBlob;
     }
 
-    private boolean isInsideBlob(int x, int y) {
-        return luminanceMap.getLuminanceAt(x, y) <= luminanceThreshold;
-    }
-
     public void cancel() {
-        threadGroup.interrupt();
+        scheduler.shutdown();
     }
 
 }
