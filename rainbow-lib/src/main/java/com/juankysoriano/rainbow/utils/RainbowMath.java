@@ -55,39 +55,39 @@ public abstract class RainbowMath {
     private static int float_nf_left, float_nf_right;
     private static boolean float_nf_commas;
 
-    public static float abs(final float n) {
+    public static float abs( float n) {
         return (n < 0) ? -n : n;
     }
 
-    public static int abs(final int n) {
+    public static int abs( int n) {
         return (n < 0) ? -n : n;
     }
 
-    public static float log(final float a) {
+    public static float log( float a) {
         return (float) Math.log(a);
     }
 
-    public static float exp(final float a) {
+    public static float exp( float a) {
         return (float) Math.exp(a);
     }
 
-    public static float pow(final float a, final float b) {
+    public static float pow( float a,  float b) {
         return (float) Math.pow(a, b);
     }
 
-    public static int max(final int a, final int b) {
+    public static int max( int a,  int b) {
         return (a > b) ? a : b;
     }
 
-    public static float max(final float a, final float b) {
+    public static float max( float a,  float b) {
         return (a > b) ? a : b;
     }
 
-    public static int max(final int a, final int b, final int c) {
+    public static int max( int a,  int b,  int c) {
         return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
     }
 
-    public static float max(final float a, final float b, final float c) {
+    public static float max( float a,  float b,  float c) {
         return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
     }
 
@@ -98,7 +98,7 @@ public abstract class RainbowMath {
      * @param list the source array
      * @return The maximum value
      */
-    public static final int max(final int[] list) {
+    public static  int max( int[] list) {
         if (list.length == 0) {
             throw new ArrayIndexOutOfBoundsException(RainbowMath.ERROR_MIN_MAX);
         }
@@ -118,7 +118,7 @@ public abstract class RainbowMath {
      * @param list the source array
      * @return The maximum value
      */
-    public static final float max(final float[] list) {
+    public static  float max( float[] list) {
         if (list.length == 0) {
             throw new ArrayIndexOutOfBoundsException(RainbowMath.ERROR_MIN_MAX);
         }
@@ -131,19 +131,19 @@ public abstract class RainbowMath {
         return max;
     }
 
-    public static final int min(final int a, final int b) {
+    public static  int min( int a,  int b) {
         return (a < b) ? a : b;
     }
 
-    public static final float min(final float a, final float b) {
+    public static  float min( float a,  float b) {
         return (a < b) ? a : b;
     }
 
-    public static final int min(final int a, final int b, final int c) {
+    public static  int min( int a,  int b,  int c) {
         return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
     }
 
-    public static final float min(final float a, final float b, final float c) {
+    public static  float min( float a,  float b,  float c) {
         return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
     }
 
@@ -154,7 +154,7 @@ public abstract class RainbowMath {
      * @param list the source array
      * @return The minimum value
      */
-    public static final int min(final int[] list) {
+    public static  int min( int[] list) {
         if (list.length == 0) {
             throw new ArrayIndexOutOfBoundsException(RainbowMath.ERROR_MIN_MAX);
         }
@@ -174,7 +174,7 @@ public abstract class RainbowMath {
      * @param list the source array
      * @return The minimum value
      */
-    public static final float min(final float[] list) {
+    public static  float min( float[] list) {
         if (list.length == 0) {
             throw new ArrayIndexOutOfBoundsException(RainbowMath.ERROR_MIN_MAX);
         }
@@ -187,52 +187,52 @@ public abstract class RainbowMath {
         return min;
     }
 
-    public static final int constrain(final int amt, final int low, final int high) {
+    public static  int constrain( int amt,  int low,  int high) {
         return (amt < low) ? low : ((amt > high) ? high : amt);
     }
 
     // ////////////////////////////////////////////////////////////
 
-    public static final float constrain(final float amt, final float low, final float high) {
+    public static  float constrain( float amt,  float low,  float high) {
         return (amt < low) ? low : ((amt > high) ? high : amt);
     }
 
-    public static final float sin(final float angle) {
+    public static  float sin( float angle) {
         return (float) Math.sin(angle);
     }
 
     // ////////////////////////////////////////////////////////////
     // getting the time
 
-    public static final float cos(final float angle) {
+    public static  float cos( float angle) {
         return (float) Math.cos(angle);
     }
 
-    public static final float tan(final float angle) {
+    public static  float tan( float angle) {
         return (float) Math.tan(angle);
     }
 
-    public static final float asin(final float value) {
+    public static  float asin( float value) {
         return (float) Math.asin(value);
     }
 
-    public static final float acos(final float value) {
+    public static  float acos( float value) {
         return (float) Math.acos(value);
     }
 
-    public static final float atan(final float value) {
+    public static  float atan( float value) {
         return (float) Math.atan(value);
     }
 
-    public static final float atan2(final float a, final float b) {
+    public static  float atan2( float a,  float b) {
         return (float) Math.atan2(a, b);
     }
 
-    public static final float degrees(final float radians) {
+    public static  float degrees( float radians) {
         return radians * RAD_TO_DEG;
     }
 
-    public static final float radians(final float degrees) {
+    public static  float radians( float degrees) {
         return degrees * DEG_TO_RAD;
     }
 
@@ -240,47 +240,47 @@ public abstract class RainbowMath {
 
     // controlling time (playing god)
 
-    public static final int ceil(final float what) {
+    public static  int ceil( float what) {
         return (int) Math.ceil(what);
     }
 
-    public static final int floor(final float what) {
+    public static  int floor( float what) {
         return (int) Math.floor(what);
     }
 
     // ////////////////////////////////////////////////////////////
 
-    public static final int round(final float what) {
+    public static  int round( float what) {
         return Math.round(what);
     }
 
-    public static final float mag(final float a, final float b) {
+    public static  float mag( float a,  float b) {
         return (float) Math.sqrt((a * a) + (b * b));
     }
 
-    public static final float mag(final float a, final float b, final float c) {
+    public static  float mag( float a,  float b,  float c) {
         return (float) Math.sqrt((a * a) + (b * b) + (c * c));
     }
 
-    public static final float dist(final float x1, final float y1, final float x2, final float y2) {
+    public static  float dist( float x1,  float y1,  float x2,  float y2) {
         return RainbowMath.sqrt(RainbowMath.sq(x2 - x1) + RainbowMath.sq(y2 - y1));
     }
 
-    public static final float sqrt(final float a) {
+    public static  float sqrt( float a) {
         return (float) Math.sqrt(a);
     }
 
     // ////////////////////////////////////////////////////////////
 
-    public static final float sq(final float a) {
+    public static  float sq( float a) {
         return a * a;
     }
 
-    public static final float dist(final float x1, final float y1, final float z1, final float x2, final float y2, final float z2) {
+    public static  float dist( float x1,  float y1,  float z1,  float x2,  float y2,  float z2) {
         return RainbowMath.sqrt(RainbowMath.sq(x2 - x1) + RainbowMath.sq(y2 - y1) + RainbowMath.sq(z2 - z1));
     }
 
-    public static final float lerp(final float start, final float stop, final float amt) {
+    public static  float lerp( float start,  float stop,  float amt) {
         return start + ((stop - start) * amt);
     }
 
@@ -289,7 +289,7 @@ public abstract class RainbowMath {
      * the opposite of lerp(), figures out what proportion a particular value is
      * relative to start and stop coordinates.
      */
-    public static final float norm(final float value, final float start, final float stop) {
+    public static  float norm( float value,  float start,  float stop) {
         return (value - start) / (stop - start);
     }
 
@@ -297,88 +297,88 @@ public abstract class RainbowMath {
      * Convenience function to map a variable from one coordinate space to
      * another. Equivalent to unlerp() followed by lerp().
      */
-    public static final float map(final float value, final float istart, final float istop, final float ostart, final float ostop) {
+    public static  float map( float value,  float istart,  float istop,  float ostart,  float ostop) {
         return ostart + ((ostop - ostart) * ((value - istart) / (istop - istart)));
     }
 
     // ////////////////////////////////////////////////////////////
 
-    public static byte[] sort(final byte what[]) {
+    public static byte[] sort( byte what[]) {
         return RainbowMath.sort(what, what.length);
     }
 
-    public static byte[] sort(final byte[] what, final int count) {
-        final byte[] outgoing = new byte[what.length];
+    public static byte[] sort( byte[] what,  int count) {
+         byte[] outgoing = new byte[what.length];
         System.arraycopy(what, 0, outgoing, 0, what.length);
         Arrays.sort(outgoing, 0, count);
         return outgoing;
     }
 
-    public static char[] sort(final char what[]) {
+    public static char[] sort( char what[]) {
         return RainbowMath.sort(what, what.length);
     }
 
-    public static char[] sort(final char[] what, final int count) {
-        final char[] outgoing = new char[what.length];
+    public static char[] sort( char[] what,  int count) {
+         char[] outgoing = new char[what.length];
         System.arraycopy(what, 0, outgoing, 0, what.length);
         Arrays.sort(outgoing, 0, count);
         return outgoing;
     }
 
-    public static int[] sort(final int what[]) {
+    public static int[] sort( int what[]) {
         return RainbowMath.sort(what, what.length);
     }
 
-    public static int[] sort(final int[] what, final int count) {
-        final int[] outgoing = new int[what.length];
+    public static int[] sort( int[] what,  int count) {
+         int[] outgoing = new int[what.length];
         System.arraycopy(what, 0, outgoing, 0, what.length);
         Arrays.sort(outgoing, 0, count);
         return outgoing;
     }
 
-    public static float[] sort(final float what[]) {
+    public static float[] sort( float what[]) {
         return RainbowMath.sort(what, what.length);
     }
 
-    public static float[] sort(final float[] what, final int count) {
-        final float[] outgoing = new float[what.length];
+    public static float[] sort( float[] what,  int count) {
+         float[] outgoing = new float[what.length];
         System.arraycopy(what, 0, outgoing, 0, what.length);
         Arrays.sort(outgoing, 0, count);
         return outgoing;
     }
 
-    public static String[] sort(final String what[]) {
+    public static String[] sort( String what[]) {
         return RainbowMath.sort(what, what.length);
     }
 
-    public static String[] sort(final String[] what, final int count) {
-        final String[] outgoing = new String[what.length];
+    public static String[] sort( String[] what,  int count) {
+         String[] outgoing = new String[what.length];
         System.arraycopy(what, 0, outgoing, 0, what.length);
         Arrays.sort(outgoing, 0, count);
         return outgoing;
     }
 
-    public static boolean[] expand(final boolean list[]) {
+    public static boolean[] expand( boolean list[]) {
         return RainbowMath.expand(list, list.length << 1);
     }
 
-    public static boolean[] expand(final boolean list[], final int newSize) {
-        final boolean temp[] = new boolean[newSize];
+    public static boolean[] expand( boolean list[],  int newSize) {
+         boolean temp[] = new boolean[newSize];
         System.arraycopy(list, 0, temp, 0, Math.min(newSize, list.length));
         return temp;
     }
 
-    public static byte[] expand(final byte list[]) {
+    public static byte[] expand( byte list[]) {
         return RainbowMath.expand(list, list.length << 1);
     }
 
-    public static byte[] expand(final byte list[], final int newSize) {
-        final byte temp[] = new byte[newSize];
+    public static byte[] expand( byte list[],  int newSize) {
+         byte temp[] = new byte[newSize];
         System.arraycopy(list, 0, temp, 0, Math.min(newSize, list.length));
         return temp;
     }
 
-    public static char[] expand(final char list[]) {
+    public static char[] expand( char list[]) {
         return RainbowMath.expand(list, list.length << 1);
     }
 
@@ -400,215 +400,215 @@ public abstract class RainbowMath {
     // doubles are overkill for processing applets, and casting
     // things all the time is annoying, thus the functions below.
 
-    public static char[] expand(final char list[], final int newSize) {
-        final char temp[] = new char[newSize];
+    public static char[] expand( char list[],  int newSize) {
+         char temp[] = new char[newSize];
         System.arraycopy(list, 0, temp, 0, Math.min(newSize, list.length));
         return temp;
     }
 
-    public static int[] expand(final int list[]) {
+    public static int[] expand( int list[]) {
         return RainbowMath.expand(list, list.length << 1);
     }
 
-    public static int[] expand(final int list[], final int newSize) {
-        final int temp[] = new int[newSize];
+    public static int[] expand( int list[],  int newSize) {
+         int temp[] = new int[newSize];
         System.arraycopy(list, 0, temp, 0, Math.min(newSize, list.length));
         return temp;
     }
 
-    public static RainbowImage[] expand(final RainbowImage list[]) {
+    public static RainbowImage[] expand( RainbowImage list[]) {
         return RainbowMath.expand(list, list.length << 1);
     }
 
-    public static RainbowImage[] expand(final RainbowImage list[], final int newSize) {
-        final RainbowImage temp[] = new RainbowImage[newSize];
+    public static RainbowImage[] expand( RainbowImage list[],  int newSize) {
+         RainbowImage temp[] = new RainbowImage[newSize];
         System.arraycopy(list, 0, temp, 0, Math.min(newSize, list.length));
         return temp;
     }
 
-    public static float[] expand(final float list[]) {
+    public static float[] expand( float list[]) {
         return RainbowMath.expand(list, list.length << 1);
     }
 
-    public static float[] expand(final float list[], final int newSize) {
-        final float temp[] = new float[newSize];
+    public static float[] expand( float list[],  int newSize) {
+         float temp[] = new float[newSize];
         System.arraycopy(list, 0, temp, 0, Math.min(newSize, list.length));
         return temp;
     }
 
-    public static String[] expand(final String list[]) {
+    public static String[] expand( String list[]) {
         return RainbowMath.expand(list, list.length << 1);
     }
 
-    public static String[] expand(final String list[], final int newSize) {
-        final String temp[] = new String[newSize];
+    public static String[] expand( String list[],  int newSize) {
+         String temp[] = new String[newSize];
         // in case the new size is smaller than list.length
         System.arraycopy(list, 0, temp, 0, Math.min(newSize, list.length));
         return temp;
     }
 
-    public static Object expand(final Object array) {
+    public static Object expand( Object array) {
         return RainbowMath.expand(array, Array.getLength(array) << 1);
     }
 
-    public static Object expand(final Object list, final int newSize) {
-        final Class<?> type = list.getClass().getComponentType();
-        final Object temp = Array.newInstance(type, newSize);
+    public static Object expand( Object list,  int newSize) {
+         Class<?> type = list.getClass().getComponentType();
+         Object temp = Array.newInstance(type, newSize);
         System.arraycopy(list, 0, temp, 0, Math.min(Array.getLength(list), newSize));
         return temp;
     }
 
-    public static byte[] append(byte b[], final byte value) {
+    public static byte[] append(byte b[],  byte value) {
         b = RainbowMath.expand(b, b.length + 1);
         b[b.length - 1] = value;
         return b;
     }
 
-    public static char[] append(char b[], final char value) {
+    public static char[] append(char b[],  char value) {
         b = RainbowMath.expand(b, b.length + 1);
         b[b.length - 1] = value;
         return b;
     }
 
-    public static int[] append(int b[], final int value) {
+    public static int[] append(int b[],  int value) {
         b = RainbowMath.expand(b, b.length + 1);
         b[b.length - 1] = value;
         return b;
     }
 
-    public static float[] append(float b[], final float value) {
+    public static float[] append(float b[],  float value) {
         b = RainbowMath.expand(b, b.length + 1);
         b[b.length - 1] = value;
         return b;
     }
 
-    public static String[] append(String b[], final String value) {
+    public static String[] append(String b[],  String value) {
         b = RainbowMath.expand(b, b.length + 1);
         b[b.length - 1] = value;
         return b;
     }
 
-    public static Object append(Object b, final Object value) {
-        final int length = Array.getLength(b);
+    public static Object append(Object b,  Object value) {
+         int length = Array.getLength(b);
         b = RainbowMath.expand(b, length + 1);
         Array.set(b, length, value);
         return b;
     }
 
-    public static boolean[] shorten(final boolean list[]) {
+    public static boolean[] shorten( boolean list[]) {
         return RainbowMath.subset(list, 0, list.length - 1);
     }
 
-    public static boolean[] subset(final boolean list[], final int start, final int count) {
-        final boolean output[] = new boolean[count];
+    public static boolean[] subset( boolean list[],  int start,  int count) {
+         boolean output[] = new boolean[count];
         System.arraycopy(list, start, output, 0, count);
         return output;
     }
 
-    public static byte[] shorten(final byte list[]) {
+    public static byte[] shorten( byte list[]) {
         return RainbowMath.subset(list, 0, list.length - 1);
     }
 
-    public static byte[] subset(final byte list[], final int start, final int count) {
-        final byte output[] = new byte[count];
+    public static byte[] subset( byte list[],  int start,  int count) {
+         byte output[] = new byte[count];
         System.arraycopy(list, start, output, 0, count);
         return output;
     }
 
-    public static char[] shorten(final char list[]) {
+    public static char[] shorten( char list[]) {
         return RainbowMath.subset(list, 0, list.length - 1);
     }
 
-    public static char[] subset(final char list[], final int start, final int count) {
-        final char output[] = new char[count];
+    public static char[] subset( char list[],  int start,  int count) {
+         char output[] = new char[count];
         System.arraycopy(list, start, output, 0, count);
         return output;
     }
 
-    public static int[] shorten(final int list[]) {
+    public static int[] shorten( int list[]) {
         return RainbowMath.subset(list, 0, list.length - 1);
     }
 
-    public static int[] subset(final int list[], final int start, final int count) {
-        final int output[] = new int[count];
+    public static int[] subset( int list[],  int start,  int count) {
+         int output[] = new int[count];
         System.arraycopy(list, start, output, 0, count);
         return output;
     }
 
-    public static float[] shorten(final float list[]) {
+    public static float[] shorten( float list[]) {
         return RainbowMath.subset(list, 0, list.length - 1);
     }
 
-    public static float[] subset(final float list[], final int start, final int count) {
-        final float output[] = new float[count];
+    public static float[] subset( float list[],  int start,  int count) {
+         float output[] = new float[count];
         System.arraycopy(list, start, output, 0, count);
         return output;
     }
 
-    public static String[] shorten(final String list[]) {
+    public static String[] shorten( String list[]) {
         return RainbowMath.subset(list, 0, list.length - 1);
     }
 
-    public static String[] subset(final String list[], final int start, final int count) {
-        final String output[] = new String[count];
+    public static String[] subset( String list[],  int start,  int count) {
+         String output[] = new String[count];
         System.arraycopy(list, start, output, 0, count);
         return output;
     }
 
-    public static Object shorten(final Object list) {
-        final int length = Array.getLength(list);
+    public static Object shorten( Object list) {
+         int length = Array.getLength(list);
         return RainbowMath.subset(list, 0, length - 1);
     }
 
-    public static Object subset(final Object list, final int start, final int count) {
-        final Class<?> type = list.getClass().getComponentType();
-        final Object outgoing = Array.newInstance(type, count);
+    public static Object subset( Object list,  int start,  int count) {
+         Class<?> type = list.getClass().getComponentType();
+         Object outgoing = Array.newInstance(type, count);
         System.arraycopy(list, start, outgoing, 0, count);
         return outgoing;
     }
 
-    static final public boolean[] splice(final boolean list[], final boolean v, final int index) {
-        final boolean outgoing[] = new boolean[list.length + 1];
+    static  public boolean[] splice( boolean list[],  boolean v,  int index) {
+         boolean outgoing[] = new boolean[list.length + 1];
         System.arraycopy(list, 0, outgoing, 0, index);
         outgoing[index] = v;
         System.arraycopy(list, index, outgoing, index + 1, list.length - index);
         return outgoing;
     }
 
-    static final public boolean[] splice(final boolean list[], final boolean v[], final int index) {
-        final boolean outgoing[] = new boolean[list.length + v.length];
+    static  public boolean[] splice( boolean list[],  boolean v[],  int index) {
+         boolean outgoing[] = new boolean[list.length + v.length];
         System.arraycopy(list, 0, outgoing, 0, index);
         System.arraycopy(v, 0, outgoing, index, v.length);
         System.arraycopy(list, index, outgoing, index + v.length, list.length - index);
         return outgoing;
     }
 
-    static final public byte[] splice(final byte list[], final byte v, final int index) {
-        final byte outgoing[] = new byte[list.length + 1];
+    static  public byte[] splice( byte list[],  byte v,  int index) {
+         byte outgoing[] = new byte[list.length + 1];
         System.arraycopy(list, 0, outgoing, 0, index);
         outgoing[index] = v;
         System.arraycopy(list, index, outgoing, index + 1, list.length - index);
         return outgoing;
     }
 
-    static final public byte[] splice(final byte list[], final byte v[], final int index) {
-        final byte outgoing[] = new byte[list.length + v.length];
+    static  public byte[] splice( byte list[],  byte v[],  int index) {
+         byte outgoing[] = new byte[list.length + v.length];
         System.arraycopy(list, 0, outgoing, 0, index);
         System.arraycopy(v, 0, outgoing, index, v.length);
         System.arraycopy(list, index, outgoing, index + v.length, list.length - index);
         return outgoing;
     }
 
-    static final public char[] splice(final char list[], final char v, final int index) {
-        final char outgoing[] = new char[list.length + 1];
+    static  public char[] splice( char list[],  char v,  int index) {
+         char outgoing[] = new char[list.length + 1];
         System.arraycopy(list, 0, outgoing, 0, index);
         outgoing[index] = v;
         System.arraycopy(list, index, outgoing, index + 1, list.length - index);
         return outgoing;
     }
 
-    static final public char[] splice(final char list[], final char v[], final int index) {
-        final char outgoing[] = new char[list.length + v.length];
+    static  public char[] splice( char list[],  char v[],  int index) {
+         char outgoing[] = new char[list.length + v.length];
         System.arraycopy(list, 0, outgoing, 0, index);
         System.arraycopy(v, 0, outgoing, index, v.length);
         System.arraycopy(list, index, outgoing, index + v.length, list.length - index);
@@ -619,32 +619,32 @@ public abstract class RainbowMath {
 
     // RANDOM NUMBERS
 
-    static final public int[] splice(final int list[], final int v, final int index) {
-        final int outgoing[] = new int[list.length + 1];
+    static  public int[] splice( int list[],  int v,  int index) {
+         int outgoing[] = new int[list.length + 1];
         System.arraycopy(list, 0, outgoing, 0, index);
         outgoing[index] = v;
         System.arraycopy(list, index, outgoing, index + 1, list.length - index);
         return outgoing;
     }
 
-    static final public int[] splice(final int list[], final int v[], final int index) {
-        final int outgoing[] = new int[list.length + v.length];
+    static  public int[] splice( int list[],  int v[],  int index) {
+         int outgoing[] = new int[list.length + v.length];
         System.arraycopy(list, 0, outgoing, 0, index);
         System.arraycopy(v, 0, outgoing, index, v.length);
         System.arraycopy(list, index, outgoing, index + v.length, list.length - index);
         return outgoing;
     }
 
-    static final public float[] splice(final float list[], final float v, final int index) {
-        final float outgoing[] = new float[list.length + 1];
+    static  public float[] splice( float list[],  float v,  int index) {
+         float outgoing[] = new float[list.length + 1];
         System.arraycopy(list, 0, outgoing, 0, index);
         outgoing[index] = v;
         System.arraycopy(list, index, outgoing, index + 1, list.length - index);
         return outgoing;
     }
 
-    static final public float[] splice(final float list[], final float v[], final int index) {
-        final float outgoing[] = new float[list.length + v.length];
+    static  public float[] splice( float list[],  float v[],  int index) {
+         float outgoing[] = new float[list.length + v.length];
         System.arraycopy(list, 0, outgoing, 0, index);
         System.arraycopy(v, 0, outgoing, index, v.length);
         System.arraycopy(list, index, outgoing, index + v.length, list.length - index);
@@ -666,29 +666,29 @@ public abstract class RainbowMath {
     // implementation by the german demo group farbrausch
     // as used in their demo "art": http://www.farb-rausch.de/fr010src.zip
 
-    static final public String[] splice(final String list[], final String v, final int index) {
-        final String outgoing[] = new String[list.length + 1];
+    static  public String[] splice( String list[],  String v,  int index) {
+         String outgoing[] = new String[list.length + 1];
         System.arraycopy(list, 0, outgoing, 0, index);
         outgoing[index] = v;
         System.arraycopy(list, index, outgoing, index + 1, list.length - index);
         return outgoing;
     }
 
-    static final public String[] splice(final String list[], final String v[], final int index) {
-        final String outgoing[] = new String[list.length + v.length];
+    static  public String[] splice( String list[],  String v[],  int index) {
+         String outgoing[] = new String[list.length + v.length];
         System.arraycopy(list, 0, outgoing, 0, index);
         System.arraycopy(v, 0, outgoing, index, v.length);
         System.arraycopy(list, index, outgoing, index + v.length, list.length - index);
         return outgoing;
     }
 
-    static final public Object splice(final Object list, final Object v, final int index) {
+    static  public Object splice( Object list,  Object v,  int index) {
         Object[] outgoing = null;
-        final int length = Array.getLength(list);
+         int length = Array.getLength(list);
 
         // check whether item being spliced in is an array
         if (v.getClass().getName().charAt(0) == '[') {
-            final int vlength = Array.getLength(v);
+             int vlength = Array.getLength(v);
             outgoing = new Object[length + vlength];
             System.arraycopy(list, 0, outgoing, 0, index);
             System.arraycopy(v, 0, outgoing, index, vlength);
@@ -703,65 +703,65 @@ public abstract class RainbowMath {
         return outgoing;
     }
 
-    public static boolean[] subset(final boolean list[], final int start) {
+    public static boolean[] subset( boolean list[],  int start) {
         return RainbowMath.subset(list, start, list.length - start);
     }
 
-    public static byte[] subset(final byte list[], final int start) {
+    public static byte[] subset( byte list[],  int start) {
         return RainbowMath.subset(list, start, list.length - start);
     }
 
-    public static char[] subset(final char list[], final int start) {
+    public static char[] subset( char list[],  int start) {
         return RainbowMath.subset(list, start, list.length - start);
     }
 
-    public static int[] subset(final int list[], final int start) {
+    public static int[] subset( int list[],  int start) {
         return RainbowMath.subset(list, start, list.length - start);
     }
 
-    public static float[] subset(final float list[], final int start) {
+    public static float[] subset( float list[],  int start) {
         return RainbowMath.subset(list, start, list.length - start);
     }
 
-    public static String[] subset(final String list[], final int start) {
+    public static String[] subset( String list[],  int start) {
         return RainbowMath.subset(list, start, list.length - start);
     }
 
-    public static Object subset(final Object list, final int start) {
-        final int length = Array.getLength(list);
+    public static Object subset( Object list,  int start) {
+         int length = Array.getLength(list);
         return RainbowMath.subset(list, start, length - start);
     }
 
-    public static boolean[] concat(final boolean a[], final boolean b[]) {
-        final boolean c[] = new boolean[a.length + b.length];
+    public static boolean[] concat( boolean a[],  boolean b[]) {
+         boolean c[] = new boolean[a.length + b.length];
         System.arraycopy(a, 0, c, 0, a.length);
         System.arraycopy(b, 0, c, a.length, b.length);
         return c;
     }
 
-    public static byte[] concat(final byte a[], final byte b[]) {
-        final byte c[] = new byte[a.length + b.length];
+    public static byte[] concat( byte a[],  byte b[]) {
+         byte c[] = new byte[a.length + b.length];
         System.arraycopy(a, 0, c, 0, a.length);
         System.arraycopy(b, 0, c, a.length, b.length);
         return c;
     }
 
-    public static char[] concat(final char a[], final char b[]) {
-        final char c[] = new char[a.length + b.length];
+    public static char[] concat( char a[],  char b[]) {
+         char c[] = new char[a.length + b.length];
         System.arraycopy(a, 0, c, 0, a.length);
         System.arraycopy(b, 0, c, a.length, b.length);
         return c;
     }
 
-    public static int[] concat(final int a[], final int b[]) {
-        final int c[] = new int[a.length + b.length];
+    public static int[] concat( int a[],  int b[]) {
+         int c[] = new int[a.length + b.length];
         System.arraycopy(a, 0, c, 0, a.length);
         System.arraycopy(b, 0, c, a.length, b.length);
         return c;
     }
 
-    public static float[] concat(final float a[], final float b[]) {
-        final float c[] = new float[a.length + b.length];
+    public static float[] concat( float a[],  float b[]) {
+         float c[] = new float[a.length + b.length];
         System.arraycopy(a, 0, c, 0, a.length);
         System.arraycopy(b, 0, c, a.length, b.length);
         return c;
@@ -772,81 +772,81 @@ public abstract class RainbowMath {
     // for different levels of detail. lower values will produce
     // smoother results as higher octaves are surpressed
 
-    public static String[] concat(final String a[], final String b[]) {
-        final String c[] = new String[a.length + b.length];
+    public static String[] concat( String a[],  String b[]) {
+         String c[] = new String[a.length + b.length];
         System.arraycopy(a, 0, c, 0, a.length);
         System.arraycopy(b, 0, c, a.length, b.length);
         return c;
     }
 
-    public static Object concat(final Object a, final Object b) {
-        final Class<?> type = a.getClass().getComponentType();
-        final int alength = Array.getLength(a);
-        final int blength = Array.getLength(b);
-        final Object outgoing = Array.newInstance(type, alength + blength);
+    public static Object concat( Object a,  Object b) {
+         Class<?> type = a.getClass().getComponentType();
+         int alength = Array.getLength(a);
+         int blength = Array.getLength(b);
+         Object outgoing = Array.newInstance(type, alength + blength);
         System.arraycopy(a, 0, outgoing, 0, alength);
         System.arraycopy(b, 0, outgoing, alength, blength);
         return outgoing;
     }
 
-    public static boolean[] reverse(final boolean list[]) {
-        final boolean outgoing[] = new boolean[list.length];
-        final int length1 = list.length - 1;
+    public static boolean[] reverse( boolean list[]) {
+         boolean outgoing[] = new boolean[list.length];
+         int length1 = list.length - 1;
         for (int i = 0; i < list.length; i++) {
             outgoing[i] = list[length1 - i];
         }
         return outgoing;
     }
 
-    public static byte[] reverse(final byte list[]) {
-        final byte outgoing[] = new byte[list.length];
-        final int length1 = list.length - 1;
+    public static byte[] reverse( byte list[]) {
+         byte outgoing[] = new byte[list.length];
+         int length1 = list.length - 1;
         for (int i = 0; i < list.length; i++) {
             outgoing[i] = list[length1 - i];
         }
         return outgoing;
     }
 
-    public static char[] reverse(final char list[]) {
-        final char outgoing[] = new char[list.length];
-        final int length1 = list.length - 1;
+    public static char[] reverse( char list[]) {
+         char outgoing[] = new char[list.length];
+         int length1 = list.length - 1;
         for (int i = 0; i < list.length; i++) {
             outgoing[i] = list[length1 - i];
         }
         return outgoing;
     }
 
-    public static int[] reverse(final int list[]) {
-        final int outgoing[] = new int[list.length];
-        final int length1 = list.length - 1;
+    public static int[] reverse( int list[]) {
+         int outgoing[] = new int[list.length];
+         int length1 = list.length - 1;
         for (int i = 0; i < list.length; i++) {
             outgoing[i] = list[length1 - i];
         }
         return outgoing;
     }
 
-    public static float[] reverse(final float list[]) {
-        final float outgoing[] = new float[list.length];
-        final int length1 = list.length - 1;
+    public static float[] reverse( float list[]) {
+         float outgoing[] = new float[list.length];
+         int length1 = list.length - 1;
         for (int i = 0; i < list.length; i++) {
             outgoing[i] = list[length1 - i];
         }
         return outgoing;
     }
 
-    public static String[] reverse(final String list[]) {
-        final String outgoing[] = new String[list.length];
-        final int length1 = list.length - 1;
+    public static String[] reverse( String list[]) {
+         String outgoing[] = new String[list.length];
+         int length1 = list.length - 1;
         for (int i = 0; i < list.length; i++) {
             outgoing[i] = list[length1 - i];
         }
         return outgoing;
     }
 
-    public static Object reverse(final Object list) {
-        final Class<?> type = list.getClass().getComponentType();
-        final int length = Array.getLength(list);
-        final Object outgoing = Array.newInstance(type, length);
+    public static Object reverse( Object list) {
+         Class<?> type = list.getClass().getComponentType();
+         int length = Array.getLength(list);
+         Object outgoing = Array.newInstance(type, length);
         for (int i = 0; i < length; i++) {
             Array.set(outgoing, i, Array.get(list, (length - 1) - i));
         }
@@ -857,7 +857,7 @@ public abstract class RainbowMath {
      * Remove whitespace characters from the beginning and ending of a String.
      * Works like String.trim() but includes the unicode nbsp character as well.
      */
-    public static String trim(final String str) {
+    public static String trim( String str) {
         return str.replace('\u00A0', ' ').trim();
     }
 
@@ -865,8 +865,8 @@ public abstract class RainbowMath {
      * Trim the whitespace from a String array. This returns a new array and
      * does not affect the passed-in array.
      */
-    public static String[] trim(final String[] array) {
-        final String[] outgoing = new String[array.length];
+    public static String[] trim( String[] array) {
+         String[] outgoing = new String[array.length];
         for (int i = 0; i < array.length; i++) {
             if (array[i] != null) {
                 outgoing[i] = array[i].replace('\u00A0', ' ').trim();
@@ -879,7 +879,7 @@ public abstract class RainbowMath {
      * Join an array of Strings together as a single String, separated by the
      * whatever's passed in for the separator.
      */
-    public static String join(final String str[], final char separator) {
+    public static String join( String str[],  char separator) {
         return RainbowMath.join(str, String.valueOf(separator));
     }
 
@@ -896,8 +896,8 @@ public abstract class RainbowMath {
      * // list is now &quot;apple, bear, cat&quot;
      * </PRE>
      */
-    public static String join(final String str[], final String separator) {
-        final StringBuffer buffer = new StringBuffer();
+    public static String join( String str[],  String separator) {
+         StringBuffer buffer = new StringBuffer();
         for (int i = 0; i < str.length; i++) {
             if (i != 0) {
                 buffer.append(separator);
@@ -928,9 +928,9 @@ public abstract class RainbowMath {
      * i.e. splitTokens("a   | b", WHITESPACE + "|");  ->  { "a", "b" }
      * </PRE>
      */
-    public static String[] splitTokens(final String what, final String delim) {
-        final StringTokenizer toker = new StringTokenizer(what, delim);
-        final String pieces[] = new String[toker.countTokens()];
+    public static String[] splitTokens( String what,  String delim) {
+         StringTokenizer toker = new StringTokenizer(what, delim);
+         String pieces[] = new String[toker.countTokens()];
 
         int index = 0;
         while (toker.hasMoreTokens()) {
@@ -948,7 +948,7 @@ public abstract class RainbowMath {
      * string (""). This way, one can split on tab characters, but maintain the
      * column alignments (of say an excel file) where there are empty columns.
      */
-    public static String[] split(final String what, final char delim) {
+    public static String[] split( String what,  char delim) {
         // do this so that the exception occurs inside the user's
         // program, rather than appearing to be a bug inside split()
         if (what == null) {
@@ -956,7 +956,7 @@ public abstract class RainbowMath {
             // return split(what, String.valueOf(delim)); // huh
         }
 
-        final char chars[] = what.toCharArray();
+         char chars[] = what.toCharArray();
         int splitCount = 0; // 1;
         for (int i = 0; i < chars.length; i++) {
             if (chars[i] == delim) {
@@ -970,12 +970,12 @@ public abstract class RainbowMath {
         // on second thought, i don't agree with this, will disable
         // }
         if (splitCount == 0) {
-            final String splits[] = new String[1];
+             String splits[] = new String[1];
             splits[0] = new String(what);
             return splits;
         }
         // int pieceCount = splitCount + 1;
-        final String splits[] = new String[splitCount + 1];
+         String splits[] = new String[splitCount + 1];
         int splitIndex = 0;
         int startIndex = 0;
         for (int i = 0; i < chars.length; i++) {
@@ -996,8 +996,8 @@ public abstract class RainbowMath {
      * confusing than necessary, and String.split() is always available for
      * those who want regexp.
      */
-    public static String[] split(final String what, final String delim) {
-        final ArrayList<String> items = new ArrayList<String>();
+    public static String[] split( String what,  String delim) {
+         ArrayList<String> items = new ArrayList<String>();
         int index;
         int offset = 0;
         while ((index = what.indexOf(delim, offset)) != -1) {
@@ -1005,7 +1005,7 @@ public abstract class RainbowMath {
             offset = index + delim.length();
         }
         items.add(what.substring(offset));
-        final String[] outgoing = new String[items.size()];
+         String[] outgoing = new String[items.size()];
         items.toArray(outgoing);
         return outgoing;
     }
@@ -1020,12 +1020,12 @@ public abstract class RainbowMath {
      * of any lines found in the source, and the . operator will also pick up
      * newline characters.
      */
-    public static String[] match(final String what, final String regexp) {
-        final Pattern p = RainbowMath.matchPattern(regexp);
-        final Matcher m = p.matcher(what);
+    public static String[] match( String what,  String regexp) {
+         Pattern p = RainbowMath.matchPattern(regexp);
+         Matcher m = p.matcher(what);
         if (m.find()) {
-            final int count = m.groupCount() + 1;
-            final String[] groups = new String[count];
+             int count = m.groupCount() + 1;
+             String[] groups = new String[count];
             for (int i = 0; i < count; i++) {
                 groups[i] = m.group(i);
             }
@@ -1034,7 +1034,7 @@ public abstract class RainbowMath {
         return null;
     }
 
-    static Pattern matchPattern(final String regexp) {
+    static Pattern matchPattern( String regexp) {
         Pattern p = null;
         if (RainbowMath.matchPatterns == null) {
             RainbowMath.matchPatterns = new HashMap<String, Pattern>();
@@ -1067,13 +1067,13 @@ public abstract class RainbowMath {
      * Identical to match(), except that it returns an array of all matches in
      * the specified String, rather than just the first.
      */
-    public static String[][] matchAll(final String what, final String regexp) {
-        final Pattern p = RainbowMath.matchPattern(regexp);
-        final Matcher m = p.matcher(what);
-        final ArrayList<String[]> results = new ArrayList<String[]>();
-        final int count = m.groupCount() + 1;
+    public static String[][] matchAll( String what,  String regexp) {
+         Pattern p = RainbowMath.matchPattern(regexp);
+         Matcher m = p.matcher(what);
+         ArrayList<String[]> results = new ArrayList<String[]>();
+         int count = m.groupCount() + 1;
         while (m.find()) {
-            final String[] groups = new String[count];
+             String[] groups = new String[count];
             for (int i = 0; i < count; i++) {
                 groups[i] = m.group(i);
             }
@@ -1082,7 +1082,7 @@ public abstract class RainbowMath {
         if (results.isEmpty()) {
             return null;
         }
-        final String[][] matches = new String[results.size()][count];
+         String[][] matches = new String[results.size()][count];
         for (int i = 0; i < matches.length; i++) {
             matches[i] = results.get(i);
         }
@@ -1101,7 +1101,7 @@ public abstract class RainbowMath {
      *
      * @return false if 0, true if any other number
      */
-    static final public boolean parseBoolean(final int what) {
+    static  public boolean parseBoolean( int what) {
         return (what != 0);
     }
 
@@ -1110,7 +1110,7 @@ public abstract class RainbowMath {
      *
      * @return true if 'what' is "true" or "TRUE", false otherwise
      */
-    static final public boolean parseBoolean(final String what) {
+    static  public boolean parseBoolean( String what) {
         return Boolean.valueOf(what);
     }
 
@@ -1121,8 +1121,8 @@ public abstract class RainbowMath {
      *
      * @return array of boolean elements
      */
-    static final public boolean[] parseBoolean(final byte what[]) {
-        final boolean outgoing[] = new boolean[what.length];
+    static  public boolean[] parseBoolean( byte what[]) {
+         boolean outgoing[] = new boolean[what.length];
         for (int i = 0; i < what.length; i++) {
             outgoing[i] = (what[i] != 0);
         }
@@ -1135,50 +1135,50 @@ public abstract class RainbowMath {
      *
      * @return array of boolean elements
      */
-    static final public boolean[] parseBoolean(final int what[]) {
-        final boolean outgoing[] = new boolean[what.length];
+    static  public boolean[] parseBoolean( int what[]) {
+         boolean outgoing[] = new boolean[what.length];
         for (int i = 0; i < what.length; i++) {
             outgoing[i] = (what[i] != 0);
         }
         return outgoing;
     }
 
-    static final public boolean[] parseBoolean(final String what[]) {
-        final boolean outgoing[] = new boolean[what.length];
+    static  public boolean[] parseBoolean( String what[]) {
+         boolean outgoing[] = new boolean[what.length];
         for (int i = 0; i < what.length; i++) {
             outgoing[i] = new Boolean(what[i]).booleanValue();
         }
         return outgoing;
     }
 
-    static final public byte parseByte(final boolean what) {
+    static  public byte parseByte( boolean what) {
         return what ? (byte) 1 : 0;
     }
 
     // FONT I/O
 
-    static final public byte parseByte(final char what) {
+    static  public byte parseByte( char what) {
         return (byte) what;
     }
 
-    static final public byte parseByte(final int what) {
+    static  public byte parseByte( int what) {
         return (byte) what;
     }
 
-    static final public byte parseByte(final float what) {
+    static  public byte parseByte( float what) {
         return (byte) what;
     }
 
-    static final public byte[] parseByte(final boolean what[]) {
-        final byte outgoing[] = new byte[what.length];
+    static  public byte[] parseByte( boolean what[]) {
+         byte outgoing[] = new byte[what.length];
         for (int i = 0; i < what.length; i++) {
             outgoing[i] = what[i] ? (byte) 1 : 0;
         }
         return outgoing;
     }
 
-    static final public byte[] parseByte(final char what[]) {
-        final byte outgoing[] = new byte[what.length];
+    static  public byte[] parseByte( char what[]) {
+         byte outgoing[] = new byte[what.length];
         for (int i = 0; i < what.length; i++) {
             outgoing[i] = (byte) what[i];
         }
@@ -1189,40 +1189,40 @@ public abstract class RainbowMath {
 
     // READERS AND WRITERS
 
-    static final public byte[] parseByte(final int what[]) {
-        final byte outgoing[] = new byte[what.length];
+    static  public byte[] parseByte( int what[]) {
+         byte outgoing[] = new byte[what.length];
         for (int i = 0; i < what.length; i++) {
             outgoing[i] = (byte) what[i];
         }
         return outgoing;
     }
 
-    static final public byte[] parseByte(final float what[]) {
-        final byte outgoing[] = new byte[what.length];
+    static  public byte[] parseByte( float what[]) {
+         byte outgoing[] = new byte[what.length];
         for (int i = 0; i < what.length; i++) {
             outgoing[i] = (byte) what[i];
         }
         return outgoing;
     }
 
-    static final public char parseChar(final byte what) {
+    static  public char parseChar( byte what) {
         return (char) (what & 0xff);
     }
 
-    static final public char parseChar(final int what) {
+    static  public char parseChar( int what) {
         return (char) what;
     }
 
-    static final public char[] parseChar(final byte what[]) {
-        final char outgoing[] = new char[what.length];
+    static  public char[] parseChar( byte what[]) {
+         char outgoing[] = new char[what.length];
         for (int i = 0; i < what.length; i++) {
             outgoing[i] = (char) (what[i] & 0xff);
         }
         return outgoing;
     }
 
-    static final public char[] parseChar(final int what[]) {
-        final char outgoing[] = new char[what.length];
+    static  public char[] parseChar( int what[]) {
+         char outgoing[] = new char[what.length];
         for (int i = 0; i < what.length; i++) {
             outgoing[i] = (char) what[i];
         }
@@ -1233,14 +1233,14 @@ public abstract class RainbowMath {
 
     // FILE INPUT
 
-    static final public int parseInt(final boolean what) {
+    static  public int parseInt( boolean what) {
         return what ? 1 : 0;
     }
 
     /**
      * Note that parseInt() will un-sign a signed byte value.
      */
-    static final public int parseInt(final byte what) {
+    static  public int parseInt( byte what) {
         return what & 0xff;
     }
 
@@ -1249,21 +1249,21 @@ public abstract class RainbowMath {
      * return 5, but the ascii value. This is because ((int) someChar) returns
      * the ascii value, and parseInt() is just longhand for the cast.
      */
-    static final public int parseInt(final char what) {
+    static  public int parseInt( char what) {
         return what;
     }
 
     /**
      * Same as floor(), or an (int) cast.
      */
-    static final public int parseInt(final float what) {
+    static  public int parseInt( float what) {
         return (int) what;
     }
 
     /**
      * Parse a String into an int value. Returns 0 if the value is bad.
      */
-    static final public int parseInt(final String what) {
+    static  public int parseInt( String what) {
         return RainbowMath.parseInt(what, 0);
     }
 
@@ -1271,45 +1271,45 @@ public abstract class RainbowMath {
      * Parse a String to an int, and provide an alternate value that should be
      * used when the number is invalid.
      */
-    static final public int parseInt(final String what, final int otherwise) {
+    static  public int parseInt( String what,  int otherwise) {
         try {
-            final int offset = what.indexOf('.');
+             int offset = what.indexOf('.');
             if (offset == -1) {
                 return Integer.parseInt(what);
             } else {
                 return Integer.parseInt(what.substring(0, offset));
             }
-        } catch (final NumberFormatException e) {
+        } catch ( NumberFormatException e) {
         }
         return otherwise;
     }
 
-    static final public int[] parseInt(final boolean what[]) {
-        final int list[] = new int[what.length];
+    static  public int[] parseInt( boolean what[]) {
+         int list[] = new int[what.length];
         for (int i = 0; i < what.length; i++) {
             list[i] = what[i] ? 1 : 0;
         }
         return list;
     }
 
-    static final public int[] parseInt(final byte what[]) { // note this unsigns
-        final int list[] = new int[what.length];
+    static  public int[] parseInt( byte what[]) { // note this unsigns
+         int list[] = new int[what.length];
         for (int i = 0; i < what.length; i++) {
             list[i] = (what[i] & 0xff);
         }
         return list;
     }
 
-    static final public int[] parseInt(final char what[]) {
-        final int list[] = new int[what.length];
+    static  public int[] parseInt( char what[]) {
+         int list[] = new int[what.length];
         for (int i = 0; i < what.length; i++) {
             list[i] = what[i];
         }
         return list;
     }
 
-    public static int[] parseInt(final float what[]) {
-        final int inties[] = new int[what.length];
+    public static int[] parseInt( float what[]) {
+         int inties[] = new int[what.length];
         for (int i = 0; i < what.length; i++) {
             inties[i] = (int) what[i];
         }
@@ -1328,7 +1328,7 @@ public abstract class RainbowMath {
      * <p/>
      * numbers will contain { 1, 300, 44 }
      */
-    public static int[] parseInt(final String what[]) {
+    public static int[] parseInt( String what[]) {
         return RainbowMath.parseInt(what, 0);
     }
 
@@ -1342,12 +1342,12 @@ public abstract class RainbowMath {
      * <p/>
      * numbers will contain { 1, 300, 9999, 44 }
      */
-    public static int[] parseInt(final String what[], final int missing) {
-        final int output[] = new int[what.length];
+    public static int[] parseInt( String what[],  int missing) {
+         int output[] = new int[what.length];
         for (int i = 0; i < what.length; i++) {
             try {
                 output[i] = Integer.parseInt(what[i]);
-            } catch (final NumberFormatException e) {
+            } catch ( NumberFormatException e) {
                 output[i] = missing;
             }
         }
@@ -1358,49 +1358,49 @@ public abstract class RainbowMath {
      * Convert an int to a float value. Also handles bytes because of Java's
      * rules for upgrading values.
      */
-    static final public float parseFloat(final int what) { // also handles byte
+    static  public float parseFloat( int what) { // also handles byte
         return what;
     }
 
-    static final public float parseFloat(final String what) {
+    static  public float parseFloat( String what) {
         return RainbowMath.parseFloat(what, Float.NaN);
     }
 
-    static final public float parseFloat(final String what, final float otherwise) {
+    static  public float parseFloat( String what,  float otherwise) {
         try {
             return new Float(what).floatValue();
-        } catch (final NumberFormatException e) {
+        } catch ( NumberFormatException e) {
         }
 
         return otherwise;
     }
 
-    static final public float[] parseByte(final byte what[]) {
-        final float floaties[] = new float[what.length];
+    static  public float[] parseByte( byte what[]) {
+         float floaties[] = new float[what.length];
         for (int i = 0; i < what.length; i++) {
             floaties[i] = what[i];
         }
         return floaties;
     }
 
-    static final public float[] parseFloat(final int what[]) {
-        final float floaties[] = new float[what.length];
+    static  public float[] parseFloat( int what[]) {
+         float floaties[] = new float[what.length];
         for (int i = 0; i < what.length; i++) {
             floaties[i] = what[i];
         }
         return floaties;
     }
 
-    static final public float[] parseFloat(final String what[]) {
+    static  public float[] parseFloat( String what[]) {
         return RainbowMath.parseFloat(what, Float.NaN);
     }
 
-    static final public float[] parseFloat(final String what[], final float missing) {
-        final float output[] = new float[what.length];
+    static  public float[] parseFloat( String what[],  float missing) {
+         float output[] = new float[what.length];
         for (int i = 0; i < what.length; i++) {
             try {
                 output[i] = new Float(what[i]).floatValue();
-            } catch (final NumberFormatException e) {
+            } catch ( NumberFormatException e) {
                 output[i] = missing;
             }
         }
@@ -1409,62 +1409,62 @@ public abstract class RainbowMath {
 
     //
 
-    static final public String str(final boolean x) {
+    static  public String str( boolean x) {
         return String.valueOf(x);
     }
 
-    static final public String str(final byte x) {
+    static  public String str( byte x) {
         return String.valueOf(x);
     }
 
-    static final public String str(final char x) {
+    static  public String str( char x) {
         return String.valueOf(x);
     }
 
     // ////////////////////////////////////////////////////////////
 
-    static final public String str(final int x) {
+    static  public String str( int x) {
         return String.valueOf(x);
     }
 
-    static final public String str(final float x) {
+    static  public String str( float x) {
         return String.valueOf(x);
     }
 
-    static final public String[] str(final boolean x[]) {
-        final String s[] = new String[x.length];
+    static  public String[] str( boolean x[]) {
+         String s[] = new String[x.length];
         for (int i = 0; i < x.length; i++) {
             s[i] = String.valueOf(x[i]);
         }
         return s;
     }
 
-    static final public String[] str(final byte x[]) {
-        final String s[] = new String[x.length];
+    static  public String[] str( byte x[]) {
+         String s[] = new String[x.length];
         for (int i = 0; i < x.length; i++) {
             s[i] = String.valueOf(x[i]);
         }
         return s;
     }
 
-    static final public String[] str(final char x[]) {
-        final String s[] = new String[x.length];
+    static  public String[] str( char x[]) {
+         String s[] = new String[x.length];
         for (int i = 0; i < x.length; i++) {
             s[i] = String.valueOf(x[i]);
         }
         return s;
     }
 
-    static final public String[] str(final int x[]) {
-        final String s[] = new String[x.length];
+    static  public String[] str( int x[]) {
+         String s[] = new String[x.length];
         for (int i = 0; i < x.length; i++) {
             s[i] = String.valueOf(x[i]);
         }
         return s;
     }
 
-    static final public String[] str(final float x[]) {
-        final String s[] = new String[x.length];
+    static  public String[] str( float x[]) {
+         String s[] = new String[x.length];
         for (int i = 0; i < x.length; i++) {
             s[i] = String.valueOf(x[i]);
         }
@@ -1475,15 +1475,15 @@ public abstract class RainbowMath {
 
     // URL ENCODING
 
-    public static String[] nf(final int num[], final int digits) {
-        final String formatted[] = new String[num.length];
+    public static String[] nf( int num[],  int digits) {
+         String formatted[] = new String[num.length];
         for (int i = 0; i < formatted.length; i++) {
             formatted[i] = RainbowMath.nf(num[i], digits);
         }
         return formatted;
     }
 
-    public static String nf(final int num, final int digits) {
+    public static String nf( int num,  int digits) {
         if ((RainbowMath.int_nf != null) && (RainbowMath.int_nf_digits == digits) && !RainbowMath.int_nf_commas) {
             return RainbowMath.int_nf.format(num);
         }
@@ -1499,15 +1499,15 @@ public abstract class RainbowMath {
     // ////////////////////////////////////////////////////////////
     // SORT
 
-    public static String[] nfc(final int num[]) {
-        final String formatted[] = new String[num.length];
+    public static String[] nfc( int num[]) {
+         String formatted[] = new String[num.length];
         for (int i = 0; i < formatted.length; i++) {
             formatted[i] = RainbowMath.nfc(num[i]);
         }
         return formatted;
     }
 
-    public static String nfc(final int num) {
+    public static String nfc( int num) {
         if ((RainbowMath.int_nf != null) && (RainbowMath.int_nf_digits == 0) && RainbowMath.int_nf_commas) {
             return RainbowMath.int_nf.format(num);
         }
@@ -1520,8 +1520,8 @@ public abstract class RainbowMath {
         return RainbowMath.int_nf.format(num);
     }
 
-    public static String[] nfs(final int num[], final int digits) {
-        final String formatted[] = new String[num.length];
+    public static String[] nfs( int num[],  int digits) {
+         String formatted[] = new String[num.length];
         for (int i = 0; i < formatted.length; i++) {
             formatted[i] = RainbowMath.nfs(num[i], digits);
         }
@@ -1533,12 +1533,12 @@ public abstract class RainbowMath {
      * in the front when it's positive so that it can be properly aligned with
      * numbers that have a negative sign in front of them.
      */
-    public static String nfs(final int num, final int digits) {
+    public static String nfs( int num,  int digits) {
         return (num < 0) ? RainbowMath.nf(num, digits) : (' ' + RainbowMath.nf(num, digits));
     }
 
-    public static String[] nfp(final int num[], final int digits) {
-        final String formatted[] = new String[num.length];
+    public static String[] nfp( int num[],  int digits) {
+         String formatted[] = new String[num.length];
         for (int i = 0; i < formatted.length; i++) {
             formatted[i] = RainbowMath.nfp(num[i], digits);
         }
@@ -1549,19 +1549,19 @@ public abstract class RainbowMath {
      * number format positive (or plus) Formats a number, always placing a - or
      * + sign in the front when it's negative or positive.
      */
-    public static String nfp(final int num, final int digits) {
+    public static String nfp( int num,  int digits) {
         return (num < 0) ? RainbowMath.nf(num, digits) : ('+' + RainbowMath.nf(num, digits));
     }
 
-    public static String[] nf(final float num[], final int left, final int right) {
-        final String formatted[] = new String[num.length];
+    public static String[] nf( float num[],  int left,  int right) {
+         String formatted[] = new String[num.length];
         for (int i = 0; i < formatted.length; i++) {
             formatted[i] = RainbowMath.nf(num[i], left, right);
         }
         return formatted;
     }
 
-    public static String nf(final float num, final int left, final int right) {
+    public static String nf( float num,  int left,  int right) {
         if ((RainbowMath.float_nf != null) && (RainbowMath.float_nf_left == left) && (RainbowMath.float_nf_right == right) && !RainbowMath.float_nf_commas) {
             return RainbowMath.float_nf.format(num);
         }
@@ -1582,15 +1582,15 @@ public abstract class RainbowMath {
         return RainbowMath.float_nf.format(num);
     }
 
-    public static String[] nfc(final float num[], final int right) {
-        final String formatted[] = new String[num.length];
+    public static String[] nfc( float num[],  int right) {
+         String formatted[] = new String[num.length];
         for (int i = 0; i < formatted.length; i++) {
             formatted[i] = RainbowMath.nfc(num[i], right);
         }
         return formatted;
     }
 
-    public static String nfc(final float num, final int right) {
+    public static String nfc( float num,  int right) {
         if ((RainbowMath.float_nf != null) && (RainbowMath.float_nf_left == 0) && (RainbowMath.float_nf_right == right) && RainbowMath.float_nf_commas) {
             return RainbowMath.float_nf.format(num);
         }
@@ -1615,20 +1615,20 @@ public abstract class RainbowMath {
      * Number formatter that takes into account whether the number has a sign
      * (positive, negative, etc) in front of it.
      */
-    public static String[] nfs(final float num[], final int left, final int right) {
-        final String formatted[] = new String[num.length];
+    public static String[] nfs( float num[],  int left,  int right) {
+         String formatted[] = new String[num.length];
         for (int i = 0; i < formatted.length; i++) {
             formatted[i] = RainbowMath.nfs(num[i], left, right);
         }
         return formatted;
     }
 
-    public static String nfs(final float num, final int left, final int right) {
+    public static String nfs( float num,  int left,  int right) {
         return (num < 0) ? RainbowMath.nf(num, left, right) : (' ' + RainbowMath.nf(num, left, right));
     }
 
-    public static String[] nfp(final float num[], final int left, final int right) {
-        final String formatted[] = new String[num.length];
+    public static String[] nfp( float num[],  int left,  int right) {
+         String formatted[] = new String[num.length];
         for (int i = 0; i < formatted.length; i++) {
             formatted[i] = RainbowMath.nfp(num[i], left, right);
         }
@@ -1637,14 +1637,14 @@ public abstract class RainbowMath {
 
     //
 
-    public static String nfp(final float num, final int left, final int right) {
+    public static String nfp( float num,  int left,  int right) {
         return (num < 0) ? RainbowMath.nf(num, left, right) : ('+' + RainbowMath.nf(num, left, right));
     }
 
     /**
      * Convert a byte into a two digit hex string.
      */
-    static public String hex(final byte what) {
+    static public String hex( byte what) {
         return RainbowMath.hex(what, 2);
     }
 
@@ -1655,13 +1655,13 @@ public abstract class RainbowMath {
      * @param digits the number of digits (maximum 8)
      * @return a String object with the formatted values
      */
-    static public String hex(final int what, int digits) {
-        final String stuff = Integer.toHexString(what).toUpperCase();
+    static public String hex( int what, int digits) {
+         String stuff = Integer.toHexString(what).toUpperCase();
         if (digits > 8) {
             digits = 8;
         }
 
-        final int length = stuff.length();
+         int length = stuff.length();
         if (length > digits) {
             return stuff.substring(length - digits);
 
@@ -1674,18 +1674,18 @@ public abstract class RainbowMath {
     /**
      * Convert a Unicode character into a four digit hex string.
      */
-    static public String hex(final char what) {
+    static public String hex( char what) {
         return RainbowMath.hex(what, 4);
     }
 
     /**
      * Convert an integer into an eight digit hex string.
      */
-    static public String hex(final int what) {
+    static public String hex( int what) {
         return RainbowMath.hex(what, 8);
     }
 
-    static public int unhex(final String what) {
+    static public int unhex( String what) {
         // has to parse as a Long so that it'll work for numbers bigger than
         // 2^31
         return (int) (Long.parseLong(what, 16));
@@ -1695,7 +1695,7 @@ public abstract class RainbowMath {
      * Returns a String that contains the binary value of a byte. The returned
      * value will always have 8 digits.
      */
-    static public String binary(final byte what) {
+    static public String binary( byte what) {
         return RainbowMath.binary(what, 8);
     }
 
@@ -1703,18 +1703,18 @@ public abstract class RainbowMath {
      * Returns a String that contains the binary value of an int. The digits
      * parameter determines how many digits will be used.
      */
-    static public String binary(final int what, int digits) {
-        final String stuff = Integer.toBinaryString(what);
+    static public String binary( int what, int digits) {
+         String stuff = Integer.toBinaryString(what);
         if (digits > 32) {
             digits = 32;
         }
 
-        final int length = stuff.length();
+         int length = stuff.length();
         if (length > digits) {
             return stuff.substring(length - digits);
 
         } else if (length < digits) {
-            final int offset = 32 - (digits - length);
+             int offset = 32 - (digits - length);
             return "00000000000000000000000000000000".substring(offset) + stuff;
         }
         return stuff;
@@ -1724,7 +1724,7 @@ public abstract class RainbowMath {
      * Returns a String that contains the binary value of a char. The returned
      * value will always have 16 digits because chars are two bytes long.
      */
-    static public String binary(final char what) {
+    static public String binary( char what) {
         return RainbowMath.binary(what, 16);
     }
 
@@ -1733,7 +1733,7 @@ public abstract class RainbowMath {
      * depends on the size of the number itself. If you want a specific number
      * of digits use binary(int what, int digits) to specify how many.
      */
-    static public String binary(final int what) {
+    static public String binary( int what) {
         return RainbowMath.binary(what, 32);
     }
 
@@ -1741,7 +1741,7 @@ public abstract class RainbowMath {
      * Unpack a binary String into an int. i.e. unbinary("00001000") would
      * return 8.
      */
-    static public int unbinary(final String what) {
+    static public int unbinary( String what) {
         return Integer.parseInt(what, 2);
     }
 
@@ -1755,11 +1755,11 @@ public abstract class RainbowMath {
      * random(5, 5) will return 5 (useful) and random(7, 4) will return 7 (not
      * useful.. better idea?)
      */
-    public static float random(final float howsmall, final float howbig) {
+    public static float random( float howsmall,  float howbig) {
         if (howsmall >= howbig) {
             return howsmall;
         }
-        final float diff = howbig - howsmall;
+         float diff = howbig - howsmall;
         return random(diff) + howsmall;
     }
 
@@ -1769,7 +1769,7 @@ public abstract class RainbowMath {
      * The number returned will range from zero up to (but not including)
      * 'howbig'.
      */
-    public static float random(final float howbig) {
+    public static float random( float howbig) {
         // for some reason (rounding error?) Math.random() * 3
         // can sometimes return '3' (once in ~30 million tries)
         // so a check was added to avoid the inclusion of 'howbig'
@@ -1798,7 +1798,7 @@ public abstract class RainbowMath {
      * The number returned will range from zero up to (but not including)
      * 'howbig'.
      */
-    public static int random(final int howbig) {
+    public static int random( int howbig) {
         // for some reason (rounding error?) Math.random() * 3
         // can sometimes return '3' (once in ~30 million tries)
         // so a check was added to avoid the inclusion of 'howbig'
@@ -1816,7 +1816,7 @@ public abstract class RainbowMath {
         return internalRandom.nextInt(howbig);
     }
 
-    public static void randomSeed(final long what) {
+    public static void randomSeed( long what) {
         // internal random number object
         if (internalRandom == null) {
             internalRandom = new Random();
@@ -1827,7 +1827,7 @@ public abstract class RainbowMath {
     /**
      * Computes the Perlin noise function value at point x.
      */
-    public static float noise(final float x) {
+    public static float noise( float x) {
         // is this legit? it's a dumb way to do it (but repair it later)
         return noise(x, 0f, 0f);
     }
@@ -1924,7 +1924,7 @@ public abstract class RainbowMath {
     // [toxi 031112]
     // now adjusts to the size of the cosLUT used via
     // the new variables, defined above
-    private static float noise_fsc(final float i) {
+    private static float noise_fsc( float i) {
         // using bagel's cosine table instead
         return 0.5f * (1.0f - perlin_cosTable[(int) (i * perlin_PI) % perlin_TWOPI]);
     }
@@ -1932,11 +1932,11 @@ public abstract class RainbowMath {
     /**
      * Computes the Perlin noise function value at the point x, y.
      */
-    public static float noise(final float x, final float y) {
+    public static float noise( float x,  float y) {
         return noise(x, y, 0f);
     }
 
-    public static void noiseSeed(final long what) {
+    public static void noiseSeed( long what) {
         if (perlinRandom == null) {
             perlinRandom = new Random();
         }
@@ -1945,7 +1945,7 @@ public abstract class RainbowMath {
         perlin = null;
     }
 
-    public void noiseDetail(final int lod) {
+    public void noiseDetail( int lod) {
         if (lod > 0) {
             perlin_octaves = lod;
         }
@@ -1955,7 +1955,7 @@ public abstract class RainbowMath {
 
     // INT NUMBER FORMATTING
 
-    public void noiseDetail(final int lod, final float falloff) {
+    public void noiseDetail( int lod,  float falloff) {
         if (lod > 0) {
             perlin_octaves = lod;
         }

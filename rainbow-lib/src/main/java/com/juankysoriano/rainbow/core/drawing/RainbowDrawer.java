@@ -10,7 +10,7 @@ import com.juankysoriano.rainbow.core.graphics.RainbowImage;
 import com.juankysoriano.rainbow.core.matrix.RMatrix;
 import com.juankysoriano.rainbow.core.matrix.RMatrix2D;
 import com.juankysoriano.rainbow.core.matrix.RMatrix3D;
-import com.juankysoriano.rainbow.utils.RainbowBitmapUtils;
+import com.juankysoriano.rainbow.utils.BitmapLoader;
 
 import java.io.File;
 
@@ -88,7 +88,7 @@ public class RainbowDrawer {
     }
 
     public void loadImage(String path, Modes.LoadMode mode, RainbowImage.LoadPictureListener listener) {
-        Bitmap bitmap = RainbowBitmapUtils.getBitmap(path, width, height, mode);
+        Bitmap bitmap = BitmapLoader.INSTANCE.loadBitmap(path, width, height, mode);
         loadImage(bitmap, listener);
     }
 
@@ -103,32 +103,32 @@ public class RainbowDrawer {
     }
 
     public void loadImage(String path, int width, int height, Modes.LoadMode mode, RainbowImage.LoadPictureListener listener) {
-        Bitmap bitmap = RainbowBitmapUtils.getBitmap(path, width, height, mode);
+        Bitmap bitmap = BitmapLoader.INSTANCE.loadBitmap(path, width, height, mode);
         loadImage(bitmap, listener);
     }
 
     public void loadImage(int resID, Modes.LoadMode mode, RainbowImage.LoadPictureListener listener) {
-        Bitmap bitmap = RainbowBitmapUtils.getBitmap(resID, width, height, mode);
+        Bitmap bitmap = BitmapLoader.INSTANCE.loadBitmap(resID, width, height, mode);
         loadImage(bitmap, listener);
     }
 
     public void loadImage(int resID, int width, int height, Modes.LoadMode mode, RainbowImage.LoadPictureListener listener) {
-        Bitmap bitmap = RainbowBitmapUtils.getBitmap(resID, width, height, mode);
+        Bitmap bitmap = BitmapLoader.INSTANCE.loadBitmap(resID, width, height, mode);
         loadImage(bitmap, listener);
     }
 
     public void loadImage(File file, Modes.LoadMode mode, RainbowImage.LoadPictureListener listener) {
-        Bitmap bitmap = RainbowBitmapUtils.getBitmap(file, width, height, mode);
+        Bitmap bitmap = BitmapLoader.INSTANCE.loadBitmap(file, width, height, mode);
         loadImage(bitmap, listener);
     }
 
     public void loadImage(Uri uri, Modes.LoadMode mode, RainbowImage.LoadPictureListener listener) {
-        Bitmap bitmap = RainbowBitmapUtils.getBitmap(uri, width, height, mode);
+        Bitmap bitmap = BitmapLoader.INSTANCE.loadBitmap(uri, width, height, mode);
         loadImage(bitmap, listener);
     }
 
     public void loadImage(Uri uri, int width, int height, Modes.LoadMode mode, RainbowImage.LoadPictureListener listener) {
-        Bitmap bitmap = RainbowBitmapUtils.getBitmap(uri, width, height, mode);
+        Bitmap bitmap = BitmapLoader.INSTANCE.loadBitmap(uri, width, height, mode);
         loadImage(bitmap, listener);
     }
 
