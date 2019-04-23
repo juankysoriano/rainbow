@@ -14,16 +14,13 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputCon
     private RainbowDrawer.PointDetectedListener pointDetectedListener = new RainbowDrawer.PointDetectedListener() {
 
         @Override
-        public void onPointDetected(float px, float py, float x, float y, RainbowDrawer rainbowDrawer) {
-            drawEllipse(x, y, 200, 200, rainbowDrawer);
+        public void onPointDetected(float px, float py, float x, float y) {
+            getRainbowDrawer().stroke(0, 30);
+            getRainbowDrawer().fill(0, 0);
+            getRainbowDrawer().ellipseMode(RainbowGraphics.CENTER);
+            getRainbowDrawer().ellipse(x, y, 200, 200);
         }
 
-        private void drawEllipse(float x, float y, float radius, int color, RainbowDrawer rainbowDrawer) {
-            rainbowDrawer.stroke(0, 30);
-            rainbowDrawer.fill(0, 0);
-            rainbowDrawer.ellipseMode(RainbowGraphics.CENTER);
-            rainbowDrawer.ellipse(x, y, radius, radius);
-        }
     };
 
     public RainbowLineCirclesSketch(ViewGroup viewGroup) {
@@ -32,7 +29,7 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputCon
 
     @Override
     public void onSketchSetup() {
-        frameRate(500);
+        stepRate(500);
         getRainbowDrawer().background(255);
         getRainbowDrawer().smooth();
         getRainbowDrawer().noFill();
@@ -40,12 +37,12 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputCon
 
     @Override
     public void onDrawingStart() {
-        getRainbowInputController().setRainbowInteractionListener(this);
+        getRainbowInputController().attach(this);
     }
 
     @Override
     public void onDrawingStop() {
-        getRainbowInputController().removeSketchInteractionListener();
+        getRainbowInputController().detach();
     }
 
     @Override
@@ -66,17 +63,11 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputCon
     @Override
     public void onFingerDragged(MotionEvent event, RainbowDrawer rainbowDrawer) {
         RainbowInputController rainbowInputController = getRainbowInputController();
-        float x = rainbowInputController.getSmoothX();
-        float y = rainbowInputController.getSmoothY();
-        float oldX = rainbowInputController.getPreviousSmoothX();
-        float oldY = rainbowInputController.getPreviousSmoothY();
-
-        drawEllipsedLine(oldX, oldY, x, y);
-    }
-
-    private void drawEllipsedLine(float x1, float y1, float x2, float y2) {
-        final RainbowDrawer drawer = getRainbowDrawer();
-        drawer.exploreLine(x1, y1, x2, y2, Precision.HIGH, pointDetectedListener);
+        float x = rainbowInputController.getX();
+        float y = rainbowInputController.getY();
+        float oldX = rainbowInputController.getPreviousX();
+        float oldY = rainbowInputController.getPreviousY();
+        getRainbowDrawer().exploreLine(oldX, oldY, x, y, Precision.VERY_HIGH, pointDetectedListener);
     }
 
     @Override

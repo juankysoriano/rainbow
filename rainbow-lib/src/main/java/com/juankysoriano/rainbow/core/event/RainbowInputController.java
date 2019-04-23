@@ -4,20 +4,16 @@ import android.support.annotation.NonNull;
 import android.view.MotionEvent;
 
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
-
-import java.util.concurrent.ThreadFactory;
-
-import io.reactivex.Scheduler;
-import io.reactivex.internal.schedulers.RxThreadFactory;
-import io.reactivex.internal.schedulers.SingleScheduler;
+import com.juankysoriano.rainbow.utils.schedulers.RainbowScheduler;
+import com.juankysoriano.rainbow.utils.schedulers.RainbowSchedulers;
 
 public class RainbowInputController {
     private static final int DIVISIONS = 2;
     private final RainbowDrawer rainbowDrawer;
-    private final FingerPositionSmoother fingerPositionPredictor;
+    private final FingerPositionSmoother smoother;
     private float x, y;
     private float px, py;
-    private final Scheduler scheduler;
+    private final RainbowScheduler scheduler;
     private RainbowInteractionListener rainbowInteractionListener;
     private boolean screenTouched;
     private boolean fingerMoving;
@@ -25,26 +21,21 @@ public class RainbowInputController {
     public static RainbowInputController newInstance() {
         FingerPositionSmoother positionSmoother = new FingerPositionSmoother();
         RainbowDrawer rainbowDrawer = new RainbowDrawer();
-        ThreadFactory threadFactory = new RxThreadFactory("RainbowController", Thread.NORM_PRIORITY, true);
-        SingleScheduler scheduler = new SingleScheduler(threadFactory);
-        return new RainbowInputController(
-                scheduler,
-                positionSmoother,
-                rainbowDrawer
-        );
+        RainbowScheduler scheduler = RainbowSchedulers.single("InputController", RainbowSchedulers.Priority.NORMAL);
+        return new RainbowInputController(scheduler, positionSmoother, rainbowDrawer);
     }
 
-    private RainbowInputController(Scheduler scheduler,
+    private RainbowInputController(RainbowScheduler rainbowScheduler,
                                    FingerPositionSmoother predictor,
                                    RainbowDrawer drawer) {
-        this.scheduler = scheduler;
-        fingerPositionPredictor = predictor;
+        scheduler = rainbowScheduler;
+        smoother = predictor;
         rainbowDrawer = drawer;
         x = y = px = py = -1;
     }
 
     public void postEvent(final MotionEvent motionEvent) {
-        scheduler.scheduleDirect(inputEventFor(MotionEvent.obtain(motionEvent)));
+        scheduler.scheduleNow(inputEventFor(MotionEvent.obtain(motionEvent)));
     }
 
     private Runnable inputEventFor(final MotionEvent motionEvent) {
@@ -125,28 +116,28 @@ public class RainbowInputController {
     }
 
     private void performTouch(MotionEvent event, RainbowDrawer rainbowDrawer) {
-        fingerPositionPredictor.resetTo(event.getX(), event.getY());
-        if (hasInteractionListener()) {
+        smoother.resetTo(event.getX(), event.getY());
+        if (rainbowInteractionListener != null) {
             rainbowInteractionListener.onSketchTouched(event, rainbowDrawer);
         }
     }
 
     private void performRelease(MotionEvent event, RainbowDrawer rainbowDrawer) {
-        fingerPositionPredictor.resetTo(event.getX(), event.getY());
-        if (hasInteractionListener()) {
+        smoother.resetTo(event.getX(), event.getY());
+        if (rainbowInteractionListener != null) {
             rainbowInteractionListener.onSketchReleased(event, rainbowDrawer);
         }
     }
 
     private void performMove(MotionEvent event, RainbowDrawer rainbowDrawer) {
-        fingerPositionPredictor.moveTo(event.getX(), event.getY());
-        if (hasInteractionListener()) {
+        smoother.moveTo(event.getX(), event.getY());
+        if (rainbowInteractionListener != null) {
             rainbowInteractionListener.onFingerDragged(event, rainbowDrawer);
         }
     }
 
     private void performMotion(MotionEvent event, RainbowDrawer rainbowDrawer) {
-        if (hasInteractionListener()) {
+        if (rainbowInteractionListener != null) {
             rainbowInteractionListener.onMotionEvent(event, rainbowDrawer);
         }
     }
@@ -159,24 +150,22 @@ public class RainbowInputController {
         return fingerMoving;
     }
 
-    private boolean hasInteractionListener() {
-        return rainbowInteractionListener != null;
-    }
-
     /**
      * Used to set a RainbowInteractionListener which will listen for different interaction events
      *
      * @param rainbowInteractionListener
      */
-    public void setRainbowInteractionListener(RainbowInteractionListener rainbowInteractionListener) {
+    public void attach(RainbowInteractionListener rainbowInteractionListener) {
         this.rainbowInteractionListener = rainbowInteractionListener;
     }
 
     /**
      * Used to remove the attached RainbowInteractionListener
+     * Also stops any pending input event processing task.
      */
-    public void removeSketchInteractionListener() {
+    public void detach() {
         this.rainbowInteractionListener = null;
+        this.scheduler.shutdown();
     }
 
     public float getX() {
@@ -196,7 +185,7 @@ public class RainbowInputController {
     }
 
     public MovementDirection getVerticalDirection() {
-        if (fingerPositionPredictor.getY() > fingerPositionPredictor.getOldY()) {
+        if (smoother.getY() > smoother.getOldY()) {
             return MovementDirection.DOWN;
         } else {
             return MovementDirection.UP;
@@ -204,7 +193,7 @@ public class RainbowInputController {
     }
 
     public MovementDirection getHorizontalDirection() {
-        if (fingerPositionPredictor.getX() > fingerPositionPredictor.getOldX()) {
+        if (smoother.getX() > smoother.getOldX()) {
             return MovementDirection.RIGHT;
         } else {
             return MovementDirection.LEFT;
@@ -212,23 +201,23 @@ public class RainbowInputController {
     }
 
     public float getSmoothX() {
-        return fingerPositionPredictor.getX();
+        return smoother.getX();
     }
 
     public float getSmoothY() {
-        return fingerPositionPredictor.getY();
+        return smoother.getY();
     }
 
     public float getPreviousSmoothX() {
-        return fingerPositionPredictor.getOldX();
+        return smoother.getOldX();
     }
 
     public float getPreviousSmoothY() {
-        return fingerPositionPredictor.getOldY();
+        return smoother.getOldY();
     }
 
     public float getFingerVelocity() {
-        return fingerPositionPredictor.getFingerVelocity();
+        return smoother.getFingerVelocity();
     }
 
     public RainbowDrawer getRainbowDrawer() {

@@ -13,14 +13,11 @@ import com.juankysoriano.rainbow.core.graphics.RainbowImage;
 import com.juankysoriano.rainbow.demo.R;
 import com.juankysoriano.rainbow.demo.sketch.rainbow.LibraryApplication;
 import com.juankysoriano.rainbow.utils.RainbowMath;
+import com.juankysoriano.rainbow.utils.schedulers.RainbowScheduler;
+import com.juankysoriano.rainbow.utils.schedulers.RainbowSchedulers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadFactory;
-
-import io.reactivex.Scheduler;
-import io.reactivex.internal.schedulers.ComputationScheduler;
-import io.reactivex.internal.schedulers.RxThreadFactory;
 
 public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallback {
 
@@ -37,14 +34,13 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     private BlobDetection blobDetection;
     private MediaPlayer mediaPlayer;
     private final List<Blob> blobList;
-    private final Scheduler scheduler;
+    private final RainbowScheduler scheduler;
 
     public RainbowBlobDetection(ViewGroup viewGroup) {
         super(viewGroup);
         blobList = new ArrayList<>();
         mediaPlayer = MediaPlayer.create(LibraryApplication.getContext(), R.raw.mozart);
-        ThreadFactory threadFactory = new RxThreadFactory("RainbowBlobDetection", Thread.MAX_PRIORITY, true);
-        scheduler = new ComputationScheduler(threadFactory);
+        scheduler = RainbowSchedulers.multiThreaded("DrawBlobs", RainbowSchedulers.Priority.NORMAL);
     }
 
     @Override
@@ -105,7 +101,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     private void paintNextBlob() {
         List<Blob> blobs = new ArrayList<>(blobList);
         blobList.clear();
-        scheduler.scheduleDirect(paintBlobTask(blobs));
+        scheduler.scheduleNow(paintBlobTask(blobs));
     }
 
     private Runnable paintBlobTask(final List<Blob> blobs) {

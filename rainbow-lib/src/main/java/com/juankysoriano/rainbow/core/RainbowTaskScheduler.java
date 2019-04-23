@@ -1,45 +1,35 @@
 package com.juankysoriano.rainbow.core;
 
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
+import com.juankysoriano.rainbow.utils.schedulers.RainbowScheduler;
+import com.juankysoriano.rainbow.utils.schedulers.RainbowSchedulers;
 
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Scheduler;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.internal.schedulers.RxThreadFactory;
-import io.reactivex.internal.schedulers.SingleScheduler;
-
 class RainbowTaskScheduler {
-    private static final long SECOND = TimeUnit.SECONDS.toMillis(1);
+    private static final long SECOND = TimeUnit.SECONDS.toNanos(1);
     private final Rainbow rainbow;
     private final DrawingTask.Step stepTask;
     private final DrawingTask.Invalidate invalidateTask;
-    private final Scheduler scheduler;
-    private Disposable disposable;
+    private RainbowScheduler scheduler;
 
     static RainbowTaskScheduler newInstance(final Rainbow rainbow) {
         final RainbowDrawer rainbowDrawer = rainbow.getRainbowDrawer();
         DrawingTask.Step stepTask = new DrawingTask.Step(rainbow);
         DrawingTask.Invalidate invalidateTask = new DrawingTask.Invalidate(rainbow, rainbowDrawer);
-        ThreadFactory threadFactory = new RxThreadFactory("RainbowDrawing", Thread.MAX_PRIORITY, true);
-        SingleScheduler scheduler = new SingleScheduler(threadFactory);
-        return new RainbowTaskScheduler(rainbow, stepTask, invalidateTask, scheduler);
+        return new RainbowTaskScheduler(rainbow, stepTask, invalidateTask);
     }
 
     private RainbowTaskScheduler(Rainbow rainbow,
                                  DrawingTask.Step stepTask,
-                                 DrawingTask.Invalidate invalidateTask,
-                                 Scheduler scheduler) {
+                                 DrawingTask.Invalidate invalidateTask) {
         this.rainbow = rainbow;
         this.stepTask = stepTask;
         this.invalidateTask = invalidateTask;
-        this.scheduler = scheduler;
     }
 
     void scheduleSetup() {
-        scheduler.scheduleDirect(new Runnable() {
+        scheduler().scheduleNow(new Runnable() {
             @Override
             public void run() {
                 rainbow.setupSketch();
@@ -52,7 +42,7 @@ class RainbowTaskScheduler {
     }
 
     void scheduleSingleDraw() {
-        scheduler.scheduleDirect(new Runnable() {
+        scheduler().scheduleNow(new Runnable() {
             @Override
             public void run() {
                 rainbow.getRainbowDrawer().beginDraw();
@@ -62,24 +52,25 @@ class RainbowTaskScheduler {
         });
     }
 
-    void scheduleDrawing(int frameRate) {
-        if (isTerminated()) {
-            Disposable stepDisposable = scheduler.schedulePeriodicallyDirect(stepTask, SECOND, SECOND / frameRate, TimeUnit.MILLISECONDS);
-            Disposable invalidateDisposable = scheduler.schedulePeriodicallyDirect(invalidateTask, SECOND, SECOND / 60, TimeUnit.MILLISECONDS);
-            disposable = new CompositeDisposable(stepDisposable, invalidateDisposable);
-        }
-
+    void scheduleDrawing(int stepRate, int frameRate) {
+        scheduler().scheduleAtRate(stepTask, SECOND / stepRate, TimeUnit.NANOSECONDS);
+        scheduler().scheduleAtRate(invalidateTask, SECOND / frameRate, TimeUnit.NANOSECONDS);
     }
 
     boolean isTerminated() {
-        return disposable == null || disposable.isDisposed();
+        return scheduler().isTerminated();
 
     }
 
     void shutdown() {
-        if (disposable != null) {
-            disposable.dispose();
+        scheduler().shutdown();
+    }
+
+    private RainbowScheduler scheduler() {
+        if (scheduler == null || scheduler.isTerminated()) {
+            scheduler = RainbowSchedulers.single("Drawing", RainbowSchedulers.Priority.MAX);
         }
+        return scheduler;
     }
 
 }

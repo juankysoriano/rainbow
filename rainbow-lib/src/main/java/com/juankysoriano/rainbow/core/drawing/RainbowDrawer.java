@@ -18,6 +18,7 @@ import java.io.File;
 public class RainbowDrawer {
 
     private RainbowGraphics graphics;
+    private final LineExplorer lineExplorer = new LineExplorer();
     private int[] pixels; // this value will be null until loadPixels() has been called.
     private int width;
     private int height;
@@ -126,7 +127,7 @@ public class RainbowDrawer {
         final Bitmap bitmap = RainbowBitmapUtils.getBitmap(uri, width, height, mode);
         loadImage(bitmap, listener);
     }
-    
+
     public void loadImage(Uri uri, int width, int height, int mode, RainbowImage.LoadPictureListener listener) {
         final Bitmap bitmap = RainbowBitmapUtils.getBitmap(uri, width, height, mode);
         loadImage(bitmap, listener);
@@ -549,8 +550,7 @@ public class RainbowDrawer {
                             float y2,
                             RainbowDrawer.Precision precision,
                             final PointDetectedListener listener) {
-        LineExplorer lineExplorer = new LineExplorer(precision, this, listener);
-        lineExplorer.exploreLine(x1, y1, x2, y2);
+        lineExplorer.exploreLine(x1, y1, x2, y2, precision, listener);
     }
 
     public void triangle(final float x1, final float y1, final float x2, final float y2, final float x3, final float y3) {
@@ -1744,10 +1744,11 @@ public class RainbowDrawer {
     }
 
     public interface PointDetectedListener {
-        void onPointDetected(float px, float py, float x, float y, RainbowDrawer rainbowDrawer);
+        void onPointDetected(float px, float py, float x, float y);
     }
 
     public enum Precision {
+        VERY_HIGH(1),
         HIGH(4),
         NORMAL(16),
         LOW(32);

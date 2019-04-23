@@ -13,7 +13,8 @@ import com.juankysoriano.rainbow.core.graphics.RainbowGraphics2D;
 
 public class Rainbow {
     private int frameRate = 60;
-    private int frameCount;
+    private int stepRate = 60;
+    private int stepCount;
     private boolean surfaceReady;
     private int width;
     private int height;
@@ -136,7 +137,7 @@ public class Rainbow {
             onDrawingResume();
             resumed = true;
             paused = false;
-            rainbowTaskScheduler.scheduleDrawing(frameRate);
+            rainbowTaskScheduler.scheduleDrawing(stepRate, frameRate);
         }
     }
 
@@ -149,7 +150,7 @@ public class Rainbow {
 
     void performStep() {
         if (canDraw()) {
-            frameCount++;
+            stepCount++;
             onDrawingStep();
         }
     }
@@ -270,16 +271,29 @@ public class Rainbow {
         return rainbowInputController;
     }
 
+    public float stepRate() {
+        return stepRate;
+    }
+
+    public int stepCount() {
+        return stepCount;
+    }
+
+    /**
+     * Sets the rate of steps per seconds to be performed. Default is 60
+     * @param stepRate
+     */
+    protected void stepRate(int stepRate) {
+        this.stepRate = stepRate;
+        restart();
+    }
+
     public float frameRate() {
-        return frameRate;
+        return stepRate;
     }
 
-    public int frameCount() {
-        return frameCount;
-    }
-
-    public void frameRate(final int newRateTarget) {
-        frameRate = newRateTarget;
+    protected void frameRate(int frameRate) {
+        this.frameRate = frameRate;
         restart();
     }
 

@@ -1,10 +1,8 @@
 package com.juankysoriano.rainbow.core.cv.blobdetector;
 
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;
-
-import java.util.concurrent.ThreadFactory;
-
-import io.reactivex.internal.schedulers.SingleScheduler;
+import com.juankysoriano.rainbow.utils.schedulers.RainbowScheduler;
+import com.juankysoriano.rainbow.utils.schedulers.RainbowSchedulers;
 
 /**
  * “It's still magic even if you know how it's done.”
@@ -18,7 +16,7 @@ public class BlobDetection {
     private final LuminanceMap luminanceMap;
 
     private int numberOfBlobsDetected;
-    private final SingleScheduler scheduler;
+    private final RainbowScheduler scheduler;
     private boolean skipBlobDetection;
 
     public BlobDetection(RainbowImage rainbowImage) {
@@ -28,8 +26,7 @@ public class BlobDetection {
     private BlobDetection(RainbowImage rainbowImage, int maxNumberOfBlobs) {
         this.luminanceMap = LuminanceMap.newInstance(rainbowImage);
         this.maxNumberOfBlobs = maxNumberOfBlobs;
-        ThreadFactory threadFactory = new BlobDetectionThreadFactory("blob detection");
-        scheduler = new SingleScheduler(threadFactory);
+        scheduler = RainbowSchedulers.singleForRecursion("BlobDetection", RainbowSchedulers.Priority.NORMAL);
     }
 
     public void setThreshold(float value) {
@@ -37,7 +34,7 @@ public class BlobDetection {
     }
 
     public void computeBlobs(final OnBlobDetectedCallback onBlobDetectedCallback) {
-        scheduler.scheduleDirect(new Runnable() {
+        scheduler.scheduleNow(new Runnable() {
             @Override
             public void run() {
                 luminanceMap.reset();
