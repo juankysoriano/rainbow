@@ -4,8 +4,8 @@ import android.support.annotation.NonNull;
 import android.view.MotionEvent;
 
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
-import com.juankysoriano.rainbow.utils.schedulers.RainbowScheduler;
-import com.juankysoriano.rainbow.utils.schedulers.RainbowSchedulers;
+import com.juankysoriano.rainbow.core.schedulers.RainbowScheduler;
+import com.juankysoriano.rainbow.core.schedulers.RainbowSchedulers;
 
 public class RainbowInputController {
     private static final int DIVISIONS = 2;
@@ -21,7 +21,7 @@ public class RainbowInputController {
     public static RainbowInputController newInstance() {
         FingerPositionSmoother positionSmoother = new FingerPositionSmoother();
         RainbowDrawer rainbowDrawer = new RainbowDrawer();
-        RainbowScheduler scheduler = RainbowSchedulers.single("InputController", RainbowSchedulers.Priority.NORMAL);
+        RainbowScheduler scheduler = RainbowSchedulers.INSTANCE.single("InputController", RainbowSchedulers.INSTANCE.Priority.NORMAL);
         return new RainbowInputController(scheduler, positionSmoother, rainbowDrawer);
     }
 

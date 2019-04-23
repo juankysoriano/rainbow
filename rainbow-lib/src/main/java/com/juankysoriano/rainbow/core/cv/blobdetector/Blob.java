@@ -1,6 +1,6 @@
 package com.juankysoriano.rainbow.core.cv.blobdetector;
 
-import com.juankysoriano.rainbow.core.matrix.RVector;
+import com.juankysoriano.rainbow.core.math.RVector;
 
 import java.util.ArrayList;
 import java.util.List;

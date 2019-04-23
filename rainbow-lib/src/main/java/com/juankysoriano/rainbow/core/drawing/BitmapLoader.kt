@@ -1,8 +1,7 @@
-package com.juankysoriano.rainbow.utils
+package com.juankysoriano.rainbow.core.drawing
 
 import android.graphics.Bitmap
 import android.net.Uri
-import com.juankysoriano.rainbow.core.drawing.Modes
 import com.squareup.picasso.Picasso
 import java.io.File
 

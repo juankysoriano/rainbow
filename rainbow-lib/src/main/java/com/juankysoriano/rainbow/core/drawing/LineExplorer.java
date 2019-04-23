@@ -2,7 +2,7 @@ package com.juankysoriano.rainbow.core.drawing;
 
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer.PointDetectedListener;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer.Precision;
-import com.juankysoriano.rainbow.utils.RainbowMath;
+import com.juankysoriano.rainbow.core.math.RainbowMath;
 
 class LineExplorer {
     private static final float NO_PREVIOUS = -1;

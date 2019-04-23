@@ -1,8 +1,8 @@
 package com.juankysoriano.rainbow.core;
 
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
-import com.juankysoriano.rainbow.utils.schedulers.RainbowScheduler;
-import com.juankysoriano.rainbow.utils.schedulers.RainbowSchedulers;
+import com.juankysoriano.rainbow.core.schedulers.RainbowScheduler;
+import com.juankysoriano.rainbow.core.schedulers.RainbowSchedulers;
 
 import java.util.concurrent.TimeUnit;
 
@@ -68,7 +68,7 @@ class RainbowTaskScheduler {
 
     private RainbowScheduler scheduler() {
         if (scheduler == null || scheduler.isTerminated()) {
-            scheduler = RainbowSchedulers.single("Drawing", RainbowSchedulers.Priority.MAX);
+            scheduler = RainbowSchedulers.INSTANCE.single("Drawing", RainbowSchedulers.Priority.MAX);
         }
         return scheduler;
     }

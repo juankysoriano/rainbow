@@ -3,8 +3,8 @@ package com.juankysoriano.rainbow.core.cv.edgedetector;
 import java.util.List;
 
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;
-import com.juankysoriano.rainbow.core.matrix.RVector;
-import com.juankysoriano.rainbow.utils.RainbowMath;
+import com.juankysoriano.rainbow.core.math.RVector;
+import com.juankysoriano.rainbow.core.math.RainbowMath;
 
 /*
  An algorithm that uses a custom implementation of a Sobel/Scharr operator to get 

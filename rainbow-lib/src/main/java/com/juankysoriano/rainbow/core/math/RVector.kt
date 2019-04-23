@@ -21,10 +21,9 @@
   Boston, MA  02111-1307  USA
  */
 
-package com.juankysoriano.rainbow.core.matrix
+package com.juankysoriano.rainbow.core.math
 
 import com.juankysoriano.rainbow.core.Rainbow
-import com.juankysoriano.rainbow.utils.RainbowMath
 
 /**
  * ( begin auto-generated from PVector.xml )

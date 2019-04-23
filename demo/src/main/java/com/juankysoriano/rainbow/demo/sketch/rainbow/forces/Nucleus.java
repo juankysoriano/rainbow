@@ -1,6 +1,6 @@
 package com.juankysoriano.rainbow.demo.sketch.rainbow.forces;
 
-import com.juankysoriano.rainbow.core.matrix.RVector;
+import com.juankysoriano.rainbow.core.math.RVector;
 
 public class Nucleus {
     RVector origin;

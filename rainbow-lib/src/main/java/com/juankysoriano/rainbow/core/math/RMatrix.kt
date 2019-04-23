@@ -20,7 +20,7 @@
   Boston, MA  02111-1307  USA
 */
 
-package com.juankysoriano.rainbow.core.matrix
+package com.juankysoriano.rainbow.core.math
 
 interface RMatrix {
 

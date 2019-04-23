@@ -1,8 +1,8 @@
 package com.juankysoriano.rainbow.core.cv.blobdetector;
 
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;
-import com.juankysoriano.rainbow.utils.schedulers.RainbowScheduler;
-import com.juankysoriano.rainbow.utils.schedulers.RainbowSchedulers;
+import com.juankysoriano.rainbow.core.schedulers.RainbowScheduler;
+import com.juankysoriano.rainbow.core.schedulers.RainbowSchedulers;
 
 /**
  * “It's still magic even if you know how it's done.”
@@ -26,7 +26,7 @@ public class BlobDetection {
     private BlobDetection(RainbowImage rainbowImage, int maxNumberOfBlobs) {
         this.luminanceMap = LuminanceMap.newInstance(rainbowImage);
         this.maxNumberOfBlobs = maxNumberOfBlobs;
-        scheduler = RainbowSchedulers.singleForRecursion("BlobDetection", RainbowSchedulers.Priority.NORMAL);
+        scheduler = RainbowSchedulers.INSTANCE.singleForRecursion("BlobDetection", RainbowSchedulers.INSTANCE.Priority.NORMAL);
     }
 
     public void setThreshold(float value) {

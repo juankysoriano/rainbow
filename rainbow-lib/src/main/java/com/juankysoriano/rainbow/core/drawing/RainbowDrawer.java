@@ -7,10 +7,9 @@ import android.net.Uri;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics2D;
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;
-import com.juankysoriano.rainbow.core.matrix.RMatrix;
-import com.juankysoriano.rainbow.core.matrix.RMatrix2D;
-import com.juankysoriano.rainbow.core.matrix.RMatrix3D;
-import com.juankysoriano.rainbow.utils.BitmapLoader;
+import com.juankysoriano.rainbow.core.math.RMatrix;
+import com.juankysoriano.rainbow.core.math.RMatrix2D;
+import com.juankysoriano.rainbow.core.math.RMatrix3D;
 
 import java.io.File;
 

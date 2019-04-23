@@ -28,10 +28,10 @@ import android.graphics.Color;
 import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.core.drawing.Modes;
 import com.juankysoriano.rainbow.core.drawing.RainbowStyle;
-import com.juankysoriano.rainbow.core.matrix.RMatrix;
-import com.juankysoriano.rainbow.core.matrix.RMatrix2D;
-import com.juankysoriano.rainbow.core.matrix.RMatrix3D;
-import com.juankysoriano.rainbow.utils.RainbowMath;
+import com.juankysoriano.rainbow.core.math.RMatrix;
+import com.juankysoriano.rainbow.core.math.RMatrix2D;
+import com.juankysoriano.rainbow.core.math.RMatrix3D;
+import com.juankysoriano.rainbow.core.math.RainbowMath;
 
 import java.util.HashMap;
 

@@ -13,9 +13,9 @@ import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;
 import com.juankysoriano.rainbow.demo.R;
 import com.juankysoriano.rainbow.demo.sketch.rainbow.LibraryApplication;
-import com.juankysoriano.rainbow.utils.RainbowMath;
-import com.juankysoriano.rainbow.utils.schedulers.RainbowScheduler;
-import com.juankysoriano.rainbow.utils.schedulers.RainbowSchedulers;
+import com.juankysoriano.rainbow.core.math.RainbowMath;
+import com.juankysoriano.rainbow.core.schedulers.RainbowScheduler;
+import com.juankysoriano.rainbow.core.schedulers.RainbowSchedulers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         super(viewGroup);
         blobList = new ArrayList<>();
         mediaPlayer = MediaPlayer.create(LibraryApplication.getContext(), R.raw.mozart);
-        scheduler = RainbowSchedulers.multiThreaded("DrawBlobs", RainbowSchedulers.Priority.NORMAL);
+        scheduler = RainbowSchedulers.INSTANCE.multiThreaded("DrawBlobs", RainbowSchedulers.INSTANCE.Priority.NORMAL);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.juankysoriano.rainbow.core.event;
 
-import com.juankysoriano.rainbow.utils.RainbowMath;
+import com.juankysoriano.rainbow.core.math.RainbowMath;
 
 class FingerPositionSmoother {
     private static final float SPRING = 0.1f;

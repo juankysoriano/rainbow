@@ -1,4 +1,4 @@
-package com.juankysoriano.rainbow.utils;
+package com.juankysoriano.rainbow.core.math;
 
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;

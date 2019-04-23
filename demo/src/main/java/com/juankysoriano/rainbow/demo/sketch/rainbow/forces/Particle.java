@@ -2,14 +2,14 @@ package com.juankysoriano.rainbow.demo.sketch.rainbow.forces;
 
 import android.content.res.Resources;
 
-import com.juankysoriano.rainbow.core.matrix.RVector;
+import com.juankysoriano.rainbow.core.math.RVector;
 import com.juankysoriano.rainbow.demo.R;
 import com.juankysoriano.rainbow.demo.sketch.rainbow.LibraryApplication;
-import com.juankysoriano.rainbow.utils.RainbowMath;
+import com.juankysoriano.rainbow.core.math.RainbowMath;
 
-import static com.juankysoriano.rainbow.core.matrix.RVector.dist;
-import static com.juankysoriano.rainbow.core.matrix.RVector.sub;
-import static com.juankysoriano.rainbow.utils.RainbowMath.*;
+import static com.juankysoriano.rainbow.core.math.RVector.dist;
+import static com.juankysoriano.rainbow.core.math.RVector.sub;
+import static com.juankysoriano.rainbow.core.math.RainbowMath.*;
 
 public class Particle {
     public static final float PARTICLE_DIAMETER = 3;

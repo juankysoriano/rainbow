@@ -20,9 +20,7 @@
  Boston, MA  02111-1307  USA
  */
 
-package com.juankysoriano.rainbow.core.matrix
-
-import com.juankysoriano.rainbow.utils.RainbowMath
+package com.juankysoriano.rainbow.core.math
 
 /**
  * 4x4 matrix implementation.

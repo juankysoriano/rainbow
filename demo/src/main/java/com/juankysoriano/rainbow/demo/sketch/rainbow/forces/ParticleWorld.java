@@ -2,7 +2,7 @@ package com.juankysoriano.rainbow.demo.sketch.rainbow.forces;
 
 import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
-import com.juankysoriano.rainbow.core.matrix.RVector;
+import com.juankysoriano.rainbow.core.math.RVector;
 
 class ParticleWorld {
 
