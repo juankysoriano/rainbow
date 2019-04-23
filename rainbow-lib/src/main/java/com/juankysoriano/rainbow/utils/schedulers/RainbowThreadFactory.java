@@ -3,7 +3,7 @@ package com.juankysoriano.rainbow.utils.schedulers;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
-public final class RainbowThreadFactory extends AtomicLong implements ThreadFactory {
+class RainbowThreadFactory extends AtomicLong implements ThreadFactory {
 
     private final String prefix;
 
