@@ -26,19 +26,23 @@ package com.juankysoriano.rainbow.core.graphics;
 import android.graphics.Color;
 
 import com.juankysoriano.rainbow.core.Rainbow;
-import com.juankysoriano.rainbow.core.extra.RainbowStyle;
+import com.juankysoriano.rainbow.core.drawing.Modes;
+import com.juankysoriano.rainbow.core.drawing.RainbowStyle;
 import com.juankysoriano.rainbow.core.matrix.RMatrix;
 import com.juankysoriano.rainbow.core.matrix.RMatrix2D;
 import com.juankysoriano.rainbow.core.matrix.RMatrix3D;
 import com.juankysoriano.rainbow.utils.RainbowMath;
 
 import java.util.HashMap;
-import java.util.WeakHashMap;
+
+import static com.juankysoriano.rainbow.core.drawing.Modes.Draw.*;
+import static com.juankysoriano.rainbow.core.drawing.Modes.Image.*;
+import static com.juankysoriano.rainbow.core.drawing.Modes.Shape.*;
 
 public abstract class RainbowGraphics extends RainbowImage {
 
     static final int VERTEX_FIELD_COUNT = 37;
-    public static final float cosLUT[];
+    public static final float[] cosLUT;
     public static final int R = 3;
     public static final int G = 4;
     public static final int B = 5;
@@ -55,11 +59,8 @@ public abstract class RainbowGraphics extends RainbowImage {
     public static final int SA = 16;
     public static final int SW = 17;
     public static final int HAS_NORMAL = 36;
-    public static final int ROUND = 1 << 1;
-    public static final int DEFAULT_STROKE_CAP = ROUND;
-    public static final int PROJECT = 1 << 2;  // called 'square' in the svg spec
-    public static final int MITER = 1 << 3;
-    public static final int DEFAULT_STROKE_JOIN = MITER;
+    public static final Modes.Stroke.Cap DEFAULT_STROKE_CAP = Modes.Stroke.Cap.ROUND;
+    public static final Modes.Stroke.Join DEFAULT_STROKE_JOIN = Modes.Stroke.Join.MITER;
     public static final float DEFAULT_STROKE_WEIGHT = 1;
     public static final float[] sinLUT;
     public static final float SINCOS_PRECISION = 0.5f;
@@ -68,54 +69,10 @@ public abstract class RainbowGraphics extends RainbowImage {
     public static final int Y = 1;
     public static final int Z = 2;
     /**
-     * Draw mode convention to use (x, y) to (width, height)
-     */
-    public static final int CORNER = 0;
-    /**
-     * Draw mode convention to use (x1, y1) to (x2, y2) coordinates
-     */
-    public static final int CORNERS = 1;
-    /**
-     * Draw mode from the center, and using the radius
-     */
-    public static final int RADIUS = 2;
-    /**
-     * Draw from the center, using second pair of values as the diameter.
-     * Formerly called CENTER_DIAMETER in alpha releases.
-     */
-    public static final int CENTER = 3;
-    /**
-     * Synonym for the CENTER constant. Draw from the center,
-     * using second pair of values as the diameter.
-     */
-    public static final int DIAMETER = 3;
-    public static final int CHORD = 2;
-    // vertically alignment modes for text
-    public static final int PIE = 3;
-    /**
      * texture coordinates based on image width/height
      */
     public static final int IMAGE = 2;
 
-    // arc drawing modes
-    public static final int RGB = 1;  // image & color
-    public static final int ARGB = 2;  // image
-    public static final int HSB = 3;  // color
-
-    // error messages
-    public static final int ALPHA = 4;  // image
-    public static final int CLEAR = -200;
-    public static final int POINTS = 3;   // vertices
-    public static final int LINES = 5;   // beginShape(), createShape()
-    public static final int TRIANGLES = 9;   // vertices
-    public static final int TRIANGLE_STRIP = 10;  // vertices
-    public static final int TRIANGLE_FAN = 11;  // vertices
-    public static final int QUAD = 16;  // primitive
-    public static final int QUADS = 17;  // vertices
-    public static final int QUAD_STRIP = 18;  // vertices
-    public static final int POLYGON = 20;  // in the end, probably cannot
-    public static final int OPEN = 1;
-    public static final int CLOSE = 2;
     private static final String ERROR_BACKGROUND_IMAGE_SIZE =
             "background image must be the same size as your application";
     private static final String ERROR_BACKGROUND_IMAGE_FORMAT =
@@ -141,11 +98,10 @@ public abstract class RainbowGraphics extends RainbowImage {
         }
     }
 
-    private final WeakHashMap<RainbowImage, Object> cacheMap = new WeakHashMap<>();
     private final RMatrix3D bezierBasisMatrix = new RMatrix3D(-1, 3, -3, 1, 3, -6, 3, 0, -3, 3, 0, 0, 1, 0, 0, 0);
     private final float[] cacheHsbValue = new float[3];
-    public int strokeCap = DEFAULT_STROKE_CAP;
-    public int strokeJoin = DEFAULT_STROKE_JOIN;
+    public Modes.Stroke.Cap strokeCap = DEFAULT_STROKE_CAP;
+    public Modes.Stroke.Join strokeJoin = DEFAULT_STROKE_JOIN;
     public float strokeWeight = DEFAULT_STROKE_WEIGHT;
     public boolean smooth = false;
     /**
@@ -198,14 +154,13 @@ public abstract class RainbowGraphics extends RainbowImage {
      * Type of shape passed to beginShape(), zero if no shape is currently being
      * drawn.
      */
-    protected int shape;
     protected int vertexCount; // total number of vertices
     protected RMatrix3D curveToBezierMatrix;
     protected int curveVertexCount;
     /**
      * The current image alignment (read-only)
      */
-    private int imageMode = CORNER;
+    private Modes.Draw imageDrawMode = CORNER;
     /**
      * Sets whether texture coordinates passed to vertex() calls will be based
      * on coordinates that are based on the IMAGE or NORMALIZED.
@@ -215,7 +170,7 @@ public abstract class RainbowGraphics extends RainbowImage {
     /**
      * The current colorMode
      */
-    private int colorMode;
+    private Modes.Image colorMode;
     /**
      * Max value for red (or hue) set by colorMode
      */
@@ -235,15 +190,15 @@ public abstract class RainbowGraphics extends RainbowImage {
     /**
      * The current rect mode (read-only)
      */
-    private int rectMode;
+    private Modes.Draw rectMode;
     /**
      * The current ellipse mode (read-only)
      */
-    private int ellipseMode;
+    private Modes.Draw ellipseMode;
     /**
      * The current shape alignment mode (read-only)
      */
-    private int shapeMode;
+    protected Modes.Shape shapeMode;
     private float ambientR;
     private float ambientG;
     private float ambientB;
@@ -475,7 +430,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         strokeJoin(DEFAULT_STROKE_JOIN);
         strokeCap(DEFAULT_STROKE_CAP);
 
-        shape = 0;
+        shapeMode = UNDEFINED;
 
         rectMode(CORNER);
         ellipseMode(DIAMETER);
@@ -614,7 +569,7 @@ public abstract class RainbowGraphics extends RainbowImage {
     public void vertex(float x, float y, float z) {
         vertexCheck();
         float[] vertex = vertices[vertexCount];
-        if (shape == POLYGON) {
+        if (shapeMode == POLYGON) {
             if (vertexCount > 0) {
                 float pvertex[] = vertices[vertexCount - 1];
                 if ((Math.abs(pvertex[X] - x) < RainbowMath.EPSILON) && (Math.abs(pvertex[Y] - y) < RainbowMath.EPSILON) && (Math.abs(pvertex[Z] - z) < RainbowMath.EPSILON)) {
@@ -704,7 +659,7 @@ public abstract class RainbowGraphics extends RainbowImage {
     }
 
     public void clip(float a, float b, float c, float d) {
-        if (imageMode == CORNER) {
+        if (imageDrawMode == CORNER) {
             if (c < 0) { // reset a negative width
                 a += c;
                 c = -c;
@@ -716,7 +671,7 @@ public abstract class RainbowGraphics extends RainbowImage {
 
             clipImpl(a, b, a + c, b + d);
 
-        } else if (imageMode == CORNERS) {
+        } else if (imageDrawMode == CORNERS) {
             if (c < a) { // reverse because x2 < x1
                 float temp = a;
                 a = c;
@@ -730,7 +685,7 @@ public abstract class RainbowGraphics extends RainbowImage {
 
             clipImpl(a, b, c, d);
 
-        } else if (imageMode == CENTER) {
+        } else if (imageDrawMode == CENTER) {
             // c and d are width/height
             if (c < 0) {
                 c = -c;
@@ -773,11 +728,12 @@ public abstract class RainbowGraphics extends RainbowImage {
                 z3 + ((cz - z3) * 2 / 3.0f),
                 x3,
                 y3,
-                z3);
+                z3
+        );
     }
 
     protected void bezierVertexCheck() {
-        bezierVertexCheck(shape, vertexCount);
+        bezierVertexCheck(shapeMode, vertexCount);
     }
 
     public void bezierVertex(float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4) {
@@ -816,8 +772,8 @@ public abstract class RainbowGraphics extends RainbowImage {
         }
     }
 
-    private void bezierVertexCheck(int shape, int vertexCount) {
-        if (shape == 0 || shape != POLYGON) {
+    private void bezierVertexCheck(Modes.Shape shape, int vertexCount) {
+        if (shape == UNDEFINED || shape != POLYGON) {
             throw new RuntimeException("beginShape() or beginShape(POLYGON) " + "must be used before bezierVertex() or quadraticVertex()");
         }
         if (vertexCount == 0) {
@@ -902,8 +858,8 @@ public abstract class RainbowGraphics extends RainbowImage {
      * the code and maintain it. for beta, the latter is most important so
      * that's how things are implemented.
      */
-    public void beginShape(int kind) {
-        shape = kind;
+    public void beginShape(Modes.Shape mode) {
+        shapeMode = mode;
     }
 
     public void vertex(float x, float y) {
@@ -980,7 +936,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         endShape(OPEN);
     }
 
-    public void endShape(int mode) {
+    public void endShape(Modes.Shape mode) {
     }
 
     public void triangle(float x1, float y1, float x2, float y2, float x3, float y3) {
@@ -1000,7 +956,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         endShape();
     }
 
-    public void rectMode(int mode) {
+    public void rectMode(Modes.Draw mode) {
         rectMode = mode;
     }
 
@@ -1187,7 +1143,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         }
     }
 
-    public void ellipseMode(int mode) {
+    public void ellipseMode(Modes.Draw mode) {
         ellipseMode = mode;
     }
 
@@ -1238,10 +1194,10 @@ public abstract class RainbowGraphics extends RainbowImage {
      * also tries to be smart about start < stop.
      */
     public void arc(float a, float b, float c, float d, float start, float stop) {
-        arc(a, b, c, d, start, stop, 0);
+        arc(a, b, c, d, start, stop, Modes.Arc.UNDEFINED);
     }
 
-    public void arc(float a, float b, float c, float d, float start, float stop, int mode) {
+    public void arc(float a, float b, float c, float d, float start, float stop, Modes.Arc mode) {
         float x = a;
         float y = b;
         float w = c;
@@ -1291,7 +1247,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      * arc can be drawn that crosses zero mark, and the user will still collect
      * $200.
      */
-    protected void arcImpl(float x, float y, float w, float h, float start, float stop, int mode) {
+    protected void arcImpl(float x, float y, float w, float h, float start, float stop, Modes.Arc mode) {
         showMissingWarning("arc");
     }
 
@@ -1375,7 +1331,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         normalX = nx;
         normalY = ny;
         normalZ = nz;
-        if (shape != 0) {
+        if (shapeMode != UNDEFINED) {
             if (normalMode == NORMAL_MODE_AUTO) {
                 // One normal per begin/end shape
                 normalMode = NORMAL_MODE_SHAPE;
@@ -1765,7 +1721,8 @@ public abstract class RainbowGraphics extends RainbowImage {
                     curveVertices[curveVertexCount - 2][X],
                     curveVertices[curveVertexCount - 2][Y],
                     curveVertices[curveVertexCount - 1][X],
-                    curveVertices[curveVertexCount - 1][Y]);
+                    curveVertices[curveVertexCount - 1][Y]
+            );
         }
     }
 
@@ -1774,7 +1731,7 @@ public abstract class RainbowGraphics extends RainbowImage {
     // SPLINE UTILITY FUNCTIONS (used by both Bezier and Catmull-Rom)
 
     protected void curveVertexCheck() {
-        curveVertexCheck(shape);
+        curveVertexCheck(shapeMode);
     }
 
     // ////////////////////////////////////////////////////////////
@@ -1819,7 +1776,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      * Perform initialization specific to curveVertex(), and handle standard
      * error modes. Can be overridden by subclasses that need the flexibility.
      */
-    void curveVertexCheck(int shape) {
+    void curveVertexCheck(Modes.Shape shape) {
         if (shape != POLYGON) {
             throw new RuntimeException("You must use beginShape() or " + "beginShape(POLYGON) before curveVertex()");
         }
@@ -1869,7 +1826,8 @@ public abstract class RainbowGraphics extends RainbowImage {
                     curveVertices[curveVertexCount - 2][Z],
                     curveVertices[curveVertexCount - 1][X],
                     curveVertices[curveVertexCount - 1][Y],
-                    curveVertices[curveVertexCount - 1][Z]);
+                    curveVertices[curveVertexCount - 1][Z]
+            );
         }
     }
 
@@ -1939,9 +1897,9 @@ public abstract class RainbowGraphics extends RainbowImage {
      * <p/>
      * Support for CENTER was added in release 0146.
      */
-    public void imageMode(int mode) {
+    public void imageMode(Modes.Draw mode) {
         if ((mode == CORNER) || (mode == CORNERS) || (mode == CENTER)) {
-            imageMode = mode;
+            imageDrawMode = mode;
         } else {
             String msg = "imageMode() only works with CORNER, CORNERS, or CENTER";
             throw new RuntimeException(msg);
@@ -1960,10 +1918,10 @@ public abstract class RainbowGraphics extends RainbowImage {
             return;
         }
 
-        if (imageMode == CORNER || imageMode == CORNERS) {
+        if (imageDrawMode == CORNER || imageDrawMode == CORNERS) {
             imageImpl(image, x, y, x + image.width, y + image.height, 0, 0, image.width, image.height);
 
-        } else if (imageMode == CENTER) {
+        } else if (imageDrawMode == CENTER) {
             float x1 = x - image.width / 2;
             float y1 = y - image.height / 2;
             imageImpl(image, x1, y1, x1 + image.width, y1 + image.height, 0, 0, image.width, image.height);
@@ -2051,7 +2009,7 @@ public abstract class RainbowGraphics extends RainbowImage {
             return;
         }
 
-        if (imageMode == CORNER) {
+        if (imageDrawMode == CORNER) {
             if (c < 0) { // reset a negative width
                 a += c;
                 c = -c;
@@ -2063,7 +2021,7 @@ public abstract class RainbowGraphics extends RainbowImage {
 
             imageImpl(image, a, b, a + c, b + d, u1, v1, u2, v2);
 
-        } else if (imageMode == CORNERS) {
+        } else if (imageDrawMode == CORNERS) {
             if (c < a) { // reverse because x2 < x1
                 float temp = a;
                 a = c;
@@ -2077,7 +2035,7 @@ public abstract class RainbowGraphics extends RainbowImage {
 
             imageImpl(image, a, b, c, d, u1, v1, u2, v2);
 
-        } else if (imageMode == CENTER) {
+        } else if (imageDrawMode == CENTER) {
             // c and d are width/height
             if (c < 0) {
                 c = -c;
@@ -2255,7 +2213,8 @@ public abstract class RainbowGraphics extends RainbowImage {
                 source.m30,
                 source.m31,
                 source.m32,
-                source.m33);
+                source.m33
+        );
     }
 
     /**
@@ -2491,7 +2450,7 @@ public abstract class RainbowGraphics extends RainbowImage {
     }
 
     public void style(RainbowStyle s) {
-        imageMode(s.imageMode);
+        imageMode(s.imageDrawMode);
         rectMode(s.rectMode);
         ellipseMode(s.ellipseMode);
 
@@ -2532,7 +2491,7 @@ public abstract class RainbowGraphics extends RainbowImage {
             s = new RainbowStyle();
         }
 
-        s.imageMode = imageMode;
+        s.imageDrawMode = imageDrawMode;
         s.rectMode = rectMode;
         s.ellipseMode = ellipseMode;
         s.shapeMode = shapeMode;
@@ -2571,12 +2530,12 @@ public abstract class RainbowGraphics extends RainbowImage {
         strokeWeight = weight;
     }
 
-    public void strokeJoin(int join) {
-        strokeJoin = join;
+    public void strokeJoin(Modes.Stroke.Join mode) {
+        strokeJoin = mode;
     }
 
-    public void strokeCap(int cap) {
-        strokeCap = cap;
+    public void strokeCap(Modes.Stroke.Cap mode) {
+        strokeCap = mode;
     }
 
     public void noStroke() {
@@ -3167,11 +3126,11 @@ public abstract class RainbowGraphics extends RainbowImage {
         popStyle();
     }
 
-    public void colorMode(int mode) {
+    public void colorMode(Modes.Image mode) {
         colorMode(mode, colorModeX, colorModeY, colorModeZ, colorModeA);
     }
 
-    public void colorMode(int mode, float maxX, float maxY, float maxZ, float maxA) {
+    public void colorMode(Modes.Image mode, float maxX, float maxY, float maxZ, float maxA) {
         colorMode = mode;
 
         colorModeX = maxX; // still needs to be set for hsb
@@ -3183,8 +3142,8 @@ public abstract class RainbowGraphics extends RainbowImage {
         colorModeDefault = (colorMode == RGB) && (colorModeA == 255) && (colorModeX == 255) && (colorModeY == 255) && (colorModeZ == 255);
     }
 
-    public void colorMode(int mode, float max) {
-        colorMode(mode, max, max, max, max);
+    public void colorMode(Modes.Image format, float max) {
+        colorMode(format, max, max, max, max);
     }
 
     /**
@@ -3199,7 +3158,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      * <p/>
      * because the alpha values were still between 0 and 255.
      */
-    public void colorMode(int mode, float maxX, float maxY, float maxZ) {
+    public void colorMode(Modes.Image mode, float maxX, float maxY, float maxZ) {
         colorMode(mode, maxX, maxY, maxZ, colorModeA);
     }
 
@@ -3398,7 +3357,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      * Interpolate between two colors. Like lerp(), but for the individual color
      * components of a color supplied as an int value.
      */
-    public static int lerpColor(int c1, int c2, float amt, int mode) {
+    public static int lerpColor(int c1, int c2, float amt, Modes.Image mode) {
         if (mode == RGB) {
             float a1 = ((c1 >> 24) & 0xff);
             float r1 = (c1 >> 16) & 0xff;

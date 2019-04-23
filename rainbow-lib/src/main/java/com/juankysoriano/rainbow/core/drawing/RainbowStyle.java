@@ -20,15 +20,15 @@
   Boston, MA  02111-1307  USA
 */
 
-package com.juankysoriano.rainbow.core.extra;
+package com.juankysoriano.rainbow.core.drawing;
 
 public class RainbowStyle {
-    public int imageMode;
-    public int rectMode;
-    public int ellipseMode;
-    public int shapeMode;
+    public Modes.Draw imageDrawMode;
+    public Modes.Draw rectMode;
+    public Modes.Draw ellipseMode;
+    public Modes.Shape shapeMode;
 
-    public int colorMode;
+    public Modes.Image colorMode;
     public float colorModeX;
     public float colorModeY;
     public float colorModeZ;
@@ -41,8 +41,8 @@ public class RainbowStyle {
     public boolean stroke;
     public int strokeColor;
     public float strokeWeight;
-    public int strokeCap;
-    public int strokeJoin;
+    public Modes.Stroke.Cap strokeCap;
+    public Modes.Stroke.Join strokeJoin;
 
     // TODO these fellas are inconsistent, and may need to go elsewhere
     public float ambientR, ambientG, ambientB;

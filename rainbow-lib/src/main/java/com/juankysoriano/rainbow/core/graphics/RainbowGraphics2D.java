@@ -34,10 +34,14 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 
+import com.juankysoriano.rainbow.core.drawing.Modes;
 import com.juankysoriano.rainbow.core.drawing.RainbowTextureView;
 import com.juankysoriano.rainbow.core.matrix.RMatrix;
 import com.juankysoriano.rainbow.core.matrix.RMatrix2D;
 import com.juankysoriano.rainbow.utils.RainbowMath;
+
+import static com.juankysoriano.rainbow.core.drawing.Modes.Image.ALPHA;
+import static com.juankysoriano.rainbow.core.drawing.Modes.Shape.*;
 
 /**
  * Subclass for PGraphics that implements the graphics API using the Android 2D
@@ -164,7 +168,6 @@ public class RainbowGraphics2D extends RainbowGraphics {
         }
     }
 
-
     @Override
     public void resetMatrix() {
         canvas.setMatrix(new android.graphics.Matrix());
@@ -207,8 +210,8 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     @Override
-    public void beginShape(int kind) {
-        shape = kind;
+    public void beginShape(Modes.Shape mode) {
+        shapeMode = mode;
         vertexCount = 0;
         curveVertexCount = 0;
     }
@@ -220,7 +223,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     @Override
     public void vertex(float x, float y) {
-        if (shape == POLYGON) {
+        if (shapeMode == POLYGON) {
             vertexPolygon(x, y);
         } else {
             curveVertexCount = 0;
@@ -235,7 +238,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
             vertices[vertexCount][Y] = y;
             vertexCount++;
 
-            switch (shape) {
+            switch (shapeMode) {
                 case POINTS:
                     break;
                 case LINES:
@@ -341,13 +344,13 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     @Override
-    public void endShape(int mode) {
-        if (shape == POINTS && stroke && vertexCount > 0) {
+    public void endShape(Modes.Shape mode) {
+        if (shapeMode == POINTS && stroke && vertexCount > 0) {
             endPointsShape();
-        } else if (shape == POLYGON) {
+        } else if (shapeMode == POLYGON) {
             endPolygonShape(mode);
         }
-        shape = 0;
+        shapeMode = UNDEFINED;
     }
 
     private void endPointsShape() {
@@ -379,7 +382,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
         }
     }
 
-    private void endPolygonShape(int mode) {
+    private void endPolygonShape(Modes.Shape mode) {
         if (!path.isEmpty()) {
             if (mode == CLOSE) {
                 path.close();
@@ -551,7 +554,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     @Override
-    protected void arcImpl(float x, float y, float w, float h, float start, float stop, int mode) {
+    protected void arcImpl(float x, float y, float w, float h, float start, float stop, Modes.Arc mode) {
 
         if (stop - start >= RainbowMath.TWO_PI) {
             ellipseImpl(x, y, w, h);
@@ -574,24 +577,24 @@ public class RainbowGraphics2D extends RainbowGraphics {
             float sweep = stop - start;
             rect.set(x, y, x + w, y + h);
 
-            if (mode == 0) {
+            if (mode == Modes.Arc.UNDEFINED) {
                 if (fill) {
                     canvas.drawArc(rect, start, sweep, true, fillPaint);
                 }
                 if (stroke) {
                     canvas.drawArc(rect, start, sweep, false, strokePaint);
                 }
-            } else if (mode == OPEN) {
+            } else if (mode == Modes.Arc.OPEN) {
                 if (fill) {
                     showMissingWarning("arc");
                 }
                 if (stroke) {
                     canvas.drawArc(rect, start, sweep, false, strokePaint);
                 }
-            } else if (mode == CHORD) {
+            } else if (mode == Modes.Arc.CHORD) {
                 showMissingWarning("arc");
 
-            } else if (mode == PIE) {
+            } else if (mode == Modes.Arc.PIE) {
                 if (fill) {
                     canvas.drawArc(rect, start, sweep, true, fillPaint);
                 }
@@ -755,27 +758,27 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     @Override
-    public void strokeCap(int cap) {
-        super.strokeCap(cap);
+    public void strokeCap(Modes.Stroke.Cap mode) {
+        super.strokeCap(mode);
 
-        if (strokeCap == ROUND) {
+        if (strokeCap == Modes.Stroke.Cap.ROUND) {
             strokePaint.setStrokeCap(Paint.Cap.ROUND);
-        } else if (strokeCap == PROJECT) {
+        } else if (strokeCap == Modes.Stroke.Cap.SQUARE) {
             strokePaint.setStrokeCap(Paint.Cap.SQUARE);
-        } else {
+        } else if (strokeCap == Modes.Stroke.Cap.BUTT) {
             strokePaint.setStrokeCap(Paint.Cap.BUTT);
         }
     }
 
     @Override
-    public void strokeJoin(int join) {
-        super.strokeJoin(join);
+    public void strokeJoin(Modes.Stroke.Join mode) {
+        super.strokeJoin(mode);
 
-        if (strokeJoin == MITER) {
+        if (strokeJoin == Modes.Stroke.Join.MITER) {
             strokePaint.setStrokeJoin(Paint.Join.MITER);
-        } else if (strokeJoin == ROUND) {
+        } else if (strokeJoin == Modes.Stroke.Join.ROUND) {
             strokePaint.setStrokeJoin(Paint.Join.ROUND);
-        } else {
+        } else if (strokeJoin == Modes.Stroke.Join.BEVEL) {
             strokePaint.setStrokeJoin(Paint.Join.BEVEL);
         }
     }

@@ -8,6 +8,7 @@ import com.juankysoriano.rainbow.core.cv.blobdetector.Blob;
 import com.juankysoriano.rainbow.core.cv.blobdetector.BlobDetection;
 import com.juankysoriano.rainbow.core.cv.blobdetector.EdgeVertex;
 import com.juankysoriano.rainbow.core.cv.blobdetector.OnBlobDetectedCallback;
+import com.juankysoriano.rainbow.core.drawing.Modes;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;
 import com.juankysoriano.rainbow.demo.R;
@@ -49,10 +50,12 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         getRainbowDrawer().smooth();
         getRainbowDrawer().noFill();
         getRainbowDrawer().background(0, 0, 0);
-        getRainbowDrawer().loadImage(R.drawable.gatito,
-                                     (getWidth() / RESIZE_FACTOR),
-                                     (getHeight() / RESIZE_FACTOR),
-                                     RainbowImage.LOAD_CENTER_CROP, new RainbowImage.LoadPictureListener() {
+        getRainbowDrawer().loadImage(
+                R.drawable.gatito,
+                (getWidth() / RESIZE_FACTOR),
+                (getHeight() / RESIZE_FACTOR),
+                Modes.LoadMode.LOAD_CENTER_CROP,
+                new RainbowImage.LoadPictureListener() {
 
                     @Override
                     public void onLoadSucceed(RainbowImage image) {

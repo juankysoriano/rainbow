@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.Shader;
 import android.net.Uri;
 
-import com.juankysoriano.rainbow.core.extra.RainbowStyle;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics2D;
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;
@@ -18,7 +17,7 @@ import java.io.File;
 public class RainbowDrawer {
 
     private RainbowGraphics graphics;
-    private final LineExplorer lineExplorer = new LineExplorer();
+    private LineExplorer lineExplorer = new LineExplorer();
     private int[] pixels; // this value will be null until loadPixels() has been called.
     private int width;
     private int height;
@@ -31,7 +30,7 @@ public class RainbowDrawer {
      * Interpolate between two colors. Like lerp(), but for the individual color
      * components of a color supplied as an int value.
      */
-    public static int lerpColor(final int c1, final int c2, final float amt, final int mode) {
+    public static int lerpColor(int c1, int c2, float amt, Modes.Image mode) {
         return RainbowGraphics.lerpColor(c1, c2, amt, mode);
     }
 
@@ -43,7 +42,7 @@ public class RainbowDrawer {
      * @param mode
      * @return
      */
-    public static int blendColor(final int c1, final int c2, final int mode) {
+    public static int blendColor(int c1, int c2, Modes.Blend mode) {
         return RainbowImage.blendColor(c1, c2, mode);
     }
 
@@ -73,7 +72,7 @@ public class RainbowDrawer {
         return graphics != null;
     }
 
-    public RainbowGraphics createGraphics(final int iwidth, final int iheight) {
+    public RainbowGraphics createGraphics(int iwidth, int iheight) {
         RainbowGraphics pg = new RainbowGraphics2D();
         pg.setParent(graphics.parent);
         pg.setPrimary(false);
@@ -82,13 +81,13 @@ public class RainbowDrawer {
         return pg;
     }
 
-    public RainbowImage createImage(final int wide, final int high, final int format) {
-        final RainbowImage image = new RainbowImage(wide, high, format);
+    public RainbowImage createImage(int wide, int high, Modes.Image format) {
+        RainbowImage image = new RainbowImage(wide, high, format);
         image.parent = graphics.parent;
         return image;
     }
 
-    public void loadImage(String path, int mode, RainbowImage.LoadPictureListener listener) {
+    public void loadImage(String path, Modes.LoadMode mode, RainbowImage.LoadPictureListener listener) {
         Bitmap bitmap = RainbowBitmapUtils.getBitmap(path, width, height, mode);
         loadImage(bitmap, listener);
     }
@@ -97,43 +96,43 @@ public class RainbowDrawer {
         if (bitmap == null) {
             listener.onLoadFail();
         } else {
-            final RainbowImage image = new RainbowImage(bitmap);
+            RainbowImage image = new RainbowImage(bitmap);
             image.parent = graphics.parent;
             listener.onLoadSucceed(image);
         }
     }
 
-    public void loadImage(String path, int width, int height, int mode, RainbowImage.LoadPictureListener listener) {
+    public void loadImage(String path, int width, int height, Modes.LoadMode mode, RainbowImage.LoadPictureListener listener) {
         Bitmap bitmap = RainbowBitmapUtils.getBitmap(path, width, height, mode);
         loadImage(bitmap, listener);
     }
 
-    public void loadImage(int resID, int mode, RainbowImage.LoadPictureListener listener) {
-        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(resID, width, height, mode);
+    public void loadImage(int resID, Modes.LoadMode mode, RainbowImage.LoadPictureListener listener) {
+        Bitmap bitmap = RainbowBitmapUtils.getBitmap(resID, width, height, mode);
         loadImage(bitmap, listener);
     }
 
-    public void loadImage(int resID, int width, int height, int mode, RainbowImage.LoadPictureListener listener) {
-        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(resID, width, height, mode);
+    public void loadImage(int resID, int width, int height, Modes.LoadMode mode, RainbowImage.LoadPictureListener listener) {
+        Bitmap bitmap = RainbowBitmapUtils.getBitmap(resID, width, height, mode);
         loadImage(bitmap, listener);
     }
 
-    public void loadImage(File file, int mode, RainbowImage.LoadPictureListener listener) {
-        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(file, width, height, mode);
+    public void loadImage(File file, Modes.LoadMode mode, RainbowImage.LoadPictureListener listener) {
+        Bitmap bitmap = RainbowBitmapUtils.getBitmap(file, width, height, mode);
         loadImage(bitmap, listener);
     }
 
-    public void loadImage(Uri uri, int mode, RainbowImage.LoadPictureListener listener) {
-        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(uri, width, height, mode);
+    public void loadImage(Uri uri, Modes.LoadMode mode, RainbowImage.LoadPictureListener listener) {
+        Bitmap bitmap = RainbowBitmapUtils.getBitmap(uri, width, height, mode);
         loadImage(bitmap, listener);
     }
 
-    public void loadImage(Uri uri, int width, int height, int mode, RainbowImage.LoadPictureListener listener) {
-        final Bitmap bitmap = RainbowBitmapUtils.getBitmap(uri, width, height, mode);
+    public void loadImage(Uri uri, int width, int height, Modes.LoadMode mode, RainbowImage.LoadPictureListener listener) {
+        Bitmap bitmap = RainbowBitmapUtils.getBitmap(uri, width, height, mode);
         loadImage(bitmap, listener);
     }
 
-    public final int color(int gray) {
+    public int color(int gray) {
         if (graphics == null) {
             if (gray > 255) {
                 gray = 255;
@@ -145,7 +144,7 @@ public class RainbowDrawer {
         return graphics.color(gray);
     }
 
-    public final int color(final float fgray) {
+    public int color(float fgray) {
         if (graphics == null) {
             int gray = (int) fgray;
             if (gray > 255) {
@@ -158,7 +157,7 @@ public class RainbowDrawer {
         return graphics.color(fgray);
     }
 
-    public final int color(final int gray, int alpha) {
+    public int color(int gray, int alpha) {
         if (graphics == null) {
             if (alpha > 255) {
                 alpha = 255;
@@ -176,7 +175,7 @@ public class RainbowDrawer {
         return graphics.color(gray, alpha);
     }
 
-    public final int color(final float fgray, final float falpha) {
+    public int color(float fgray, float falpha) {
         if (graphics == null) {
             int gray = (int) fgray;
             int alpha = (int) falpha;
@@ -195,7 +194,7 @@ public class RainbowDrawer {
         return graphics.color(fgray, falpha);
     }
 
-    public final int color(int x, int y, int z) {
+    public int color(int x, int y, int z) {
         if (graphics == null) {
             if (x > 255) {
                 x = 255;
@@ -218,7 +217,7 @@ public class RainbowDrawer {
         return graphics.color(x, y, z);
     }
 
-    public final int color(float x, float y, float z) {
+    public int color(float x, float y, float z) {
         if (graphics == null) {
             if (x > 255) {
                 x = 255;
@@ -241,7 +240,7 @@ public class RainbowDrawer {
         return graphics.color(x, y, z);
     }
 
-    public final int color(int x, int y, int z, int a) {
+    public int color(int x, int y, int z, int a) {
         if (graphics == null) {
             if (a > 255) {
                 a = 255;
@@ -269,7 +268,7 @@ public class RainbowDrawer {
         return graphics.color(x, y, z, a);
     }
 
-    public final int color(float x, float y, float z, float a) {
+    public int color(float x, float y, float z, float a) {
         if (graphics == null) {
             if (a > 255) {
                 a = 255;
@@ -311,7 +310,7 @@ public class RainbowDrawer {
         graphics.updatePixels();
     }
 
-    public void updatePixels(final int x1, final int y1, final int x2, final int y2) {
+    public void updatePixels(int x1, int y1, int x2, int y2) {
         graphics.updatePixels(x1, y1, x2, y2);
     }
 
@@ -372,15 +371,15 @@ public class RainbowDrawer {
      * the code and maintain it. for beta, the latter is most important so
      * that's how things are implemented.
      */
-    public void beginShape(final int kind) {
-        graphics.beginShape(kind);
+    public void beginShape(Modes.Shape mode) {
+        graphics.beginShape(mode);
     }
 
     /**
      * Sets whether the upcoming vertex is part of an edge. Equivalent to
      * glEdgeFlag(), for people familiar with OpenGL.
      */
-    public void edge(final boolean edge) {
+    public void edge(boolean edge) {
         graphics.edge(edge);
     }
 
@@ -395,7 +394,7 @@ public class RainbowDrawer {
      * For people familiar with OpenGL, this function is basically identical to
      * glNormal3f().
      */
-    public void normal(final float nx, final float ny, final float nz) {
+    public void normal(float nx, float ny, float nz) {
         graphics.normal(nx, ny, nz);
     }
 
@@ -403,11 +402,11 @@ public class RainbowDrawer {
      * Set texture mode to either to use coordinates based on the IMAGE (more
      * intuitive for new users) or NORMALIZED (better for advanced chaps)
      */
-    public void textureMode(final int mode) {
+    public void textureMode(int mode) {
         graphics.textureMode(mode);
     }
 
-    public void textureWrap(final int wrap) {
+    public void textureWrap(int wrap) {
         graphics.textureWrap(wrap);
     }
 
@@ -417,7 +416,7 @@ public class RainbowDrawer {
      *
      * @param image reference to a PImage object
      */
-    public void texture(final RainbowImage image) {
+    public void texture(RainbowImage image) {
         graphics.texture(image);
     }
 
@@ -429,11 +428,11 @@ public class RainbowDrawer {
         graphics.noTexture();
     }
 
-    public void vertex(final float x, final float y) {
+    public void vertex(float x, float y) {
         graphics.vertex(x, y);
     }
 
-    public void vertex(final float x, final float y, final float z) {
+    public void vertex(float x, float y, float z) {
         graphics.vertex(x, y, z);
     }
 
@@ -444,15 +443,15 @@ public class RainbowDrawer {
      * @param v vertex parameters, as a float array of length
      *          VERTEX_FIELD_COUNT
      */
-    public void vertex(final float[] v) {
+    public void vertex(float[] v) {
         graphics.vertex(v);
     }
 
-    public void vertex(final float x, final float y, final float u, final float v) {
+    public void vertex(float x, float y, float u, float v) {
         graphics.vertex(x, y, u, v);
     }
 
-    public void vertex(final float x, final float y, final float z, final float u, final float v) {
+    public void vertex(float x, float y, float z, float u, float v) {
         graphics.vertex(x, y, z, u, v);
     }
 
@@ -475,11 +474,11 @@ public class RainbowDrawer {
         graphics.endShape();
     }
 
-    public void endShape(final int mode) {
+    public void endShape(Modes.Shape mode) {
         graphics.endShape(mode);
     }
 
-    public void clip(final float a, final float b, final float c, final float d) {
+    public void clip(float a, float b, float c, float d) {
         graphics.clip(a, b, c, d);
     }
 
@@ -487,35 +486,35 @@ public class RainbowDrawer {
         graphics.noClip();
     }
 
-    public void blendMode(final int mode) {
+    public void blendMode(int mode) {
         graphics.blendMode(mode);
     }
 
-    public void bezierVertex(final float x2, final float y2, final float x3, final float y3, final float x4, final float y4) {
+    public void bezierVertex(float x2, float y2, float x3, float y3, float x4, float y4) {
         graphics.bezierVertex(x2, y2, x3, y3, x4, y4);
     }
 
-    public void bezierVertex(final float x2, final float y2, final float z2, final float x3, final float y3, final float z3, final float x4, final float y4, final float z4) {
+    public void bezierVertex(float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4) {
         graphics.bezierVertex(x2, y2, z2, x3, y3, z3, x4, y4, z4);
     }
 
-    public void quadraticVertex(final float cx, final float cy, final float x3, final float y3) {
+    public void quadraticVertex(float cx, float cy, float x3, float y3) {
         graphics.quadraticVertex(cx, cy, x3, y3);
     }
 
-    public void quadraticVertex(final float cx, final float cy, final float cz, final float x3, final float y3, final float z3) {
+    public void quadraticVertex(float cx, float cy, float cz, float x3, float y3, float z3) {
         graphics.quadraticVertex(cx, cy, cz, x3, y3, z3);
     }
 
-    public void curveVertex(final float x, final float y) {
+    public void curveVertex(float x, float y) {
         graphics.curveVertex(x, y);
     }
 
-    public void curveVertex(final float x, final float y, final float z) {
+    public void curveVertex(float x, float y, float z) {
         graphics.curveVertex(x, y, z);
     }
 
-    public void point(final float x, final float y) {
+    public void point(float x, float y) {
         graphics.point(x, y);
     }
 
@@ -523,11 +522,11 @@ public class RainbowDrawer {
         graphics.point(points);
     }
 
-    public void point(final float x, final float y, final float z) {
+    public void point(float x, float y, float z) {
         graphics.point(x, y, z);
     }
 
-    public void line(final float... vertex) {
+    public void line(float... vertex) {
         graphics.line(vertex);
     }
 
@@ -549,39 +548,39 @@ public class RainbowDrawer {
                             float x2,
                             float y2,
                             RainbowDrawer.Precision precision,
-                            final PointDetectedListener listener) {
+                            PointDetectedListener listener) {
         lineExplorer.exploreLine(x1, y1, x2, y2, precision, listener);
     }
 
-    public void triangle(final float x1, final float y1, final float x2, final float y2, final float x3, final float y3) {
+    public void triangle(float x1, float y1, float x2, float y2, float x3, float y3) {
         graphics.triangle(x1, y1, x2, y2, x3, y3);
     }
 
-    public void quad(final float x1, final float y1, final float x2, final float y2, final float x3, final float y3, final float x4, final float y4) {
+    public void quad(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
         graphics.quad(x1, y1, x2, y2, x3, y3, x4, y4);
     }
 
-    public void rectMode(final int mode) {
+    public void rectMode(Modes.Draw mode) {
         graphics.rectMode(mode);
     }
 
-    public void rect(final float a, final float b, final float c, final float d) {
+    public void rect(float a, float b, float c, float d) {
         graphics.rect(a, b, c, d);
     }
 
-    public void rect(final float a, final float b, final float c, final float d, final float r) {
+    public void rect(float a, float b, float c, float d, float r) {
         graphics.rect(a, b, c, d, r);
     }
 
-    public void rect(final float a, final float b, final float c, final float d, final float tl, final float tr, final float br, final float bl) {
+    public void rect(float a, float b, float c, float d, float tl, float tr, float br, float bl) {
         graphics.rect(a, b, c, d, tl, tr, br, bl);
     }
 
-    public void ellipseMode(final int mode) {
+    public void ellipseMode(Modes.Draw mode) {
         graphics.ellipseMode(mode);
     }
 
-    public void ellipse(final float a, final float b, final float c, final float d) {
+    public void ellipse(float a, float b, float c, float d) {
         graphics.ellipse(a, b, c, d);
     }
 
@@ -594,23 +593,23 @@ public class RainbowDrawer {
      * <p/>
      * also tries to be smart about start < stop.
      */
-    public void arc(final float a, final float b, final float c, final float d, final float start, final float stop) {
+    public void arc(float a, float b, float c, float d, float start, float stop) {
         graphics.arc(a, b, c, d, start, stop);
     }
 
-    public void arc(final float a, final float b, final float c, final float d, final float start, final float stop, final int mode) {
+    public void arc(float a, float b, float c, float d, float start, float stop, Modes.Arc mode) {
         graphics.arc(a, b, c, d, start, stop, mode);
     }
 
-    public void box(final float size) {
+    public void box(float size) {
         graphics.box(size);
     }
 
-    public void box(final float w, final float h, final float d) {
+    public void box(float w, float h, float d) {
         graphics.box(w, h, d);
     }
 
-    public void sphereDetail(final int res) {
+    public void sphereDetail(int res) {
         graphics.sphereDetail(res);
     }
 
@@ -621,7 +620,7 @@ public class RainbowDrawer {
      * Code for sphereDetail() submitted by toxi [031031]. Code for enhanced u/v
      * version from davbol [080801].
      */
-    public void sphereDetail(final int ures, final int vres) {
+    public void sphereDetail(int ures, int vres) {
         graphics.sphereDetail(ures, vres);
     }
 
@@ -647,7 +646,7 @@ public class RainbowDrawer {
      * [davbol 080801] now using separate sphereDetailU/V
      * </PRE>
      */
-    public void sphere(final float r) {
+    public void sphere(float r) {
         graphics.sphere(r);
     }
 
@@ -680,7 +679,7 @@ public class RainbowDrawer {
      * endShape();
      * </PRE>
      */
-    public float bezierPoint(final float a, final float b, final float c, final float d, final float t) {
+    public float bezierPoint(float a, float b, float c, float d, float t) {
         return graphics.bezierPoint(a, b, c, d, t);
     }
 
@@ -688,11 +687,11 @@ public class RainbowDrawer {
      * Provide the tangent at the given point on the bezier curve. Fix from
      * davbol for 0136.
      */
-    public float bezierTangent(final float a, final float b, final float c, final float d, final float t) {
+    public float bezierTangent(float a, float b, float c, float d, float t) {
         return graphics.bezierTangent(a, b, c, d, t);
     }
 
-    public void bezierDetail(final int detail) {
+    public void bezierDetail(int detail) {
         graphics.bezierDetail(detail);
     }
 
@@ -736,22 +735,22 @@ public class RainbowDrawer {
      * bezier(x1, y1, cx, cy, cx, cy, x2, y2);
      * </PRE>
      */
-    public void bezier(final float x1, final float y1, final float x2, final float y2, final float x3, final float y3, final float x4, final float y4) {
+    public void bezier(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
         graphics.bezier(x1, y1, x2, y2, x3, y3, x4, y4);
     }
 
-    public void bezier(final float x1,
-                       final float y1,
-                       final float z1,
-                       final float x2,
-                       final float y2,
-                       final float z2,
-                       final float x3,
-                       final float y3,
-                       final float z3,
-                       final float x4,
-                       final float y4,
-                       final float z4) {
+    public void bezier(float x1,
+                       float y1,
+                       float z1,
+                       float x2,
+                       float y2,
+                       float z2,
+                       float x3,
+                       float y3,
+                       float z3,
+                       float x4,
+                       float y4,
+                       float z4) {
         graphics.bezier(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4);
     }
 
@@ -760,7 +759,7 @@ public class RainbowDrawer {
      *
      * @param t Value between zero and one for how far along the segment
      */
-    public float curvePoint(final float a, final float b, final float c, final float d, final float t) {
+    public float curvePoint(float a, float b, float c, float d, float t) {
         return graphics.curvePoint(a, b, c, d, t);
     }
 
@@ -768,15 +767,15 @@ public class RainbowDrawer {
      * Calculate the tangent at a t value (0..1) on a Catmull-Rom curve. Code
      * thanks to Dave Bollinger (Bug #715)
      */
-    public float curveTangent(final float a, final float b, final float c, final float d, final float t) {
+    public float curveTangent(float a, float b, float c, float d, float t) {
         return graphics.curveTangent(a, b, c, d, t);
     }
 
-    public void curveDetail(final int detail) {
+    public void curveDetail(int detail) {
         graphics.curveDetail(detail);
     }
 
-    public void curveTightness(final float tightness) {
+    public void curveTightness(float tightness) {
         graphics.curveTightness(tightness);
     }
 
@@ -798,22 +797,22 @@ public class RainbowDrawer {
      * endShape();
      * </PRE>
      */
-    public void curve(final float x1, final float y1, final float x2, final float y2, final float x3, final float y3, final float x4, final float y4) {
+    public void curve(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
         graphics.curve(x1, y1, x2, y2, x3, y3, x4, y4);
     }
 
-    public void curve(final float x1,
-                      final float y1,
-                      final float z1,
-                      final float x2,
-                      final float y2,
-                      final float z2,
-                      final float x3,
-                      final float y3,
-                      final float z3,
-                      final float x4,
-                      final float y4,
-                      final float z4) {
+    public void curve(float x1,
+                      float y1,
+                      float z1,
+                      float x2,
+                      float y2,
+                      float z2,
+                      float x3,
+                      float y3,
+                      float z3,
+                      float x4,
+                      float y4,
+                      float z4) {
         graphics.curve(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4);
     }
 
@@ -825,7 +824,7 @@ public class RainbowDrawer {
         graphics.smooth();
     }
 
-    public void smooth(final int level) {
+    public void smooth(int level) {
         graphics.smooth(level);
     }
 
@@ -841,11 +840,11 @@ public class RainbowDrawer {
      * <p/>
      * Support for CENTER was added in release 0146.
      */
-    public void imageMode(final int mode) {
+    public void imageMode(Modes.Draw mode) {
         graphics.imageMode(mode);
     }
 
-    public void image(final RainbowImage image, final float x, final float y) {
+    public void image(RainbowImage image, float x, float y) {
         graphics.image(image, x, y);
     }
 
@@ -854,7 +853,7 @@ public class RainbowDrawer {
      * v coordinates are always based on image space location, regardless of the
      * current textureMode().
      */
-    public void image(final RainbowImage image, final float a, final float b, final float c, final float d, final int u1, final int v1, final int u2, final int v2) {
+    public void image(RainbowImage image, float a, float b, float c, float d, int u1, int v1, int u2, int v2) {
         graphics.image(image, a, b, c, d, u1, v1, u2, v2);
     }
 
@@ -875,14 +874,14 @@ public class RainbowDrawer {
     /**
      * Translate in X and Y.
      */
-    public void translate(final float tx, final float ty) {
+    public void translate(float tx, float ty) {
         graphics.translate(tx, ty);
     }
 
     /**
      * Translate in X, Y, and Z.
      */
-    public void translate(final float tx, final float ty, final float tz) {
+    public void translate(float tx, float ty, float tz) {
         graphics.translate(tx, ty, tz);
     }
 
@@ -895,21 +894,21 @@ public class RainbowDrawer {
      * <p/>
      * <A HREF="http://www.xkcd.com/c184.html">Additional background</A>.
      */
-    public void rotate(final float angle) {
+    public void rotate(float angle) {
         graphics.rotate(angle);
     }
 
     /**
      * Rotate around the X axis.
      */
-    public void rotateX(final float angle) {
+    public void rotateX(float angle) {
         graphics.rotateX(angle);
     }
 
     /**
      * Rotate around the Y axis.
      */
-    public void rotateY(final float angle) {
+    public void rotateY(float angle) {
         graphics.rotateY(angle);
     }
 
@@ -922,21 +921,21 @@ public class RainbowDrawer {
      * only doing things in 2D. so we just decided to have them both be the
      * same.
      */
-    public void rotateZ(final float angle) {
+    public void rotateZ(float angle) {
         graphics.rotateZ(angle);
     }
 
     /**
      * Rotate about a vector in space. Same as the glRotatef() function.
      */
-    public void rotate(final float angle, final float vx, final float vy, final float vz) {
+    public void rotate(float angle, float vx, float vy, float vz) {
         graphics.rotate(angle, vx, vy, vz);
     }
 
     /**
      * Scale in all dimensions.
      */
-    public void scale(final float s) {
+    public void scale(float s) {
         graphics.scale(s);
     }
 
@@ -946,28 +945,28 @@ public class RainbowDrawer {
      * Not recommended for use in 3D, because the z-dimension is just scaled by
      * 1, since there's no way to know what else to scale it by.
      */
-    public void scale(final float sx, final float sy) {
+    public void scale(float sx, float sy) {
         graphics.scale(sx, sy);
     }
 
     /**
      * Scale in X, Y, and Z.
      */
-    public void scale(final float x, final float y, final float z) {
+    public void scale(float x, float y, float z) {
         graphics.scale(x, y, z);
     }
 
     /**
      * Shear along X axis
      */
-    public void shearX(final float angle) {
+    public void shearX(float angle) {
         graphics.shearX(angle);
     }
 
     /**
      * Skew along Y axis
      */
-    public void shearY(final float angle) {
+    public void shearY(float angle) {
         graphics.shearY(angle);
     }
 
@@ -978,44 +977,44 @@ public class RainbowDrawer {
         graphics.resetMatrix();
     }
 
-    public void applyMatrix(final RMatrix source) {
+    public void applyMatrix(RMatrix source) {
         graphics.applyMatrix(source);
     }
 
-    public void applyMatrix(final RMatrix2D source) {
+    public void applyMatrix(RMatrix2D source) {
         graphics.applyMatrix(source);
     }
 
     /**
      * Apply a 3x2 affine transformation matrix.
      */
-    public void applyMatrix(final float n00, final float n01, final float n02, final float n10, final float n11, final float n12) {
+    public void applyMatrix(float n00, float n01, float n02, float n10, float n11, float n12) {
         graphics.applyMatrix(n00, n01, n02, n10, n11, n12);
     }
 
-    public void applyMatrix(final RMatrix3D source) {
+    public void applyMatrix(RMatrix3D source) {
         graphics.applyMatrix(source);
     }
 
     /**
      * Apply a 4x4 transformation matrix.
      */
-    public void applyMatrix(final float n00,
-                            final float n01,
-                            final float n02,
-                            final float n03,
-                            final float n10,
-                            final float n11,
-                            final float n12,
-                            final float n13,
-                            final float n20,
-                            final float n21,
-                            final float n22,
-                            final float n23,
-                            final float n30,
-                            final float n31,
-                            final float n32,
-                            final float n33) {
+    public void applyMatrix(float n00,
+                            float n01,
+                            float n02,
+                            float n03,
+                            float n10,
+                            float n11,
+                            float n12,
+                            float n13,
+                            float n20,
+                            float n21,
+                            float n22,
+                            float n23,
+                            float n30,
+                            float n31,
+                            float n32,
+                            float n33) {
         graphics.applyMatrix(n00, n01, n02, n03, n10, n11, n12, n13, n20, n21, n22, n23, n30, n31, n32, n33);
     }
 
@@ -1026,21 +1025,21 @@ public class RainbowDrawer {
     /**
      * Set the current transformation to the contents of the specified source.
      */
-    public void setMatrix(final RMatrix3D source) {
+    public void setMatrix(RMatrix3D source) {
         graphics.setMatrix(source);
     }
 
     /**
      * Set the current transformation matrix to the contents of another.
      */
-    public void setMatrix(final RMatrix source) {
+    public void setMatrix(RMatrix source) {
         graphics.setMatrix(source);
     }
 
     /**
      * Set the current transformation to the contents of the specified source.
      */
-    public void setMatrix(final RMatrix2D source) {
+    public void setMatrix(RMatrix2D source) {
         graphics.setMatrix(source);
     }
 
@@ -1048,7 +1047,7 @@ public class RainbowDrawer {
      * Copy the current transformation matrix into the specified target. Pass in
      * null to create a new matrix.
      */
-    public RMatrix2D getMatrix(final RMatrix2D target) {
+    public RMatrix2D getMatrix(RMatrix2D target) {
         return graphics.getMatrix(target);
     }
 
@@ -1056,7 +1055,7 @@ public class RainbowDrawer {
      * Copy the current transformation matrix into the specified target. Pass in
      * null to create a new matrix.
      */
-    public RMatrix3D getMatrix(final RMatrix3D target) {
+    public RMatrix3D getMatrix(RMatrix3D target) {
         return graphics.getMatrix(target);
     }
 
@@ -1079,7 +1078,7 @@ public class RainbowDrawer {
         graphics.camera();
     }
 
-    public void camera(final float eyeX, final float eyeY, final float eyeZ, final float centerX, final float centerY, final float centerZ, final float upX, final float upY, final float upZ) {
+    public void camera(float eyeX, float eyeY, float eyeZ, float centerX, float centerY, float centerZ, float upX, float upY, float upZ) {
         graphics.camera(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
     }
 
@@ -1091,11 +1090,11 @@ public class RainbowDrawer {
         graphics.ortho();
     }
 
-    public void ortho(final float left, final float right, final float bottom, final float top) {
+    public void ortho(float left, float right, float bottom, float top) {
         graphics.ortho(left, right, bottom, top);
     }
 
-    public void ortho(final float left, final float right, final float bottom, final float top, final float near, final float far) {
+    public void ortho(float left, float right, float bottom, float top, float near, float far) {
         graphics.ortho(left, right, bottom, top, near, far);
     }
 
@@ -1103,11 +1102,11 @@ public class RainbowDrawer {
         graphics.perspective();
     }
 
-    public void perspective(final float fovy, final float aspect, final float zNear, final float zFar) {
+    public void perspective(float fovy, float aspect, float zNear, float zFar) {
         graphics.perspective(fovy, aspect, zNear, zFar);
     }
 
-    public void frustum(final float left, final float right, final float bottom, final float top, final float near, final float far) {
+    public void frustum(float left, float right, float bottom, float top, float near, float far) {
         graphics.frustum(left, right, bottom, top, near, far);
     }
 
@@ -1120,7 +1119,7 @@ public class RainbowDrawer {
      * would be placed on screen, once affected by translate(), scale(), or any
      * other transformations.
      */
-    public float screenX(final float x, final float y) {
+    public float screenX(float x, float y) {
         return graphics.screenX(x, y);
     }
 
@@ -1129,7 +1128,7 @@ public class RainbowDrawer {
      * would be placed on screen, once affected by translate(), scale(), or any
      * other transformations.
      */
-    public float screenY(final float x, final float y) {
+    public float screenY(float x, float y) {
         return graphics.screenY(x, y);
     }
 
@@ -1140,7 +1139,7 @@ public class RainbowDrawer {
      * would be placed on screen, once affected by translate(), scale(), or any
      * other transformations.
      */
-    public float screenX(final float x, final float y, final float z) {
+    public float screenX(float x, float y, float z) {
         return graphics.screenX(x, y, z);
     }
 
@@ -1151,7 +1150,7 @@ public class RainbowDrawer {
      * would be placed on screen, once affected by translate(), scale(), or any
      * other transformations.
      */
-    public float screenY(final float x, final float y, final float z) {
+    public float screenY(float x, float y, float z) {
         return graphics.screenY(x, y, z);
     }
 
@@ -1165,7 +1164,7 @@ public class RainbowDrawer {
      * comparison to another value obtained from screenZ(), or directly out of
      * the zbuffer[].
      */
-    public float screenZ(final float x, final float y, final float z) {
+    public float screenZ(float x, float y, float z) {
         return graphics.screenZ(x, y, z);
     }
 
@@ -1177,21 +1176,21 @@ public class RainbowDrawer {
      * projection matrix. For instance, his can be useful for figuring out how
      * points in 3D space relate to the edge coordinates of a shape.
      */
-    public float modelX(final float x, final float y, final float z) {
+    public float modelX(float x, float y, float z) {
         return graphics.modelX(x, y, z);
     }
 
     /**
      * Returns the model space y value for an x, y, z coordinate.
      */
-    public float modelY(final float x, final float y, final float z) {
+    public float modelY(float x, float y, float z) {
         return graphics.modelY(x, y, z);
     }
 
     /**
      * Returns the model space z value for an x, y, z coordinate.
      */
-    public float modelZ(final float x, final float y, final float z) {
+    public float modelZ(float x, float y, float z) {
         return graphics.modelZ(x, y, z);
     }
 
@@ -1203,20 +1202,20 @@ public class RainbowDrawer {
         graphics.popStyle();
     }
 
-    public void style(final RainbowStyle s) {
+    public void style(RainbowStyle s) {
         graphics.style(s);
     }
 
-    public void strokeWeight(final float weight) {
+    public void strokeWeight(float weight) {
         graphics.strokeWeight(weight);
     }
 
-    public void strokeJoin(final int join) {
-        graphics.strokeJoin(join);
+    public void strokeJoin(Modes.Stroke.Join mode) {
+        graphics.strokeJoin(mode);
     }
 
-    public void strokeCap(final int cap) {
-        graphics.strokeCap(cap);
+    public void strokeCap(Modes.Stroke.Cap mode) {
+        graphics.strokeCap(mode);
     }
 
     public void noStroke() {
@@ -1239,27 +1238,27 @@ public class RainbowDrawer {
      * Set the tint to either a grayscale or ARGB value. See notes attached to
      * the fill() function.
      */
-    public void stroke(final int rgb) {
+    public void stroke(int rgb) {
         graphics.stroke(rgb);
     }
 
-    public void stroke(final int rgb, final float alpha) {
+    public void stroke(int rgb, float alpha) {
         graphics.stroke(rgb, alpha);
     }
 
-    public void stroke(final float gray) {
+    public void stroke(float gray) {
         graphics.stroke(gray);
     }
 
-    public void stroke(final float gray, final float alpha) {
+    public void stroke(float gray, float alpha) {
         graphics.stroke(gray, alpha);
     }
 
-    public void stroke(final float x, final float y, final float z) {
+    public void stroke(float x, float y, float z) {
         graphics.stroke(x, y, z);
     }
 
-    public void stroke(final float x, final float y, final float z, final float a) {
+    public void stroke(float x, float y, float z, float a) {
         graphics.stroke(x, y, z, a);
     }
 
@@ -1270,27 +1269,27 @@ public class RainbowDrawer {
     /**
      * Set the tint to either a grayscale or ARGB value.
      */
-    public void tint(final int rgb) {
+    public void tint(int rgb) {
         graphics.tint(rgb);
     }
 
-    public void tint(final int rgb, final float alpha) {
+    public void tint(int rgb, float alpha) {
         graphics.tint(rgb, alpha);
     }
 
-    public void tint(final float gray) {
+    public void tint(float gray) {
         graphics.tint(gray);
     }
 
-    public void tint(final float gray, final float alpha) {
+    public void tint(float gray, float alpha) {
         graphics.tint(gray, alpha);
     }
 
-    public void tint(final float x, final float y, final float z) {
+    public void tint(float x, float y, float z) {
         graphics.tint(x, y, z);
     }
 
-    public void tint(final float x, final float y, final float z, final float a) {
+    public void tint(float x, float y, float z, float a) {
         graphics.tint(x, y, z, a);
     }
 
@@ -1301,67 +1300,67 @@ public class RainbowDrawer {
     /**
      * Set the fill to either a grayscale value or an ARGB int.
      */
-    public void fill(final int rgb) {
+    public void fill(int rgb) {
         graphics.fill(rgb);
     }
 
-    public void fill(final int rgb, final float alpha) {
+    public void fill(int rgb, float alpha) {
         graphics.fill(rgb, alpha);
     }
 
-    public void fill(final float gray) {
+    public void fill(float gray) {
         graphics.fill(gray);
     }
 
-    public void fill(final float gray, final float alpha) {
+    public void fill(float gray, float alpha) {
         graphics.fill(gray, alpha);
     }
 
-    public void fill(final float x, final float y, final float z) {
+    public void fill(float x, float y, float z) {
         graphics.fill(x, y, z);
     }
 
-    public void fill(final float x, final float y, final float z, final float a) {
+    public void fill(float x, float y, float z, float a) {
         graphics.fill(x, y, z, a);
     }
 
-    public void ambient(final int rgb) {
+    public void ambient(int rgb) {
         graphics.ambient(rgb);
     }
 
-    public void ambient(final float gray) {
+    public void ambient(float gray) {
         graphics.ambient(gray);
     }
 
-    public void ambient(final float x, final float y, final float z) {
+    public void ambient(float x, float y, float z) {
         graphics.ambient(x, y, z);
     }
 
-    public void specular(final int rgb) {
+    public void specular(int rgb) {
         graphics.specular(rgb);
     }
 
-    public void specular(final float gray) {
+    public void specular(float gray) {
         graphics.specular(gray);
     }
 
-    public void specular(final float x, final float y, final float z) {
+    public void specular(float x, float y, float z) {
         graphics.specular(x, y, z);
     }
 
-    public void shininess(final float shine) {
+    public void shininess(float shine) {
         graphics.shininess(shine);
     }
 
-    public void emissive(final int rgb) {
+    public void emissive(int rgb) {
         graphics.emissive(rgb);
     }
 
-    public void emissive(final float gray) {
+    public void emissive(float gray) {
         graphics.emissive(gray);
     }
 
-    public void emissive(final float x, final float y, final float z) {
+    public void emissive(float x, float y, float z) {
         graphics.emissive(x, y, z);
     }
 
@@ -1373,41 +1372,41 @@ public class RainbowDrawer {
         graphics.noLights();
     }
 
-    public void ambientLight(final float red, final float green, final float blue) {
+    public void ambientLight(float red, float green, float blue) {
         graphics.ambientLight(red, green, blue);
     }
 
-    public void ambientLight(final float red, final float green, final float blue, final float x, final float y, final float z) {
+    public void ambientLight(float red, float green, float blue, float x, float y, float z) {
         graphics.ambientLight(red, green, blue, x, y, z);
     }
 
-    public void directionalLight(final float red, final float green, final float blue, final float nx, final float ny, final float nz) {
+    public void directionalLight(float red, float green, float blue, float nx, float ny, float nz) {
         graphics.directionalLight(red, green, blue, nx, ny, nz);
     }
 
-    public void pointLight(final float red, final float green, final float blue, final float x, final float y, final float z) {
+    public void pointLight(float red, float green, float blue, float x, float y, float z) {
         graphics.pointLight(red, green, blue, x, y, z);
     }
 
-    public void spotLight(final float red,
-                          final float green,
-                          final float blue,
-                          final float x,
-                          final float y,
-                          final float z,
-                          final float nx,
-                          final float ny,
-                          final float nz,
-                          final float angle,
-                          final float concentration) {
+    public void spotLight(float red,
+                          float green,
+                          float blue,
+                          float x,
+                          float y,
+                          float z,
+                          float nx,
+                          float ny,
+                          float nz,
+                          float angle,
+                          float concentration) {
         graphics.spotLight(red, green, blue, x, y, z, nx, ny, nz, angle, concentration);
     }
 
-    public void lightFalloff(final float constant, final float linear, final float quadratic) {
+    public void lightFalloff(float constant, float linear, float quadratic) {
         graphics.lightFalloff(constant, linear, quadratic);
     }
 
-    public void lightSpecular(final float x, final float y, final float z) {
+    public void lightSpecular(float x, float y, float z) {
         graphics.lightSpecular(x, y, z);
     }
 
@@ -1422,28 +1421,28 @@ public class RainbowDrawer {
      * because some implementations may require the current transformation
      * matrix to be identity before drawing.
      */
-    public void background(final int rgb) {
+    public void background(int rgb) {
         graphics.background(rgb);
     }
 
     /**
      * See notes about alpha in background(x, y, z, a).
      */
-    public void background(final int rgb, final float alpha) {
+    public void background(int rgb, float alpha) {
         graphics.background(rgb, alpha);
     }
 
     /**
      * Set the background to a grayscale value, based on the current colorMode.
      */
-    public void background(final float gray) {
+    public void background(float gray) {
         graphics.background(gray);
     }
 
     /**
      * See notes about alpha in background(x, y, z, a).
      */
-    public void background(final float gray, final float alpha) {
+    public void background(float gray, float alpha) {
         graphics.background(gray, alpha);
     }
 
@@ -1451,7 +1450,7 @@ public class RainbowDrawer {
      * Set the background to an r, g, b or h, s, b value, based on the current
      * colorMode.
      */
-    public void background(final float x, final float y, final float z) {
+    public void background(float x, float y, float z) {
         graphics.background(x, y, z);
     }
 
@@ -1466,7 +1465,7 @@ public class RainbowDrawer {
      * level of transparency. To do a semi-transparent overlay, use fill() with
      * alpha and draw a rectangle.
      */
-    public void background(final float x, final float y, final float z, final float a) {
+    public void background(float x, float y, float z, float a) {
         graphics.background(x, y, z, a);
     }
 
@@ -1486,19 +1485,19 @@ public class RainbowDrawer {
      * <p/>
      * When using 3D, this will also clear the zbuffer (if it exists).
      */
-    public void background(final RainbowImage image) {
+    public void background(RainbowImage image) {
         image(image, 0, 0, width, height);
     }
 
-    public void image(final RainbowImage image, final float x, final float y, final float c, final float d) {
+    public void image(RainbowImage image, float x, float y, float c, float d) {
         graphics.image(image, x, y, c, d);
     }
 
-    public void colorMode(final int mode) {
+    public void colorMode(Modes.Image mode) {
         graphics.colorMode(mode);
     }
 
-    public void colorMode(final int mode, final float max) {
+    public void colorMode(Modes.Image mode, float max) {
         graphics.colorMode(mode, max);
     }
 
@@ -1514,39 +1513,39 @@ public class RainbowDrawer {
      * <p/>
      * because the alpha values were still between 0 and 255.
      */
-    public void colorMode(final int mode, final float maxX, final float maxY, final float maxZ) {
+    public void colorMode(Modes.Image mode, float maxX, float maxY, float maxZ) {
         graphics.colorMode(mode, maxX, maxY, maxZ);
     }
 
-    public void colorMode(final int mode, final float maxX, final float maxY, final float maxZ, final float maxA) {
+    public void colorMode(Modes.Image mode, float maxX, float maxY, float maxZ, float maxA) {
         graphics.colorMode(mode, maxX, maxY, maxZ, maxA);
     }
 
-    public final float alpha(final int what) {
+    public float alpha(int what) {
         return graphics.alpha(what);
     }
 
-    public final float red(final int what) {
+    public float red(int what) {
         return graphics.red(what);
     }
 
-    public final float green(final int what) {
+    public float green(int what) {
         return graphics.green(what);
     }
 
-    public final float blue(final int what) {
+    public float blue(int what) {
         return graphics.blue(what);
     }
 
-    public final float hue(final int what) {
+    public float hue(int what) {
         return graphics.hue(what);
     }
 
-    public final float saturation(final int what) {
+    public float saturation(int what) {
         return graphics.saturation(what);
     }
 
-    public final float brightness(final int what) {
+    public float brightness(int what) {
         return graphics.brightness(what);
     }
 
@@ -1558,7 +1557,7 @@ public class RainbowDrawer {
     /**
      * Interpolate between two colors, using the current color mode.
      */
-    public int lerpColor(final int c1, final int c2, final float amt) {
+    public int lerpColor(int c1, int c2, float amt) {
         return graphics.lerpColor(c1, c2, amt);
     }
 
@@ -1606,7 +1605,7 @@ public class RainbowDrawer {
      * the bounds, and then has to check to see what image type it is. If you
      * want things to be more efficient, access the pixels[] array directly.
      */
-    public int get(final int x, final int y) {
+    public int get(int x, int y) {
         return graphics.get(x, y);
     }
 
@@ -1614,7 +1613,7 @@ public class RainbowDrawer {
      * @param w width of pixel rectangle to get
      * @param h height of pixel rectangle to get
      */
-    public RainbowImage get(final int x, final int y, final int w, final int h) {
+    public RainbowImage get(int x, int y, int w, int h) {
         return graphics.get(x, y, w, h);
     }
 
@@ -1628,7 +1627,7 @@ public class RainbowDrawer {
     /**
      * Set a single pixel to the specified color.
      */
-    public void set(final int x, final int y, final int c) {
+    public void set(int x, int y, int c) {
         graphics.set(x, y, c);
     }
 
@@ -1637,7 +1636,7 @@ public class RainbowDrawer {
      * No variations are employed, meaning that any scale, tint, or imageMode
      * settings will be ignored.
      */
-    public void set(final int x, final int y, final RainbowImage img) {
+    public void set(int x, int y, RainbowImage img) {
         graphics.set(x, y, img);
     }
 
@@ -1652,14 +1651,14 @@ public class RainbowDrawer {
      * use filter(GRAY) which will make the image into a "correct" grayscake by
      * performing a proper luminance-based conversion.
      */
-    public void mask(final int alpha[]) {
+    public void mask(int alpha[]) {
         graphics.mask(alpha);
     }
 
     /**
      * Set alpha channel for an image using another image as the source.
      */
-    public void mask(final RainbowImage alpha) {
+    public void mask(RainbowImage alpha) {
         graphics.mask(alpha);
     }
 
@@ -1681,8 +1680,8 @@ public class RainbowDrawer {
      * Gaussian blur code contributed by <A
      * HREF="http://incubator.quasimondo.com">Mario Klingemann</A>
      */
-    public void filter(final int kind) {
-        graphics.filter(kind);
+    public void filter(Modes.Filter mode) {
+        graphics.filter(mode);
     }
 
     /**
@@ -1701,40 +1700,40 @@ public class RainbowDrawer {
      * HREF="http://incubator.quasimondo.com">Mario Klingemann</A> and later
      * updated by toxi for better speed.
      */
-    public void filter(final int kind, final float param) {
-        graphics.filter(kind, param);
+    public void filter(Modes.Filter mode, float param) {
+        graphics.filter(mode, param);
     }
 
     /**
      * Copy things from one area of this image to another area in the same
      * image.
      */
-    public void copy(final int sx, final int sy, final int sw, final int sh, final int dx, final int dy, final int dw, final int dh) {
+    public void copy(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh) {
         graphics.copy(sx, sy, sw, sh, dx, dy, dw, dh);
     }
 
     /**
      * Copies area of one image into another PImage object.
      */
-    public void copy(final RainbowImage src, final int sx, final int sy, final int sw, final int sh, final int dx, final int dy, final int dw, final int dh) {
+    public void copy(RainbowImage src, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh) {
         graphics.copy(src, sx, sy, sw, sh, dx, dy, dw, dh);
     }
 
     /**
      * Blends one area of this image to another area.
      *
-     * @see com.juankysoriano.rainbow.core.graphics.RainbowImage#blendColor(int, int, int)
+     * @see com.juankysoriano.rainbow.core.graphics.RainbowImage#blendColor(int, int, Modes.Blend)
      */
-    public void blend(final int sx, final int sy, final int sw, final int sh, final int dx, final int dy, final int dw, final int dh, final int mode) {
+    public void blend(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, Modes.Blend mode) {
         graphics.blend(sx, sy, sw, sh, dx, dy, dw, dh, mode);
     }
 
     /**
      * Copies area of one image into another PImage object.
      *
-     * @see com.juankysoriano.rainbow.core.graphics.RainbowImage#blendColor(int, int, int)
+     * @see com.juankysoriano.rainbow.core.graphics.RainbowImage#blendColor(int, int, Modes.Blend)
      */
-    public void blend(final RainbowImage src, final int sx, final int sy, final int sw, final int sh, final int dx, final int dy, final int dw, final int dh, final int mode) {
+    public void blend(RainbowImage src, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, Modes.Blend mode) {
         graphics.blend(src, sx, sy, sw, sh, dx, dy, dw, dh, mode);
     }
 
@@ -1753,7 +1752,7 @@ public class RainbowDrawer {
         NORMAL(16),
         LOW(32);
 
-        private final int precision;
+        private int precision;
 
         Precision(int precision) {
             this.precision = precision;

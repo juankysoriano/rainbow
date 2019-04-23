@@ -4,10 +4,10 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.core.Rainbow;
+import com.juankysoriano.rainbow.core.drawing.Modes;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer.Precision;
 import com.juankysoriano.rainbow.core.event.RainbowInputController;
-import com.juankysoriano.rainbow.core.graphics.RainbowGraphics;
 
 public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputController.RainbowInteractionListener {
 
@@ -17,7 +17,7 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputCon
         public void onPointDetected(float px, float py, float x, float y) {
             getRainbowDrawer().stroke(0, 30);
             getRainbowDrawer().fill(0, 0);
-            getRainbowDrawer().ellipseMode(RainbowGraphics.CENTER);
+            getRainbowDrawer().ellipseMode(Modes.Draw.CENTER);
             getRainbowDrawer().ellipse(x, y, 200, 200);
         }
 

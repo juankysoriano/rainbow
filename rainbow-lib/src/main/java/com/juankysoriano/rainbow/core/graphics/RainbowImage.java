@@ -28,14 +28,17 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
 
 import com.juankysoriano.rainbow.core.Rainbow;
+import com.juankysoriano.rainbow.core.drawing.Modes;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
 
-import static com.juankysoriano.rainbow.core.graphics.RainbowGraphics.*;
+import static com.juankysoriano.rainbow.core.drawing.Modes.Blend.REPLACE;
+import static com.juankysoriano.rainbow.core.drawing.Modes.Filter.BLUR;
+import static com.juankysoriano.rainbow.core.drawing.Modes.Filter.THRESHOLD;
+import static com.juankysoriano.rainbow.core.drawing.Modes.Image.*;
 
 /**
  * Storage class for pixel data. This is the base class for most image and pixel
@@ -51,36 +54,7 @@ public class RainbowImage implements Cloneable {
     public static final int RED_MASK = 0x00ff0000;
     public static final int GREEN_MASK = 0x0000ff00;
     public static final int BLUE_MASK = 0x000000ff;
-    public static final int LOAD_CENTER_INSIDE = 0;
-    public static final int LOAD_CENTER_CROP = 1;
-    public static final int LOAD_ORIGINAL_SIZE = 2;
-    // blend mode keyword definitions
-    // @see imagine.core.PImage#blendColor(int,int,int)
-    public static final int BLUR = 11;
-    public static final int GRAY = 12;
-    public static final int INVERT = 13;
-    public static final int OPAQUE = 14;
-    public static final int POSTERIZE = 15;
-    public static final int THRESHOLD = 16;
-    public static final int ERODE = 17;
-    public static final int DILATE = 18;
-    public final static int REPLACE = 0;
-    public final static int BLEND = 1 << 0;
-    public final static int ADD = 1 << 1;
-    public final static int SUBTRACT = 1 << 2;
-    public final static int LIGHTEST = 1 << 3;
-    public final static int DARKEST = 1 << 4;
-    public final static int DIFFERENCE = 1 << 5;
 
-    // filter/convert types
-    public final static int EXCLUSION = 1 << 6;
-    public final static int MULTIPLY = 1 << 7;
-    public final static int SCREEN = 1 << 8;
-    public final static int OVERLAY = 1 << 9;
-    public final static int HARD_LIGHT = 1 << 10;
-    public final static int SOFT_LIGHT = 1 << 11;
-    public final static int DODGE = 1 << 12;
-    public final static int BURN = 1 << 13;
     private static final int PRECISIONB = 15;
     private static final int PRECISIONF = 1 << PRECISIONB;
     private static final int PREC_MAXVAL = PRECISIONF - 1;
@@ -91,7 +65,7 @@ public class RainbowImage implements Cloneable {
      * still require 0xff in the high byte because of how they'll be manipulated
      * by other functions
      */
-    public int format;
+    public Modes.Image format;
     public int[] pixels;
     public int width, height;
     /**
@@ -103,14 +77,6 @@ public class RainbowImage implements Cloneable {
      * Loaded pixels flag
      */
     public boolean loaded = false;
-    /**
-     * for renderers that need to store info about the image
-     */
-    protected HashMap<RainbowGraphics, Object> cacheMap;
-    /**
-     * for renderers that need to store parameters about the image
-     */
-    protected HashMap<RainbowGraphics, Object> paramMap;
     /**
      * modified portion of the image
      */
@@ -138,7 +104,7 @@ public class RainbowImage implements Cloneable {
      * not allocated.
      */
     public RainbowImage() {
-        format = ARGB;
+        format = RGB;
     }
 
     /**
@@ -157,7 +123,7 @@ public class RainbowImage implements Cloneable {
      * known when super() is called. (Leave this public so that other libraries
      * can do the same.)
      */
-    public void init(int width, int height, int format) { // ignore
+    public void init(int width, int height, Modes.Image format) { // ignore
         this.width = width;
         this.height = height;
         this.pixels = new int[width * height];
@@ -166,7 +132,7 @@ public class RainbowImage implements Cloneable {
 
     // ////////////////////////////////////////////////////////////
 
-    public RainbowImage(int width, int height, int format) {
+    public RainbowImage(int width, int height, Modes.Image format) {
         init(width, height, format);
     }
 
@@ -269,7 +235,7 @@ public class RainbowImage implements Cloneable {
      * with Processing.
      * </P>
      */
-    public static int blendColor(int c1, int c2, int mode) { // ignore
+    public static int blendColor(int c1, int c2, Modes.Blend mode) { // ignore
         switch (mode) {
             case REPLACE:
                 return c2;
@@ -317,7 +283,8 @@ public class RainbowImage implements Cloneable {
         return (low(((a & ALPHA_MASK) >>> 24) + f, 0xff) << 24 | mix(a & RED_MASK, b & RED_MASK, f) & RED_MASK | mix(a & GREEN_MASK, b & GREEN_MASK, f) & GREEN_MASK | mix(
                 a & BLUE_MASK,
                 b & BLUE_MASK,
-                f));
+                f
+        ));
     }
 
     /**
@@ -347,7 +314,7 @@ public class RainbowImage implements Cloneable {
         int f = (b & ALPHA_MASK) >>> 24;
 
         return (low(((a & ALPHA_MASK) >>> 24) + f, 0xff) << 24 | high(a & RED_MASK, ((b & RED_MASK) >> 8) * f) & RED_MASK | high(a & GREEN_MASK, ((b & GREEN_MASK) >> 8) * f) & GREEN_MASK | high(a
-                & BLUE_MASK, ((b & BLUE_MASK) * f) >> 8));
+                                                                                                                                                                                                          & BLUE_MASK, ((b & BLUE_MASK) * f) >> 8));
     }
 
     /**
@@ -677,7 +644,7 @@ public class RainbowImage implements Cloneable {
             h = 0;
         }
 
-        int targetFormat = format;
+        Modes.Image targetFormat = format;
         if (cropped && format == RGB) {
             targetFormat = ARGB;
         }
@@ -957,10 +924,10 @@ public class RainbowImage implements Cloneable {
      * Gaussian blur code contributed by <A
      * HREF="http://incubator.quasimondo.com">Mario Klingemann</A>
      */
-    public void filter(int kind) {
+    public void filter(Modes.Filter mode) {
         loadPixels();
 
-        switch (kind) {
+        switch (mode) {
             case BLUR:
                 filter(BLUR, 1);
                 break;
@@ -1029,10 +996,10 @@ public class RainbowImage implements Cloneable {
      * HREF="http://incubator.quasimondo.com">Mario Klingemann</A> and later
      * updated by toxi for better speed.
      */
-    public void filter(int kind, float param) {
+    public void filter(Modes.Filter mode, float param) {
         loadPixels();
 
-        switch (kind) {
+        switch (mode) {
             case BLUR:
                 if (format == ALPHA) {
                     blurAlpha(param);
@@ -1106,13 +1073,15 @@ public class RainbowImage implements Cloneable {
                 blurKernel[radius + i] = blurKernel[radiusi] = bki = radiusi * radiusi;
                 bm = blurMult[radius + i];
                 bmi = blurMult[radiusi--];
-                for (int j = 0; j < 256; j++)
+                for (int j = 0; j < 256; j++) {
                     bm[j] = bmi[j] = bki * j;
+                }
             }
             bk = blurKernel[radius] = radius * radius;
             bm = blurMult[radius];
-            for (int j = 0; j < 256; j++)
+            for (int j = 0; j < 256; j++) {
                 bm[j] = bk * j;
+            }
         }
     }
 
@@ -1491,9 +1460,9 @@ public class RainbowImage implements Cloneable {
     /**
      * Copies area of one image into another PImage object.
      *
-     * @see RainbowImage#blendColor(int, int, int)
+     * @see RainbowImage#blendColor(int, int, Modes.Blend)
      */
-    public void blend(RainbowImage src, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mode) {
+    public void blend(RainbowImage src, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, Modes.Blend mode) {
         int sx2 = sx + sw;
         int sy2 = sy + sh;
         int dx2 = dx + dw;
@@ -1552,7 +1521,7 @@ public class RainbowImage implements Cloneable {
      * smooth() has been enabled 'mode' determines the blending mode used in the
      * process.
      */
-    private void blit_resize(RainbowImage img, int srcX1, int srcY1, int srcX2, int srcY2, int[] destPixels, int screenW, int screenH, int destX1, int destY1, int destX2, int destY2, int mode) {
+    private void blit_resize(RainbowImage img, int srcX1, int srcY1, int srcX2, int srcY2, int[] destPixels, int screenW, int screenH, int destX1, int destY1, int destX2, int destY2, Modes.Blend mode) {
         if (srcX1 < 0) {
             srcX1 = 0;
         }
@@ -1835,9 +1804,9 @@ public class RainbowImage implements Cloneable {
     /**
      * Blends one area of this image to another area.
      *
-     * @see RainbowImage#blendColor(int, int, int)
+     * @see RainbowImage#blendColor(int, int, Modes.Blend)
      */
-    public void blend(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mode) {
+    public void blend(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, Modes.Blend mode) {
         blend(this, sx, sy, sw, sh, dx, dy, dw, dh, mode);
     }
 

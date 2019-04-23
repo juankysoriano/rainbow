@@ -27,10 +27,4 @@ public class RainbowTextureView extends TextureView {
         getParent().requestDisallowInterceptTouchEvent(true);
         return true;
     }
-
-    public void restoreView() {
-        rainbow.getRainbowDrawer().beginDraw();
-        rainbow.onDrawingStep();
-        rainbow.getRainbowDrawer().endDraw();
-    }
 }
