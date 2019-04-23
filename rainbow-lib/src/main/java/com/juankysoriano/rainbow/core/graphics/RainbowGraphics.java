@@ -43,35 +43,35 @@ public abstract class RainbowGraphics extends RainbowImage {
 
     static final int VERTEX_FIELD_COUNT = 37;
     public static final float[] cosLUT;
-    public static final int R = 3;
-    public static final int G = 4;
-    public static final int B = 5;
-    public static final int A = 6;
-    public static final int U = 7;
-    public static final int V = 8;
-    public static final int NX = 9;
-    public static final int NY = 10;
-    public static final int NZ = 11;
-    public static final int EDGE = 12;
-    public static final int SR = 13;
-    public static final int SG = 14;
-    public static final int SB = 15;
-    public static final int SA = 16;
-    public static final int SW = 17;
-    public static final int HAS_NORMAL = 36;
-    public static final Modes.Stroke.Cap DEFAULT_STROKE_CAP = Modes.Stroke.Cap.ROUND;
-    public static final Modes.Stroke.Join DEFAULT_STROKE_JOIN = Modes.Stroke.Join.MITER;
-    public static final float DEFAULT_STROKE_WEIGHT = 1;
-    public static final float[] sinLUT;
-    public static final float SINCOS_PRECISION = 0.5f;
+    private static final float SINCOS_PRECISION = 0.5f;
     public static final int SINCOS_LENGTH = (int) (360f / SINCOS_PRECISION);
-    public static final int X = 0;  // model coords xyz (formerly MX/MY/MZ)
-    public static final int Y = 1;
-    public static final int Z = 2;
+    private static final int R = 3;
+    private static final int G = 4;
+    private static final int B = 5;
+    public static final int A = 6;
+    private static final int U = 7;
+    private static final int V = 8;
+    private static final int NX = 9;
+    private static final int NY = 10;
+    private static final int NZ = 11;
+    private static final int EDGE = 12;
+    private static final int SR = 13;
+    private static final int SG = 14;
+    private static final int SB = 15;
+    private static final int SA = 16;
+    private static final int SW = 17;
+    private static final int HAS_NORMAL = 36;
+    private static final Modes.Stroke.Cap DEFAULT_STROKE_CAP = Modes.Stroke.Cap.ROUND;
+    private static final Modes.Stroke.Join DEFAULT_STROKE_JOIN = Modes.Stroke.Join.MITER;
+    private static final float DEFAULT_STROKE_WEIGHT = 1;
+    private static final float[] sinLUT;
+    static final int X = 0;  // model coords xyz (formerly MX/MY/MZ)
+    static final int Y = 1;
+    static final int Z = 2;
     /**
      * texture coordinates based on image width/height
      */
-    public static final int IMAGE = 2;
+    private static final int IMAGE = 2;
 
     private static final String ERROR_BACKGROUND_IMAGE_SIZE =
             "background image must be the same size as your application";
@@ -100,10 +100,10 @@ public abstract class RainbowGraphics extends RainbowImage {
 
     private final RMatrix3D bezierBasisMatrix = new RMatrix3D(-1, 3, -3, 1, 3, -6, 3, 0, -3, 3, 0, 0, 1, 0, 0, 0);
     private final float[] cacheHsbValue = new float[3];
-    public Modes.Stroke.Cap strokeCap = DEFAULT_STROKE_CAP;
-    public Modes.Stroke.Join strokeJoin = DEFAULT_STROKE_JOIN;
-    public float strokeWeight = DEFAULT_STROKE_WEIGHT;
-    public boolean smooth = false;
+    Modes.Stroke.Cap strokeCap = DEFAULT_STROKE_CAP;
+    Modes.Stroke.Join strokeJoin = DEFAULT_STROKE_JOIN;
+    float strokeWeight = DEFAULT_STROKE_WEIGHT;
+    boolean smooth = false;
     /**
      * True if tint() is enabled (read-only).
      * <p/>
@@ -112,51 +112,50 @@ public abstract class RainbowGraphics extends RainbowImage {
      * actual color seems a little more intuitive, it's just that g.tintEnabled
      * is even more unintuitive. Same goes for fill and stroke, et al.
      */
-    public boolean tint;
+    boolean tint;
     /**
      * tint that was last set (read-only)
      */
-    public int tintColor;
+    int tintColor;
     /**
      * true if fill() is enabled, (read-only)
      */
-    public boolean fill;
+    boolean fill;
     /**
      * fill that was last set (read-only)
      */
-    public int fillColor = 0xffFFFFFF;
+    int fillColor = 0xffFFFFFF;
     /**
      * true if stroke() is enabled, (read-only)
      */
-    public boolean stroke;
+    boolean stroke;
     /**
      * stroke that was last set (read-only)
      */
-    public int strokeColor = 0xff000000;
+    int strokeColor = 0xff000000;
     /**
      * Last background color that was set, zero if an image
      */
-    public int backgroundColor = 0xffCCCCCC;
+    int backgroundColor = 0xffCCCCCC;
 
     // ........................................................
 
     // Additional stroke properties
-    protected float vertices[][] = new float[DEFAULT_VERTICES][VERTEX_FIELD_COUNT];
-    protected int quality;
+    float[][] vertices = new float[DEFAULT_VERTICES][VERTEX_FIELD_COUNT];
     /**
      * true if this is the main drawing surface for a particular sketch. This
      * would be set to false for an offscreen buffer or if it were created any
      * other way than size(). When this is set, the listeners are also added to
      * the sketch.
      */
-    protected boolean primarySurface;
+    boolean primarySurface;
     /**
      * Type of shape passed to beginShape(), zero if no shape is currently being
      * drawn.
      */
-    protected int vertexCount; // total number of vertices
-    protected RMatrix3D curveToBezierMatrix;
-    protected int curveVertexCount;
+    int vertexCount; // total number of vertices
+    RMatrix3D curveToBezierMatrix;
+    int curveVertexCount;
     /**
      * The current image alignment (read-only)
      */
@@ -198,7 +197,7 @@ public abstract class RainbowGraphics extends RainbowImage {
     /**
      * The current shape alignment mode (read-only)
      */
-    protected Modes.Shape shapeMode;
+    Modes.Shape shapeMode;
     private float ambientR;
     private float ambientG;
     private float ambientB;
@@ -285,7 +284,6 @@ public abstract class RainbowGraphics extends RainbowImage {
     private int calcBi;
     private int calcAi;
     private int calcColor;
-    private boolean calcAlpha;
 
     /**
      * Metrics for the current native Java font
@@ -317,15 +315,6 @@ public abstract class RainbowGraphics extends RainbowImage {
      * The last RGB value converted to HSB
      */
     private int cacheHsbKey;
-
-    /**
-     * Display a warning that the specified method is only available with 3D.
-     *
-     * @param method The method name (no parentheses)
-     */
-    public static void showDepthWarning(String method) {
-        showWarning(method + "() can only be used with a renderer that " + "supports 3D, such as P3D or OPENGL.");
-    }
 
     /**
      * Show a renderer error, and keep track of it so that it's only shown once.
@@ -419,7 +408,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      * <p/>
      * This is currently called by checkSettings(), during beginDraw().
      */
-    void defaultSettings() { // ignore
+    private void defaultSettings() { // ignore
         smooth(); // 2.0a5
 
         colorMode(RGB, 255);
@@ -500,7 +489,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      * that it could be either a completely missing function, although other
      * variations of it may still work properly.
      */
-    public static void showMissingWarning(String method) {
+    static void showMissingWarning(String method) {
         showWarning(method + "(), or this particular variation of it, " + "is not available with this renderer.");
     }
 
@@ -527,7 +516,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         vertexCount++;
     }
 
-    void vertexCheck() {
+    private void vertexCheck() {
         if (vertexCount == vertices.length) {
             float temp[][] = new float[vertexCount << 1][VERTEX_FIELD_COUNT];
             System.arraycopy(vertices, 0, temp, 0, vertexCount);
@@ -553,7 +542,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      * <p/>
      * Used by both PGraphics2D (for images) and PGraphics3D.
      */
-    void vertexTexture(float u, float v) {
+    private void vertexTexture(float u, float v) {
         if (textureImage == null) {
             throw new RuntimeException("You must first call texture() before " + "using u and v coordinates with vertex()");
         }
@@ -571,7 +560,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         float[] vertex = vertices[vertexCount];
         if (shapeMode == POLYGON) {
             if (vertexCount > 0) {
-                float pvertex[] = vertices[vertexCount - 1];
+                float[] pvertex = vertices[vertexCount - 1];
                 if ((Math.abs(pvertex[X] - x) < RainbowMath.EPSILON) && (Math.abs(pvertex[Y] - y) < RainbowMath.EPSILON) && (Math.abs(pvertex[Z] - z) < RainbowMath.EPSILON)) {
                     return;
                 }
@@ -700,7 +689,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         }
     }
 
-    void clipImpl(float x1, float y1, float x2, float y2) {
+    private void clipImpl(float x1, float y1, float x2, float y2) {
         showMissingWarning("clip");
     }
 
@@ -732,7 +721,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         );
     }
 
-    protected void bezierVertexCheck() {
+    void bezierVertexCheck() {
         bezierVertexCheck(shapeMode, vertexCount);
     }
 
@@ -773,7 +762,7 @@ public abstract class RainbowGraphics extends RainbowImage {
     }
 
     private void bezierVertexCheck(Modes.Shape shape, int vertexCount) {
-        if (shape == UNDEFINED || shape != POLYGON) {
+        if (shape != POLYGON) {
             throw new RuntimeException("beginShape() or beginShape(POLYGON) " + "must be used before bezierVertex() or quadraticVertex()");
         }
         if (vertexCount == 0) {
@@ -812,7 +801,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      * @param segments number of curve segments to use when drawing
      * @param matrix   target object for the new matrix
      */
-    void splineForward(int segments, RMatrix3D matrix) {
+    private void splineForward(int segments, RMatrix3D matrix) {
         float f = 1.0f / segments;
         float ff = f * f;
         float fff = ff * f;
@@ -1064,7 +1053,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         rectImpl(a, b, c, d, tl, tr, br, bl);
     }
 
-    void rectImpl(float x1, float y1, float x2, float y2, float tl, float tr, float br, float bl) {
+    private void rectImpl(float x1, float y1, float x2, float y2, float tl, float tr, float br, float bl) {
         beginShape();
         // vertex(x1+tl, y1);
         if (tr != 0) {
@@ -1614,7 +1603,7 @@ public abstract class RainbowGraphics extends RainbowImage {
                 * (ttt * cb.getM03() + tt * cb.getM13() + t * cb.getM23() + cb.getM33()));
     }
 
-    void curveInitCheck() {
+    private void curveInitCheck() {
         if (!curveInited) {
             curveInit();
         }
@@ -1776,7 +1765,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      * Perform initialization specific to curveVertex(), and handle standard
      * error modes. Can be overridden by subclasses that need the flexibility.
      */
-    void curveVertexCheck(Modes.Shape shape) {
+    private void curveVertexCheck(Modes.Shape shape) {
         if (shape != POLYGON) {
             throw new RuntimeException("You must use beginShape() or " + "beginShape(POLYGON) before curveVertex()");
         }
@@ -1922,8 +1911,8 @@ public abstract class RainbowGraphics extends RainbowImage {
             imageImpl(image, x, y, x + image.width, y + image.height, 0, 0, image.width, image.height);
 
         } else if (imageDrawMode == CENTER) {
-            float x1 = x - image.width / 2;
-            float y1 = y - image.height / 2;
+            float x1 = x - image.width / 2f;
+            float y1 = y - image.height / 2f;
             imageImpl(image, x1, y1, x1 + image.width, y1 + image.height, 0, 0, image.width, image.height);
         }
     }
@@ -2101,7 +2090,7 @@ public abstract class RainbowGraphics extends RainbowImage {
     /**
      * Display a warning that the specified method is simply unavailable.
      */
-    public static void showMethodWarning(String method) {
+    static void showMethodWarning(String method) {
         showWarning(method + "() is not available with this renderer.");
     }
 
@@ -2556,7 +2545,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         strokeFromCalc();
     }
 
-    void colorCalc(int rgb, float alpha) {
+    private void colorCalc(int rgb, float alpha) {
         if (((rgb & 0xff000000) == 0) && (rgb <= colorModeX)) { // see above
             colorCalc((float) rgb, alpha);
 
@@ -2574,7 +2563,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         strokeColor = calcColor;
     }
 
-    void colorCalc(float gray, float alpha) {
+    private void colorCalc(float gray, float alpha) {
         if (gray > colorModeX) {
             gray = colorModeX;
         }
@@ -2599,7 +2588,6 @@ public abstract class RainbowGraphics extends RainbowImage {
         calcBi = (int) (calcB * 255);
         calcAi = (int) (calcA * 255);
         calcColor = (calcAi << 24) | (calcRi << 16) | (calcGi << 8) | calcBi;
-        calcAlpha = (calcAi != 255);
     }
 
     /**
@@ -2613,7 +2601,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      * <p/>
      * Note, no need for a bounds check since it's a 32 bit number.
      */
-    void colorCalcARGB(int argb, float alpha) {
+    private void colorCalcARGB(int argb, float alpha) {
         if (alpha == colorModeA) {
             calcAi = (argb >> 24) & 0xff;
             calcColor = argb;
@@ -2628,7 +2616,6 @@ public abstract class RainbowGraphics extends RainbowImage {
         calcR = (float) calcRi / 255.0f;
         calcG = (float) calcGi / 255.0f;
         calcB = (float) calcBi / 255.0f;
-        calcAlpha = (calcAi != 255);
     }
 
     public void stroke(float gray) {
@@ -2636,7 +2623,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         strokeFromCalc();
     }
 
-    void colorCalc(float gray) {
+    private void colorCalc(float gray) {
         colorCalc(gray, colorModeA);
     }
 
@@ -2650,11 +2637,11 @@ public abstract class RainbowGraphics extends RainbowImage {
         strokeFromCalc();
     }
 
-    void colorCalc(float x, float y, float z) {
+    private void colorCalc(float x, float y, float z) {
         colorCalc(x, y, z, colorModeA);
     }
 
-    void colorCalc(float x, float y, float z, float a) {
+    private void colorCalc(float x, float y, float z, float a) {
         if (x > colorModeX) {
             x = colorModeX;
         }
@@ -2695,7 +2682,6 @@ public abstract class RainbowGraphics extends RainbowImage {
         calcBi = (int) (255 * calcB);
         calcAi = (int) (255 * calcA);
         calcColor = (calcAi << 24) | (calcRi << 16) | (calcGi << 8) | calcBi;
-        calcAlpha = (calcAi != 255);
     }
 
     private void colorCalcRGB(float x, float y, float z, float a) {
@@ -2891,7 +2877,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      * that reads "fill(0)". The solution is to use the four parameter versions
      * of stroke or fill to more directly specify the desired result.
      */
-    void colorCalc(int rgb) {
+    private void colorCalc(int rgb) {
         if (((rgb & 0xff000000) == 0) && (rgb <= colorModeX)) {
             colorCalc((float) rgb);
 
@@ -2900,7 +2886,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         }
     }
 
-    void ambientFromCalc() {
+    private void ambientFromCalc() {
         ambientR = calcR;
         ambientG = calcG;
         ambientB = calcB;
@@ -2921,7 +2907,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         specularFromCalc();
     }
 
-    void specularFromCalc() {
+    private void specularFromCalc() {
         specularR = calcR;
         specularG = calcG;
         specularB = calcB;
@@ -2946,7 +2932,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         emissiveFromCalc();
     }
 
-    void emissiveFromCalc() {
+    private void emissiveFromCalc() {
         emissiveR = calcR;
         emissiveG = calcG;
         emissiveB = calcB;
@@ -3105,7 +3091,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      * Actually set the background image. This is separated from the error
      * handling and other semantic goofiness that is shared across renderers.
      */
-    void backgroundImpl(RainbowImage image) {
+    private void backgroundImpl(RainbowImage image) {
         // blit image to the screen
         set(0, 0, image);
     }
