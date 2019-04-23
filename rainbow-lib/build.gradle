@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 
 buildscript {
     repositories {
@@ -46,4 +48,5 @@ android {
 dependencies {
     implementation group: 'com.squareup.picasso', name: 'picasso', version: '2.71828'
     implementation 'com.android.support:support-annotations:28.0.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

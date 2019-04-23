@@ -42,10 +42,10 @@ public class Particle {
 
     private void updateGravityWith(Nucleus nucleus) {
         RVector nucleusPosition = nucleus.getPosition();
-        float distanceToNucleus = dist(location, nucleusPosition);
+        float distanceToNucleus = Companion.dist(location, nucleusPosition);
         float gravityAmplitude = (GRAVITY_CONSTANT * nucleus.getDiameter() / pow(distanceToNucleus, 2));
 
-        sub(nucleusPosition, location, gravity);
+        Companion.sub(nucleusPosition, location, gravity);
         gravity.mult(gravityAmplitude);
         gravity.setMag(MAX_GRAVITY_AMPLITUDE);
     }
@@ -58,7 +58,7 @@ public class Particle {
     public void resetTo(Nucleus nucleus) {
         RVector nucleusPosition = nucleus.getPosition();
         float alpha = random(RainbowMath.TWO_PI);
-        location.set(nucleusPosition.x + (cos(alpha)), nucleusPosition.y + (sin(alpha)), nucleusPosition.z + (random(-1, 1)));
+        location.set(nucleusPosition.getX() + (cos(alpha)), nucleusPosition.getY() + (sin(alpha)), nucleusPosition.getZ() + (random(-1, 1)));
         speed.set(random(-1, 1), random(-1, 1), random(-1, 1));
     }
 

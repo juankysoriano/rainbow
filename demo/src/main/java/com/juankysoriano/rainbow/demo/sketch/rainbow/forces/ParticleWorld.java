@@ -15,7 +15,7 @@ class ParticleWorld {
     private final float[] points;
 
     static ParticleWorld newInstance(int width, int height) {
-        RVector nucleusCoordinates = new RVector(width * HALF, height * HALF);
+        RVector nucleusCoordinates = new RVector(width * HALF, height * HALF, 0);
         Nucleus nucleus = new Nucleus(nucleusCoordinates, NUCLEUS_DIAMETER);
         Particle[] particles = generateParticles(nucleus);
 
@@ -52,8 +52,8 @@ class ParticleWorld {
 
     private void setPointFor(int particleIndex) {
         RVector particleLocation = particles[particleIndex].getLocation();
-        points[particleIndex * 2] = particleLocation.x;
-        points[particleIndex * 2 + 1] = particleLocation.y;
+        points[particleIndex * 2] = particleLocation.getX();
+        points[particleIndex * 2 + 1] = particleLocation.getY();
     }
 
     void moveNucleusTo(float x, float y) {

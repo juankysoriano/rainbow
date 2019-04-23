@@ -753,7 +753,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     @Override
     public void setMatrix(RMatrix2D source) {
         android.graphics.Matrix matrix = new android.graphics.Matrix();
-        matrix.setValues(new float[]{source.m00, source.m01, source.m02, source.m10, source.m11, source.m12, 0, 0, 1});
+        matrix.setValues(new float[]{source.getM00(), source.getM01(), source.getM02(), source.getM10(), source.getM11(), source.getM12(), 0, 0, 1});
         canvas.setMatrix(matrix);
     }
 

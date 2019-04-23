@@ -746,17 +746,17 @@ public abstract class RainbowGraphics extends RainbowImage {
         float y1 = prev[Y];
         float z1 = prev[Z];
 
-        float xplot1 = draw.m10 * x1 + draw.m11 * x2 + draw.m12 * x3 + draw.m13 * x4;
-        float xplot2 = draw.m20 * x1 + draw.m21 * x2 + draw.m22 * x3 + draw.m23 * x4;
-        float xplot3 = draw.m30 * x1 + draw.m31 * x2 + draw.m32 * x3 + draw.m33 * x4;
+        float xplot1 = draw.getM10() * x1 + draw.getM11() * x2 + draw.getM12() * x3 + draw.getM13() * x4;
+        float xplot2 = draw.getM20() * x1 + draw.getM21() * x2 + draw.getM22() * x3 + draw.getM23() * x4;
+        float xplot3 = draw.getM30() * x1 + draw.getM31() * x2 + draw.getM32() * x3 + draw.getM33() * x4;
 
-        float yplot1 = draw.m10 * y1 + draw.m11 * y2 + draw.m12 * y3 + draw.m13 * y4;
-        float yplot2 = draw.m20 * y1 + draw.m21 * y2 + draw.m22 * y3 + draw.m23 * y4;
-        float yplot3 = draw.m30 * y1 + draw.m31 * y2 + draw.m32 * y3 + draw.m33 * y4;
+        float yplot1 = draw.getM10() * y1 + draw.getM11() * y2 + draw.getM12() * y3 + draw.getM13() * y4;
+        float yplot2 = draw.getM20() * y1 + draw.getM21() * y2 + draw.getM22() * y3 + draw.getM23() * y4;
+        float yplot3 = draw.getM30() * y1 + draw.getM31() * y2 + draw.getM32() * y3 + draw.getM33() * y4;
 
-        float zplot1 = draw.m10 * z1 + draw.m11 * z2 + draw.m12 * z3 + draw.m13 * z4;
-        float zplot2 = draw.m20 * z1 + draw.m21 * z2 + draw.m22 * z3 + draw.m23 * z4;
-        float zplot3 = draw.m30 * z1 + draw.m31 * z2 + draw.m32 * z3 + draw.m33 * z4;
+        float zplot1 = draw.getM10() * z1 + draw.getM11() * z2 + draw.getM12() * z3 + draw.getM13() * z4;
+        float zplot2 = draw.getM20() * z1 + draw.getM21() * z2 + draw.getM22() * z3 + draw.getM23() * z4;
+        float zplot3 = draw.getM30() * z1 + draw.getM31() * z2 + draw.getM32() * z3 + draw.getM33() * z4;
 
         for (int j = 0; j < bezierDetail; j++) {
             x1 += xplot1;
@@ -1124,13 +1124,13 @@ public abstract class RainbowGraphics extends RainbowImage {
         float x1 = prev[X];
         float y1 = prev[Y];
 
-        float xplot1 = draw.m10 * x1 + draw.m11 * x2 + draw.m12 * x3 + draw.m13 * x4;
-        float xplot2 = draw.m20 * x1 + draw.m21 * x2 + draw.m22 * x3 + draw.m23 * x4;
-        float xplot3 = draw.m30 * x1 + draw.m31 * x2 + draw.m32 * x3 + draw.m33 * x4;
+        float xplot1 = draw.getM10() * x1 + draw.getM11() * x2 + draw.getM12() * x3 + draw.getM13() * x4;
+        float xplot2 = draw.getM20() * x1 + draw.getM21() * x2 + draw.getM22() * x3 + draw.getM23() * x4;
+        float xplot3 = draw.getM30() * x1 + draw.getM31() * x2 + draw.getM32() * x3 + draw.getM33() * x4;
 
-        float yplot1 = draw.m10 * y1 + draw.m11 * y2 + draw.m12 * y3 + draw.m13 * y4;
-        float yplot2 = draw.m20 * y1 + draw.m21 * y2 + draw.m22 * y3 + draw.m23 * y4;
-        float yplot3 = draw.m30 * y1 + draw.m31 * y2 + draw.m32 * y3 + draw.m33 * y4;
+        float yplot1 = draw.getM10() * y1 + draw.getM11() * y2 + draw.getM12() * y3 + draw.getM13() * y4;
+        float yplot2 = draw.getM20() * y1 + draw.getM21() * y2 + draw.getM22() * y3 + draw.getM23() * y4;
+        float yplot3 = draw.getM30() * y1 + draw.getM31() * y2 + draw.getM32() * y3 + draw.getM33() * y4;
 
         for (int j = 0; j < bezierDetail; j++) {
             x1 += xplot1;
@@ -1610,8 +1610,8 @@ public abstract class RainbowGraphics extends RainbowImage {
         float ttt = t * tt;
         RMatrix3D cb = curveBasisMatrix;
 
-        return (a * (ttt * cb.m00 + tt * cb.m10 + t * cb.m20 + cb.m30) + b * (ttt * cb.m01 + tt * cb.m11 + t * cb.m21 + cb.m31) + c * (ttt * cb.m02 + tt * cb.m12 + t * cb.m22 + cb.m32) + d
-                * (ttt * cb.m03 + tt * cb.m13 + t * cb.m23 + cb.m33));
+        return (a * (ttt * cb.getM00() + tt * cb.getM10() + t * cb.getM20() + cb.getM30()) + b * (ttt * cb.getM01() + tt * cb.getM11() + t * cb.getM21() + cb.getM31()) + c * (ttt * cb.getM02() + tt * cb.getM12() + t * cb.getM22() + cb.getM32()) + d
+                * (ttt * cb.getM03() + tt * cb.getM13() + t * cb.getM23() + cb.getM33()));
     }
 
     void curveInitCheck() {
@@ -1664,7 +1664,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         float t2 = t * 2;
         RMatrix3D cb = curveBasisMatrix;
 
-        return (a * (tt3 * cb.m00 + t2 * cb.m10 + cb.m20) + b * (tt3 * cb.m01 + t2 * cb.m11 + cb.m21) + c * (tt3 * cb.m02 + t2 * cb.m12 + cb.m22) + d * (tt3 * cb.m03 + t2 * cb.m13 + cb.m23));
+        return (a * (tt3 * cb.getM00() + t2 * cb.getM10() + cb.getM20()) + b * (tt3 * cb.getM01() + t2 * cb.getM11() + cb.getM21()) + c * (tt3 * cb.getM02() + t2 * cb.getM12() + cb.getM22()) + d * (tt3 * cb.getM03() + t2 * cb.getM13() + cb.getM23()));
     }
 
     public void curveDetail(int detail) {
@@ -1748,13 +1748,13 @@ public abstract class RainbowGraphics extends RainbowImage {
 
         RMatrix3D draw = curveDrawMatrix;
 
-        float xplot1 = draw.m10 * x1 + draw.m11 * x2 + draw.m12 * x3 + draw.m13 * x4;
-        float xplot2 = draw.m20 * x1 + draw.m21 * x2 + draw.m22 * x3 + draw.m23 * x4;
-        float xplot3 = draw.m30 * x1 + draw.m31 * x2 + draw.m32 * x3 + draw.m33 * x4;
+        float xplot1 = draw.getM10() * x1 + draw.getM11() * x2 + draw.getM12() * x3 + draw.getM13() * x4;
+        float xplot2 = draw.getM20() * x1 + draw.getM21() * x2 + draw.getM22() * x3 + draw.getM23() * x4;
+        float xplot3 = draw.getM30() * x1 + draw.getM31() * x2 + draw.getM32() * x3 + draw.getM33() * x4;
 
-        float yplot1 = draw.m10 * y1 + draw.m11 * y2 + draw.m12 * y3 + draw.m13 * y4;
-        float yplot2 = draw.m20 * y1 + draw.m21 * y2 + draw.m22 * y3 + draw.m23 * y4;
-        float yplot3 = draw.m30 * y1 + draw.m31 * y2 + draw.m32 * y3 + draw.m33 * y4;
+        float yplot1 = draw.getM10() * y1 + draw.getM11() * y2 + draw.getM12() * y3 + draw.getM13() * y4;
+        float yplot2 = draw.getM20() * y1 + draw.getM21() * y2 + draw.getM22() * y3 + draw.getM23() * y4;
+        float yplot3 = draw.getM30() * y1 + draw.getM31() * y2 + draw.getM32() * y3 + draw.getM33() * y4;
 
         // vertex() will reset splineVertexCount, so save it
         int savedCount = curveVertexCount;
@@ -1842,20 +1842,20 @@ public abstract class RainbowGraphics extends RainbowImage {
 
         RMatrix3D draw = curveDrawMatrix;
 
-        float xplot1 = draw.m10 * x1 + draw.m11 * x2 + draw.m12 * x3 + draw.m13 * x4;
-        float xplot2 = draw.m20 * x1 + draw.m21 * x2 + draw.m22 * x3 + draw.m23 * x4;
-        float xplot3 = draw.m30 * x1 + draw.m31 * x2 + draw.m32 * x3 + draw.m33 * x4;
+        float xplot1 = draw.getM10() * x1 + draw.getM11() * x2 + draw.getM12() * x3 + draw.getM13() * x4;
+        float xplot2 = draw.getM20() * x1 + draw.getM21() * x2 + draw.getM22() * x3 + draw.getM23() * x4;
+        float xplot3 = draw.getM30() * x1 + draw.getM31() * x2 + draw.getM32() * x3 + draw.getM33() * x4;
 
-        float yplot1 = draw.m10 * y1 + draw.m11 * y2 + draw.m12 * y3 + draw.m13 * y4;
-        float yplot2 = draw.m20 * y1 + draw.m21 * y2 + draw.m22 * y3 + draw.m23 * y4;
-        float yplot3 = draw.m30 * y1 + draw.m31 * y2 + draw.m32 * y3 + draw.m33 * y4;
+        float yplot1 = draw.getM10() * y1 + draw.getM11() * y2 + draw.getM12() * y3 + draw.getM13() * y4;
+        float yplot2 = draw.getM20() * y1 + draw.getM21() * y2 + draw.getM22() * y3 + draw.getM23() * y4;
+        float yplot3 = draw.getM30() * y1 + draw.getM31() * y2 + draw.getM32() * y3 + draw.getM33() * y4;
 
         // vertex() will reset splineVertexCount, so save it
         int savedCount = curveVertexCount;
 
-        float zplot1 = draw.m10 * z1 + draw.m11 * z2 + draw.m12 * z3 + draw.m13 * z4;
-        float zplot2 = draw.m20 * z1 + draw.m21 * z2 + draw.m22 * z3 + draw.m23 * z4;
-        float zplot3 = draw.m30 * z1 + draw.m31 * z2 + draw.m32 * z3 + draw.m33 * z4;
+        float zplot1 = draw.getM10() * z1 + draw.getM11() * z2 + draw.getM12() * z3 + draw.getM13() * z4;
+        float zplot2 = draw.getM20() * z1 + draw.getM21() * z2 + draw.getM22() * z3 + draw.getM23() * z4;
+        float zplot3 = draw.getM30() * z1 + draw.getM31() * z2 + draw.getM32() * z3 + draw.getM33() * z4;
 
         vertex(x0, y0, z0);
         for (int j = 0; j < curveDetail; j++) {
@@ -2186,7 +2186,7 @@ public abstract class RainbowGraphics extends RainbowImage {
     }
 
     public void applyMatrix(RMatrix2D source) {
-        applyMatrix(source.m00, source.m01, source.m02, source.m10, source.m11, source.m12);
+        applyMatrix(source.getM00(), source.getM01(), source.getM02(), source.getM10(), source.getM11(), source.getM12());
     }
 
     /**
@@ -2198,22 +2198,22 @@ public abstract class RainbowGraphics extends RainbowImage {
 
     public void applyMatrix(RMatrix3D source) {
         applyMatrix(
-                source.m00,
-                source.m01,
-                source.m02,
-                source.m03,
-                source.m10,
-                source.m11,
-                source.m12,
-                source.m13,
-                source.m20,
-                source.m21,
-                source.m22,
-                source.m23,
-                source.m30,
-                source.m31,
-                source.m32,
-                source.m33
+                source.getM00(),
+                source.getM01(),
+                source.getM02(),
+                source.getM03(),
+                source.getM10(),
+                source.getM11(),
+                source.getM12(),
+                source.getM13(),
+                source.getM20(),
+                source.getM21(),
+                source.getM22(),
+                source.getM23(),
+                source.getM30(),
+                source.getM31(),
+                source.getM32(),
+                source.getM33()
         );
     }
 
