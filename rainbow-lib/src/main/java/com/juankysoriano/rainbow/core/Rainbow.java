@@ -89,6 +89,7 @@ public class Rainbow {
     private void initPeriodicGraphics() {
         RainbowGraphics graphics = new RainbowGraphics2D();
         graphics.setParent(Rainbow.this);
+        graphics.setPrimary(true);
         if (width > 0 && height > 0) {
             graphics.setSize(width, height);
             rainbowDrawer.setGraphics(graphics);
