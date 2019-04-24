@@ -85,7 +85,7 @@ open class Rainbow private constructor(viewGroup: ViewGroup,
         graphics.setPrimary(true)
         if (width > 0 && height > 0) {
             graphics.setSize(width, height)
-            rainbowDrawer!!.graphics = graphics
+            rainbowDrawer.setGraphics(graphics)
         }
     }
 
@@ -95,7 +95,7 @@ open class Rainbow private constructor(viewGroup: ViewGroup,
         graphics.setPrimary(true)
         if (width > 0 && height > 0) {
             graphics.setSize(width, height)
-            rainbowInputController.rainbowDrawer.graphics = graphics
+            rainbowInputController.rainbowDrawer.setGraphics(graphics)
         }
     }
 
@@ -138,7 +138,7 @@ open class Rainbow private constructor(viewGroup: ViewGroup,
     }
 
     private fun canDraw(): Boolean {
-        return rainbowDrawer.hasGraphics() && surfaceReady && isSetup
+        return rainbowDrawer.graphics != null && surfaceReady && isSetup
     }
 
     open fun onDrawingStep() {}

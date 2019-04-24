@@ -1,14 +1,14 @@
-package com.juankysoriano.rainbow.core.drawing;
+package com.juankysoriano.rainbow.core.drawing
 
-public interface Modes {
-    enum Arc {
+interface Modes {
+    enum class Arc {
         UNDEFINED,
         OPEN,
         CHORD,
         PIE
     }
 
-    enum Blend {
+    enum class Blend {
         REPLACE,
         BLEND,
         ADD,
@@ -26,7 +26,7 @@ public interface Modes {
         BURN
     }
 
-    enum Draw {
+    enum class Draw {
         /**
          * Draw mode convention to use (x, y) to (width, height)
          */
@@ -51,7 +51,7 @@ public interface Modes {
         DIAMETER
     }
 
-    enum Filter {
+    enum class Filter {
         BLUR,
         GRAY,
         RGB,
@@ -63,42 +63,43 @@ public interface Modes {
         DILATE
     }
 
-    enum Image {
-        RGB,  // image & color
-        ARGB,  // image
-        HSB,  // color
+    enum class Image {
+        RGB, // image & color
+        ARGB, // image
+        HSB, // color
         ALPHA // image
     }
 
-    enum Shape {
+    enum class Shape {
         UNDEFINED,
         OPEN,
         CLOSE,
-        POINTS,   // vertices
-        LINES,   // beginShape(), createShape()
-        TRIANGLES,   // vertices
-        TRIANGLE_STRIP,  // vertices
-        TRIANGLE_FAN,  // vertices
-        QUAD,  // primitive
-        QUADS,  // vertices
-        QUAD_STRIP,  // vertices
+        POINTS, // vertices
+        LINES, // beginShape(), createShape()
+        TRIANGLES, // vertices
+        TRIANGLE_STRIP, // vertices
+        TRIANGLE_FAN, // vertices
+        QUAD, // primitive
+        QUADS, // vertices
+        QUAD_STRIP, // vertices
         POLYGON  // in the end, probably cannot
     }
 
     interface Stroke {
-        enum Cap {
+        enum class Cap {
             BUTT,
             ROUND,
             SQUARE
         }
-        enum Join {
+
+        enum class Join {
             ROUND,
             MITER,
             BEVEL
         }
     }
 
-    enum LoadMode {
+    enum class LoadMode {
         LOAD_CENTER_INSIDE,
         LOAD_CENTER_CROP,
         LOAD_ORIGINAL_SIZE

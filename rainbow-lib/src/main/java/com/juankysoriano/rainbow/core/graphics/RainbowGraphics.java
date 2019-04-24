@@ -3398,15 +3398,10 @@ public abstract class RainbowGraphics extends RainbowImage {
 
     public void endRaw() { // ignore
         if (raw != null) {
-            flush();
             raw.endDraw();
             raw.dispose();
             raw = null;
         }
-    }
-
-    public void flush() {
-        // no-op, mostly for P3D to write sorted stuff
     }
 
     /**
