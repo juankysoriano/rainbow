@@ -31,14 +31,20 @@ public class Rainbow {
         this(viewGroup, new RainbowDrawer(), RainbowInputController.newInstance());
     }
 
-    private Rainbow(ViewGroup viewGroup, RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
+    public Rainbow(ViewGroup viewGroup, RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
         this.rainbowInputController = rainbowInputController;
         this.rainbowDrawer = rainbowDrawer;
         this.rainbowTaskScheduler = RainbowTaskScheduler.newInstance(this);
         injectInto(viewGroup);
     }
 
-    private void injectInto(ViewGroup viewGroup) {
+    public Rainbow(RainbowDrawer rainbowDrawer, RainbowInputController rainbowInputController) {
+        this.rainbowInputController = rainbowInputController;
+        this.rainbowDrawer = rainbowDrawer;
+        this.rainbowTaskScheduler = RainbowTaskScheduler.newInstance(this);
+    }
+
+    public void injectInto(ViewGroup viewGroup) {
         drawingView = new RainbowTextureView(viewGroup, this);
         addSurfaceTextureListener();
     }
