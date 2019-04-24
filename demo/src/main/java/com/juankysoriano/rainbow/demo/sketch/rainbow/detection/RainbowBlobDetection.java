@@ -183,7 +183,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     private void drawLineWithDivisions(EdgeVertex start, EdgeVertex end, int divisions) {
         if (divisions > 0) {
             divisions--;
-            EdgeVertex middle = new EdgeVertex((start.x + end.x) / 2, (start.y + end.y) / 2);
+            EdgeVertex middle = new EdgeVertex((start.getX() + end.getX()) / 2, (start.getY() + end.getY()) / 2);
             drawLineWithDivisions(start, middle, divisions);
             drawLineWithDivisions(middle, end, divisions);
         } else {
@@ -193,11 +193,11 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
 
     private void paintLine(EdgeVertex start, EdgeVertex end) {
         RainbowDrawer rainbowDrawer = getRainbowDrawer();
-        int color = rainbowImage.get((int) (start.x * rainbowImage.width), (int) (start.y * rainbowImage.height));
-        int x1 = (int) (start.x * getWidth());
-        int x2 = (int) (end.x * getWidth());
-        int y1 = (int) (start.y * getHeight());
-        int y2 = (int) (end.y * getHeight());
+        int color = rainbowImage.get((int) (start.getX() * rainbowImage.width), (int) (start.getY() * rainbowImage.height));
+        int x1 = (int) (start.getX() * getWidth());
+        int x2 = (int) (end.getX() * getWidth());
+        int y1 = (int) (start.getY() * getHeight());
+        int y2 = (int) (end.getY() * getHeight());
         rainbowDrawer.stroke(color, ALPHAS[iteration]);
         rainbowDrawer.line(x1, y1, x2, y2);
     }

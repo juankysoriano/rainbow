@@ -28,31 +28,31 @@ data class RainbowStyle(
         var ellipseMode: Modes.Draw? = null,
         var shapeMode: Modes.Shape? = null,
         var colorMode: Modes.Image? = null,
-        var colorModeX: Float = 0.toFloat(),
-        var colorModeY: Float = 0.toFloat(),
-        var colorModeZ: Float = 0.toFloat(),
-        var colorModeA: Float = 0.toFloat(),
+        var colorModeX: Float = 0f,
+        var colorModeY: Float = 0f,
+        var colorModeZ: Float = 0f,
+        var colorModeA: Float = 0f,
         var tint: Boolean = false,
         var tintColor: Int = 0,
         var fill: Boolean = false,
         var fillColor: Int = 0,
         var stroke: Boolean = false,
         var strokeColor: Int = 0,
-        var strokeWeight: Float = 0.toFloat(),
+        var strokeWeight: Float = 0f,
         var strokeCap: Modes.Stroke.Cap? = null,
         var strokeJoin: Modes.Stroke.Join? = null
 ) {
 
     // TODO these fellas are inconsistent, and may need to go elsewhere
-    var ambientR: Float = 0.toFloat()
-    var ambientG: Float = 0.toFloat()
-    var ambientB: Float = 0.toFloat()
-    var specularR: Float = 0.toFloat()
-    var specularG: Float = 0.toFloat()
-    var specularB: Float = 0.toFloat()
-    var emissiveR: Float = 0.toFloat()
-    var emissiveG: Float = 0.toFloat()
-    var emissiveB: Float = 0.toFloat()
-    var shininess: Float = 0.toFloat()
+    var ambientR: Float = 0f
+    var ambientG: Float = 0f
+    var ambientB: Float = 0f
+    var specularR: Float = 0f
+    var specularG: Float = 0f
+    var specularB: Float = 0f
+    var emissiveR: Float = 0f
+    var emissiveG: Float = 0f
+    var emissiveB: Float = 0f
+    var shininess: Float = 0f
 
 }

@@ -14,13 +14,13 @@ internal constructor(private val scheduler: RainbowScheduler = RainbowSchedulers
                      val rainbowDrawer: RainbowDrawer = RainbowDrawer()) {
 
 
-    var x: Float = 0.toFloat()
+    var x: Float = 0f
         private set
-    var y: Float = 0.toFloat()
+    var y: Float = 0f
         private set
-    var previousX: Float = 0.toFloat()
+    var previousX: Float = 0f
         private set
-    var previousY: Float = 0.toFloat()
+    var previousY: Float = 0f
         private set
     var isScreenTouched: Boolean = false
         private set

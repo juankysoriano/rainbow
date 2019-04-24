@@ -27,22 +27,22 @@ package com.juankysoriano.rainbow.core.math
  */
 class RMatrix3D : RMatrix /* , PConstants */ {
 
-    var m00: Float = 0.toFloat()
-    var m01: Float = 0.toFloat()
-    var m02: Float = 0.toFloat()
-    var m03: Float = 0.toFloat()
-    var m10: Float = 0.toFloat()
-    var m11: Float = 0.toFloat()
-    var m12: Float = 0.toFloat()
-    var m13: Float = 0.toFloat()
-    var m20: Float = 0.toFloat()
-    var m21: Float = 0.toFloat()
-    var m22: Float = 0.toFloat()
-    var m23: Float = 0.toFloat()
-    var m30: Float = 0.toFloat()
-    var m31: Float = 0.toFloat()
-    var m32: Float = 0.toFloat()
-    var m33: Float = 0.toFloat()
+    var m00: Float = 0f
+    var m01: Float = 0f
+    var m02: Float = 0f
+    var m03: Float = 0f
+    var m10: Float = 0f
+    var m11: Float = 0f
+    var m12: Float = 0f
+    var m13: Float = 0f
+    var m20: Float = 0f
+    var m21: Float = 0f
+    var m22: Float = 0f
+    var m23: Float = 0f
+    var m30: Float = 0f
+    var m31: Float = 0f
+    var m32: Float = 0f
+    var m33: Float = 0f
 
     // locally allocated version to avoid creating new memory
     private var inverseCopy: RMatrix3D? = null

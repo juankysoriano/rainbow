@@ -27,12 +27,12 @@ package com.juankysoriano.rainbow.core.math
  */
 class RMatrix2D : RMatrix {
 
-    var m00: Float = 0.toFloat()
-    var m01: Float = 0.toFloat()
-    var m02: Float = 0.toFloat()
-    var m10: Float = 0.toFloat()
-    var m11: Float = 0.toFloat()
-    var m12: Float = 0.toFloat()
+    var m00: Float = 0f
+    var m01: Float = 0f
+    var m02: Float = 0f
+    var m10: Float = 0f
+    var m11: Float = 0f
+    var m12: Float = 0f
 
     //////////////////////////////////////////////////////////////
 

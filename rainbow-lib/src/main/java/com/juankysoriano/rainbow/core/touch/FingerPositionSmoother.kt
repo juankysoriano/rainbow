@@ -5,16 +5,16 @@ import com.juankysoriano.rainbow.core.math.RainbowMath
 private const val SPRING = 0.1f
 private const val DAMP = 0.6f
 internal class FingerPositionSmoother {
-    var x: Float = 0.toFloat()
+    var x: Float = 0f
         private set
-    var y: Float = 0.toFloat()
+    var y: Float = 0f
         private set
-    var oldX: Float = 0.toFloat()
+    var oldX: Float = 0f
         private set
-    var oldY: Float = 0.toFloat()
+    var oldY: Float = 0f
         private set
-    private var xVel: Float = 0.toFloat()
-    private var yVel: Float = 0.toFloat()
+    private var xVel: Float = 0f
+    private var yVel: Float = 0f
 
     val fingerVelocity: Float
         get() = RainbowMath.dist(0f, 0f, xVel, yVel)
