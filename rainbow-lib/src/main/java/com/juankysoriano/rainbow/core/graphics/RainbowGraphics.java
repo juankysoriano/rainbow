@@ -2439,35 +2439,35 @@ public abstract class RainbowGraphics extends RainbowImage {
     }
 
     public void style(RainbowStyle s) {
-        imageMode(s.imageDrawMode);
-        rectMode(s.rectMode);
-        ellipseMode(s.ellipseMode);
+        imageMode(s.getImageDrawMode());
+        rectMode(s.getRectMode());
+        ellipseMode(s.getEllipseMode());
 
-        if (s.tint) {
-            tint(s.tintColor);
+        if (s.getTint()) {
+            tint(s.getTintColor());
         } else {
             noTint();
         }
-        if (s.fill) {
-            fill(s.fillColor);
+        if (s.getFill()) {
+            fill(s.getFillColor());
         } else {
             noFill();
         }
-        if (s.stroke) {
-            stroke(s.strokeColor);
+        if (s.getStroke()) {
+            stroke(s.getStrokeColor());
         } else {
             noStroke();
         }
-        strokeWeight(s.strokeWeight);
-        strokeCap(s.strokeCap);
-        strokeJoin(s.strokeJoin);
+        strokeWeight(s.getStrokeWeight());
+        strokeCap(s.getStrokeCap());
+        strokeJoin(s.getStrokeJoin());
 
         colorMode(RGB, 1);
-        ambient(s.ambientR, s.ambientG, s.ambientB);
-        emissive(s.emissiveR, s.emissiveG, s.emissiveB);
-        specular(s.specularR, s.specularG, s.specularB);
-        shininess(s.shininess);
-        colorMode(s.colorMode, s.colorModeX, s.colorModeY, s.colorModeZ, s.colorModeA);
+        ambient(s.getAmbientR(), s.getAmbientG(), s.getAmbientB());
+        emissive(s.getEmissiveR(), s.getEmissiveG(), s.getEmissiveB());
+        specular(s.getSpecularR(), s.getSpecularG(), s.getSpecularB());
+        shininess(s.getShininess());
+        colorMode(s.getColorMode(), s.getColorModeX(), s.getColorModeY(), s.getColorModeZ(), s.getColorModeA());
 
     }
 
@@ -2480,37 +2480,37 @@ public abstract class RainbowGraphics extends RainbowImage {
             s = new RainbowStyle();
         }
 
-        s.imageDrawMode = imageDrawMode;
-        s.rectMode = rectMode;
-        s.ellipseMode = ellipseMode;
-        s.shapeMode = shapeMode;
+        s.setImageDrawMode(imageDrawMode);
+        s.setRectMode(rectMode);
+        s.setEllipseMode(ellipseMode);
+        s.setShapeMode(shapeMode);
 
-        s.colorMode = colorMode;
-        s.colorModeX = colorModeX;
-        s.colorModeY = colorModeY;
-        s.colorModeZ = colorModeZ;
-        s.colorModeA = colorModeA;
+        s.setColorMode(colorMode);
+        s.setColorModeX(colorModeX);
+        s.setColorModeY(colorModeY);
+        s.setColorModeZ(colorModeZ);
+        s.setColorModeA(colorModeA);
 
-        s.tint = tint;
-        s.tintColor = tintColor;
-        s.fill = fill;
-        s.fillColor = fillColor;
-        s.stroke = stroke;
-        s.strokeColor = strokeColor;
-        s.strokeWeight = strokeWeight;
-        s.strokeCap = strokeCap;
-        s.strokeJoin = strokeJoin;
+        s.setTint(tint);
+        s.setTintColor(tintColor);
+        s.setFill(fill);
+        s.setFillColor(fillColor);
+        s.setStroke(stroke);
+        s.setStrokeColor(strokeColor);
+        s.setStrokeWeight(strokeWeight);
+        s.setStrokeCap(strokeCap);
+        s.setStrokeJoin(strokeJoin);
 
-        s.ambientR = ambientR;
-        s.ambientG = ambientG;
-        s.ambientB = ambientB;
-        s.specularR = specularR;
-        s.specularG = specularG;
-        s.specularB = specularB;
-        s.emissiveR = emissiveR;
-        s.emissiveG = emissiveG;
-        s.emissiveB = emissiveB;
-        s.shininess = shininess;
+        s.setAmbientR(ambientR);
+        s.setAmbientG(ambientG);
+        s.setAmbientB(ambientB);
+        s.setSpecularR(specularR);
+        s.setSpecularG(specularG);
+        s.setSpecularB(specularB);
+        s.setEmissiveR(emissiveR);
+        s.setEmissiveG(emissiveG);
+        s.setEmissiveB(emissiveB);
+        s.setShininess(shininess);
 
         return s;
     }
