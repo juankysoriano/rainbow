@@ -369,7 +369,7 @@ class RainbowDrawer {
                     y1: Float,
                     x2: Float,
                     y2: Float,
-                    precision: RainbowDrawer.Precision,
+                    precision: Precision,
                     listener: PointDetectedListener) {
         lineExplorer.exploreLine(x1, y1, x2, y2, precision, listener)
     }

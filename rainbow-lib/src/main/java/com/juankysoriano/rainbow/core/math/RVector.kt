@@ -68,7 +68,7 @@ import com.juankysoriano.rainbow.core.Rainbow
  *
  * @webref math
  */
-data class RVector @JvmOverloads constructor(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f) {
+data class RVector constructor(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f) {
     /**
      * Array so that this can be temporarily used in an array context
      */
@@ -96,6 +96,12 @@ data class RVector @JvmOverloads constructor(var x: Float = 0f, var y: Float = 0
         this.x = x
         this.y = y
         this.z = z
+    }
+
+    operator fun set(x: Float, y: Float) {
+        this.x = x
+        this.y = y
+        this.z = 0f
     }
 
     /**
@@ -365,7 +371,6 @@ data class RVector @JvmOverloads constructor(var x: Float = 0f, var y: Float = 0
      * @param v      any variable of type PVector
      * @param target PVector to store the result
      */
-    @JvmOverloads
     fun cross(v: RVector, target: RVector? = null): RVector {
         var target = target
         val crossX = y * v.z - v.y * z
@@ -624,7 +629,6 @@ data class RVector @JvmOverloads constructor(var x: Float = 0f, var y: Float = 0
          * @param target the target vector (if null, a new vector will be created)
          * @return the random PVector
          */
-        @JvmOverloads
         fun random2D(target: RVector? = null, parent: Rainbow? = null): RVector {
             return if (parent == null) {
                 fromAngle((Math.random() * Math.PI * 2.0).toFloat(), target)
@@ -651,7 +655,6 @@ data class RVector @JvmOverloads constructor(var x: Float = 0f, var y: Float = 0
          * @param parent current Imagine instance
          * @return the random PVector
          */
-        @JvmOverloads
         fun random3D(target: RVector? = null, parent: Rainbow? = null): RVector {
             var target = target
             val angle: Float
@@ -681,7 +684,6 @@ data class RVector @JvmOverloads constructor(var x: Float = 0f, var y: Float = 0
          * @param target the target vector (if null, a new vector will be created)
          * @return the PVector
          */
-        @JvmOverloads
         fun fromAngle(angle: Float, target: RVector? = null): RVector {
             var target = target
             if (target == null) {
@@ -697,7 +699,6 @@ data class RVector @JvmOverloads constructor(var x: Float = 0f, var y: Float = 0
          *
          * @param target the target vector (if null, a new vector will be created)
          */
-        @JvmOverloads
         fun add(v1: RVector, v2: RVector, target: RVector? = null): RVector {
             var target = target
             if (target == null) {
@@ -715,7 +716,6 @@ data class RVector @JvmOverloads constructor(var x: Float = 0f, var y: Float = 0
          * @param v2     the x, y, and z components of a PVector object
          * @param target PVector to store the result
          */
-        @JvmOverloads
         fun sub(v1: RVector, v2: RVector, target: RVector? = null): RVector {
             var target = target
             if (target == null) {
@@ -731,7 +731,6 @@ data class RVector @JvmOverloads constructor(var x: Float = 0f, var y: Float = 0
          *
          * @param target PVector to store the result
          */
-        @JvmOverloads
         fun mult(v: RVector, n: Float, target: RVector? = null): RVector {
             var target = target
             if (target == null) {
@@ -742,7 +741,6 @@ data class RVector @JvmOverloads constructor(var x: Float = 0f, var y: Float = 0
             return target
         }
 
-        @JvmOverloads
         fun mult(v1: RVector, v2: RVector, target: RVector? = null): RVector {
             var target = target
             if (target == null) {
@@ -760,7 +758,6 @@ data class RVector @JvmOverloads constructor(var x: Float = 0f, var y: Float = 0
          * @param n      the number to divide with the vector
          * @param target PVector to store the result
          */
-        @JvmOverloads
         fun div(v: RVector, n: Float, target: RVector? = null): RVector {
             var target = target
             if (target == null) {
@@ -771,7 +768,6 @@ data class RVector @JvmOverloads constructor(var x: Float = 0f, var y: Float = 0
             return target
         }
 
-        @JvmOverloads
         fun div(v1: RVector, v2: RVector, target: RVector? = null): RVector {
             var target = target
             if (target == null) {

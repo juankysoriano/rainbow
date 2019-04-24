@@ -674,7 +674,7 @@ public abstract class RainbowGraphics extends RainbowImage {
 
             clipImpl(a, b, c, d);
 
-        } else if (imageDrawMode == CENTER) {
+        } else if (imageDrawMode == DIAMETER) {
             // c and d are width/height
             if (c < 0) {
                 c = -c;
@@ -966,7 +966,7 @@ public abstract class RainbowGraphics extends RainbowImage {
                 a -= hradius;
                 b -= vradius;
                 break;
-            case CENTER:
+            case DIAMETER:
                 hradius = c / 2.0f;
                 vradius = d / 2.0f;
                 c = a + hradius;
@@ -1015,7 +1015,7 @@ public abstract class RainbowGraphics extends RainbowImage {
                 a -= hradius;
                 b -= vradius;
                 break;
-            case CENTER:
+            case DIAMETER:
                 hradius = c / 2.0f;
                 vradius = d / 2.0f;
                 c = a + hradius;
@@ -1202,7 +1202,7 @@ public abstract class RainbowGraphics extends RainbowImage {
             w = c * 2;
             h = d * 2;
 
-        } else if (ellipseMode == CENTER) {
+        } else if (ellipseMode == DIAMETER) {
             x = a - c / 2f;
             y = b - d / 2f;
         }
@@ -1882,15 +1882,15 @@ public abstract class RainbowGraphics extends RainbowImage {
     }
 
     /**
-     * The mode can only be set to CORNERS, CORNER, and CENTER.
+     * The mode can only be set to CORNERS, CORNER, and DIAMETER.
      * <p/>
-     * Support for CENTER was added in release 0146.
+     * Support for DIAMETER was added in release 0146.
      */
     public void imageMode(Modes.Draw mode) {
-        if ((mode == CORNER) || (mode == CORNERS) || (mode == CENTER)) {
+        if ((mode == CORNER) || (mode == CORNERS) || (mode == DIAMETER)) {
             imageDrawMode = mode;
         } else {
-            String msg = "imageMode() only works with CORNER, CORNERS, or CENTER";
+            String msg = "imageMode() only works with CORNER, CORNERS, or DIAMETER";
             throw new RuntimeException(msg);
         }
     }
@@ -1910,7 +1910,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         if (imageDrawMode == CORNER || imageDrawMode == CORNERS) {
             imageImpl(image, x, y, x + image.width, y + image.height, 0, 0, image.width, image.height);
 
-        } else if (imageDrawMode == CENTER) {
+        } else if (imageDrawMode == DIAMETER) {
             float x1 = x - image.width / 2f;
             float y1 = y - image.height / 2f;
             imageImpl(image, x1, y1, x1 + image.width, y1 + image.height, 0, 0, image.width, image.height);
@@ -2024,7 +2024,7 @@ public abstract class RainbowGraphics extends RainbowImage {
 
             imageImpl(image, a, b, c, d, u1, v1, u2, v2);
 
-        } else if (imageDrawMode == CENTER) {
+        } else if (imageDrawMode == DIAMETER) {
             // c and d are width/height
             if (c < 0) {
                 c = -c;

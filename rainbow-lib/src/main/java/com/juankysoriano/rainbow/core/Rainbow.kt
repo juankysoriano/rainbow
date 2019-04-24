@@ -9,9 +9,9 @@ import com.juankysoriano.rainbow.core.graphics.RainbowGraphics
 import com.juankysoriano.rainbow.core.graphics.RainbowGraphics2D
 import com.juankysoriano.rainbow.core.touch.RainbowInputController
 
-open class Rainbow private constructor(viewGroup: ViewGroup,
-                                       val rainbowDrawer: RainbowDrawer = RainbowDrawer(),
-                                       val rainbowInputController: RainbowInputController = RainbowInputController()) {
+open class Rainbow(viewGroup: ViewGroup,
+                   val rainbowDrawer: RainbowDrawer = RainbowDrawer(),
+                   val rainbowInputController: RainbowInputController = RainbowInputController()) {
     var drawingView: RainbowTextureView
         private set
 
@@ -72,30 +72,15 @@ open class Rainbow private constructor(viewGroup: ViewGroup,
     internal fun setupSketch() {
         isSetup = true
         surfaceReady = true
-        width = drawingView!!.measuredWidth
-        height = drawingView!!.measuredHeight
+        width = drawingView.measuredWidth
+        height = drawingView.measuredHeight
 
-        initPeriodicGraphics()
-        initInputControllerGraphics()
-    }
-
-    private fun initPeriodicGraphics() {
         val graphics = RainbowGraphics2D()
-        graphics.setParent(this@Rainbow)
+        graphics.setParent(this)
         graphics.setPrimary(true)
         if (width > 0 && height > 0) {
             graphics.setSize(width, height)
             rainbowDrawer.setGraphics(graphics)
-        }
-    }
-
-    private fun initInputControllerGraphics() {
-        val graphics = RainbowGraphics2D()
-        graphics.setParent(this@Rainbow)
-        graphics.setPrimary(true)
-        if (width > 0 && height > 0) {
-            graphics.setSize(width, height)
-            rainbowInputController.rainbowDrawer.setGraphics(graphics)
         }
     }
 
@@ -138,7 +123,7 @@ open class Rainbow private constructor(viewGroup: ViewGroup,
     }
 
     private fun canDraw(): Boolean {
-        return rainbowDrawer.graphics != null && surfaceReady && isSetup
+        return surfaceReady && isSetup
     }
 
     open fun onDrawingStep() {}
@@ -180,7 +165,7 @@ open class Rainbow private constructor(viewGroup: ViewGroup,
     fun destroy() {
         stop()
         onSketchDestroy()
-        rainbowDrawer.graphics?.dispose()
+        rainbowDrawer.graphics.dispose()
         isSetup = false
     }
 

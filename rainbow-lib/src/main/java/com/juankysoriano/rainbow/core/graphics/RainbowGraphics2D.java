@@ -765,7 +765,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
             strokePaint.setStrokeCap(Paint.Cap.ROUND);
         } else if (strokeCap == Modes.Stroke.Cap.SQUARE) {
             strokePaint.setStrokeCap(Paint.Cap.SQUARE);
-        } else if (strokeCap == Modes.Stroke.Cap.BUTT) {
+        } else {
             strokePaint.setStrokeCap(Paint.Cap.BUTT);
         }
     }
@@ -778,7 +778,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
             strokePaint.setStrokeJoin(Paint.Join.MITER);
         } else if (strokeJoin == Modes.Stroke.Join.ROUND) {
             strokePaint.setStrokeJoin(Paint.Join.ROUND);
-        } else if (strokeJoin == Modes.Stroke.Join.BEVEL) {
+        } else {
             strokePaint.setStrokeJoin(Paint.Join.BEVEL);
         }
     }

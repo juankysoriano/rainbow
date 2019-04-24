@@ -1,8 +1,6 @@
 package com.juankysoriano.rainbow.core.touch
 
 import android.view.MotionEvent
-
-import com.juankysoriano.rainbow.core.drawing.RainbowDrawer
 import com.juankysoriano.rainbow.core.schedulers.RainbowScheduler
 import com.juankysoriano.rainbow.core.schedulers.RainbowSchedulers
 
@@ -10,8 +8,7 @@ private const val DIVISIONS = 2
 
 class RainbowInputController
 internal constructor(private val scheduler: RainbowScheduler = RainbowSchedulers.single("InputController", RainbowSchedulers.Priority.NORMAL),
-                     private val smoother: FingerPositionSmoother = FingerPositionSmoother(),
-                     val rainbowDrawer: RainbowDrawer = RainbowDrawer()) {
+                     private val smoother: FingerPositionSmoother = FingerPositionSmoother()) {
 
 
     var x: Float = 0f
@@ -115,21 +112,21 @@ internal constructor(private val scheduler: RainbowScheduler = RainbowSchedulers
             MotionEvent.ACTION_DOWN -> {
                 isScreenTouched = true
                 isFingerMoving = false
-                performTouch(event, rainbowDrawer)
+                performTouch(event)
             }
             MotionEvent.ACTION_UP -> {
                 isScreenTouched = false
                 isFingerMoving = false
-                performRelease(event, rainbowDrawer)
+                performRelease(event)
             }
             MotionEvent.ACTION_MOVE -> {
                 isScreenTouched = true
                 isFingerMoving = true
-                performMove(event, rainbowDrawer)
+                performMove(event)
             }
         }
 
-        performMotion(event, rainbowDrawer)
+        performMotion(event)
     }
 
     private fun postHandleEvent() {
@@ -137,23 +134,23 @@ internal constructor(private val scheduler: RainbowScheduler = RainbowSchedulers
         previousY = y
     }
 
-    private fun performTouch(event: MotionEvent, rainbowDrawer: RainbowDrawer) {
+    private fun performTouch(event: MotionEvent) {
         smoother.resetTo(event.x, event.y)
-        rainbowInteractionListener?.onSketchTouched(event, rainbowDrawer)
+        rainbowInteractionListener?.onSketchTouched(event)
     }
 
-    private fun performRelease(event: MotionEvent, rainbowDrawer: RainbowDrawer) {
+    private fun performRelease(event: MotionEvent) {
         smoother.resetTo(event.x, event.y)
-        rainbowInteractionListener?.onSketchReleased(event, rainbowDrawer)
+        rainbowInteractionListener?.onSketchReleased(event)
     }
 
-    private fun performMove(event: MotionEvent, rainbowDrawer: RainbowDrawer) {
+    private fun performMove(event: MotionEvent) {
         smoother.moveTo(event.x, event.y)
-        rainbowInteractionListener?.onFingerDragged(event, rainbowDrawer)
+        rainbowInteractionListener?.onFingerDragged(event)
     }
 
-    private fun performMotion(event: MotionEvent, rainbowDrawer: RainbowDrawer) {
-        rainbowInteractionListener?.onMotionEvent(event, rainbowDrawer)
+    private fun performMotion(event: MotionEvent) {
+        rainbowInteractionListener?.onMotionEvent(event)
     }
 
     /**
@@ -179,12 +176,12 @@ internal constructor(private val scheduler: RainbowScheduler = RainbowSchedulers
     }
 
     interface RainbowInteractionListener {
-        fun onSketchTouched(event: MotionEvent, rainbowDrawer: RainbowDrawer)
+        fun onSketchTouched(event: MotionEvent)
 
-        fun onSketchReleased(event: MotionEvent, rainbowDrawer: RainbowDrawer)
+        fun onSketchReleased(event: MotionEvent)
 
-        fun onFingerDragged(event: MotionEvent, rainbowDrawer: RainbowDrawer)
+        fun onFingerDragged(event: MotionEvent)
 
-        fun onMotionEvent(event: MotionEvent, rainbowDrawer: RainbowDrawer)
+        fun onMotionEvent(event: MotionEvent)
     }
 }

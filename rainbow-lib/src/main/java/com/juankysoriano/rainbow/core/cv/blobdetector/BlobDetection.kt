@@ -12,14 +12,14 @@ import com.juankysoriano.rainbow.core.schedulers.RainbowSchedulers
  */
 private const val DEFAULT_MAX_NUMBER_OF_BLOBS = 10000
 
-class BlobDetection private constructor(rainbowImage: RainbowImage,
-                                        private val luminanceMap: LuminanceMap = LuminanceMap.from(rainbowImage),
+class BlobDetection constructor(rainbowImage: RainbowImage,
                                         private val scheduler: RainbowScheduler =
                                                 RainbowSchedulers.singleForRecursion("BlobDetection", RainbowSchedulers.Priority.NORMAL),
                                         private val maxNumberOfBlobs: Int = DEFAULT_MAX_NUMBER_OF_BLOBS) {
 
     private var numberOfBlobsDetected = 0
     private var skipBlobDetection: Boolean = false
+    private val luminanceMap: LuminanceMap by lazy { LuminanceMap.from(rainbowImage) }
 
     fun setThreshold(value: Float) = luminanceMap.setThreshold(value)
 
