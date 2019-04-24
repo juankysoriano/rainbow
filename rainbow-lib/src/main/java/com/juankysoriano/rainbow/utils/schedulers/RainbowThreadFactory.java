@@ -14,12 +14,12 @@ public final class RainbowThreadFactory extends AtomicLong implements ThreadFact
     private final int stackSize;
 
     static RainbowThreadFactory newInstance(String name, int priority) {
-        return new RainbowThreadFactory("name", priority, null, 0);
+        return new RainbowThreadFactory(name, priority, null, 0);
     }
 
     static RainbowThreadFactory newInstanceForRecursion(String name, int priority) {
         ThreadGroup threadGroup = new ThreadGroup(name + "-group");
-        return new RainbowThreadFactory("name", priority, threadGroup, Integer.MAX_VALUE);
+        return new RainbowThreadFactory(name, priority, threadGroup, Integer.MAX_VALUE);
     }
 
     private RainbowThreadFactory(String prefix, int priority, ThreadGroup threadGroup, int stackSize) {

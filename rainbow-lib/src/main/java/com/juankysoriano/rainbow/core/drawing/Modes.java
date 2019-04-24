@@ -43,12 +43,7 @@ public interface Modes {
          * Draw from the center, using second pair of values as the diameter.
          * Formerly called CENTER_DIAMETER in alpha releases.
          */
-        CENTER,
-        /**
-         * Synonym for the CENTER constant. Draw from the center,
-         * using second pair of values as the diameter.
-         */
-        DIAMETER
+        CENTER
     }
 
     enum Filter {

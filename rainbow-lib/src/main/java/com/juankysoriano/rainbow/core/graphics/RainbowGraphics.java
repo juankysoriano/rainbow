@@ -433,7 +433,7 @@ public abstract class RainbowGraphics extends RainbowImage {
         shapeMode = UNDEFINED;
 
         rectMode(CORNER);
-        ellipseMode(DIAMETER);
+        ellipseMode(CENTER);
 
         autoNormal = true;
 
@@ -1163,7 +1163,7 @@ public abstract class RainbowGraphics extends RainbowImage {
             w = c * 2;
             h = d * 2;
 
-        } else if (ellipseMode == DIAMETER) {
+        } else if (ellipseMode == CENTER) {
             x = a - c / 2f;
             y = b - d / 2f;
         }
