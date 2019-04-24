@@ -3,27 +3,32 @@ package com.juankysoriano.rainbow.core.event;
 import android.support.annotation.NonNull;
 import android.view.MotionEvent;
 
+import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.utils.schedulers.RainbowScheduler;
 import com.juankysoriano.rainbow.utils.schedulers.RainbowSchedulers;
 
 public class RainbowInputController {
     private static final int DIVISIONS = 2;
+    private final RainbowDrawer rainbowDrawer;
     private final FingerPositionSmoother smoother;
+    private final RainbowScheduler scheduler;
     private float x, y;
     private float px, py;
-    private final RainbowScheduler scheduler;
     private RainbowInteractionListener rainbowInteractionListener;
     private boolean screenTouched;
     private boolean fingerMoving;
 
     public static RainbowInputController newInstance() {
-        FingerPositionSmoother positionSmoother = new FingerPositionSmoother();
+        RainbowDrawer rainbowDrawer = new RainbowDrawer();
         RainbowScheduler scheduler = RainbowSchedulers.single("InputController", RainbowSchedulers.Priority.NORMAL);
-        return new RainbowInputController(scheduler, positionSmoother);
+        FingerPositionSmoother positionSmoother = new FingerPositionSmoother();
+        return new RainbowInputController(rainbowDrawer, scheduler, positionSmoother);
     }
 
-    private RainbowInputController(RainbowScheduler rainbowScheduler,
+    private RainbowInputController(RainbowDrawer rainbowDrawer,
+                                   RainbowScheduler rainbowScheduler,
                                    FingerPositionSmoother predictor) {
+        this.rainbowDrawer = rainbowDrawer;
         scheduler = rainbowScheduler;
         smoother = predictor;
         x = y = px = py = -1;
@@ -152,6 +157,10 @@ public class RainbowInputController {
      */
     public void attach(RainbowInteractionListener rainbowInteractionListener) {
         this.rainbowInteractionListener = rainbowInteractionListener;
+    }
+
+    public RainbowDrawer getRainbowDrawer() {
+        return rainbowDrawer;
     }
 
     /**

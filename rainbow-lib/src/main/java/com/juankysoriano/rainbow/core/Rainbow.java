@@ -83,15 +83,23 @@ public class Rainbow {
         height = drawingView.getMeasuredHeight();
 
         initPeriodicGraphics();
+        initControllerGraphics();
     }
 
     private void initPeriodicGraphics() {
         RainbowGraphics graphics = new RainbowGraphics2D();
         graphics.setParent(Rainbow.this);
-        graphics.setPrimary(true);
         if (width > 0 && height > 0) {
             graphics.setSize(width, height);
             rainbowDrawer.setGraphics(graphics);
+        }
+    }
+
+    private void initControllerGraphics() {
+        RainbowGraphics graphics = RainbowGraphics2D.createFor(rainbowDrawer.getGraphics().getBitmap());
+        graphics.setParent(Rainbow.this);
+        if (width > 0 && height > 0) {
+            rainbowInputController.getRainbowDrawer().setGraphics(graphics);
         }
     }
 

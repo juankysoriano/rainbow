@@ -90,6 +90,23 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     /**
+     * Convenience method to create graphics for an already created bitmap.
+     * Useful in some situations, like when you want two separate drawers working on the same bitmap
+     * For example a drawer for the input controller and one for the sketch
+     * @param bitmap to be used for this graphics
+     * @return the created RainbowGraphics2D
+     */
+    public static RainbowGraphics2D createFor(Bitmap bitmap) {
+        RainbowGraphics2D graphics2D = new RainbowGraphics2D();
+        graphics2D.bitmap = bitmap;
+        graphics2D.width = bitmap.getWidth();
+        graphics2D.height = bitmap.getHeight();
+        graphics2D.checkSettings();
+        graphics2D.canvas = new Canvas(bitmap);
+        return graphics2D;
+    }
+
+    /**
      * Called in response to a resize event, handles setting the new width and
      * height internally, as well as re-allocating the pixel buffer for the new
      * size.
