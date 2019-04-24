@@ -16,7 +16,7 @@ class RainbowTaskScheduler {
     static RainbowTaskScheduler newInstance(final Rainbow rainbow) {
         final RainbowDrawer rainbowDrawer = rainbow.getRainbowDrawer();
         DrawingTask.Step stepTask = new DrawingTask.Step(rainbow);
-        DrawingTask.Invalidate invalidateTask = new DrawingTask.Invalidate(rainbow, rainbowDrawer);
+        DrawingTask.Invalidate invalidateTask = new DrawingTask.Invalidate(rainbow);
         return new RainbowTaskScheduler(rainbow, stepTask, invalidateTask);
     }
 
@@ -45,8 +45,9 @@ class RainbowTaskScheduler {
         scheduler().scheduleNow(new Runnable() {
             @Override
             public void run() {
+                rainbow.onStep();
                 rainbow.getRainbowDrawer().beginDraw();
-                rainbow.onDrawingStep();
+                rainbow.onFrame();
                 rainbow.getRainbowDrawer().endDraw();
             }
         });

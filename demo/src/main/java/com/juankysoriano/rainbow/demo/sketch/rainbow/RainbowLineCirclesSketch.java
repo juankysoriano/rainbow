@@ -51,17 +51,17 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputCon
     }
 
     @Override
-    public void onSketchTouched(MotionEvent event, RainbowDrawer rainbowDrawer) {
+    public void onSketchTouched(MotionEvent event) {
         //no-op
     }
 
     @Override
-    public void onSketchReleased(MotionEvent event, RainbowDrawer rainbowDrawer) {
+    public void onSketchReleased(MotionEvent event) {
         //no-op
     }
 
     @Override
-    public void onFingerDragged(MotionEvent event, RainbowDrawer rainbowDrawer) {
+    public void onFingerDragged(MotionEvent event) {
         RainbowInputController rainbowInputController = getRainbowInputController();
         float x = rainbowInputController.getX();
         float y = rainbowInputController.getY();
@@ -71,7 +71,7 @@ public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputCon
     }
 
     @Override
-    public void onMotionEvent(MotionEvent event, RainbowDrawer rainbowDrawer) {
+    public void onMotionEvent(MotionEvent event) {
 
     }
 }

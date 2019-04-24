@@ -33,12 +33,15 @@ public class RainbowParticleSystem extends Rainbow implements RainbowInputContro
     }
 
     @Override
-    public void onDrawingStep() {
-        super.onDrawingStep();
-        getRainbowDrawer().background(0);
-        if (particleWorld != null) {
-            particleWorld.updateAndDisplay(this);
-        }
+    public void onStep() {
+        super.onStep();
+        particleWorld.update();
+    }
+
+    @Override
+    public void onFrame() {
+        super.onFrame();
+        particleWorld.display(getRainbowDrawer());
     }
 
     @Override

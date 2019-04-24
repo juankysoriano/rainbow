@@ -15,7 +15,6 @@ public class Rainbow {
     private int frameRate = 60;
     private int stepRate = 60;
     private int stepCount;
-    private boolean surfaceReady;
     private int width;
     private int height;
     private boolean stopped = true;
@@ -74,12 +73,10 @@ public class Rainbow {
 
     void setupSketch() {
         isSetup = true;
-        surfaceReady = true;
         width = drawingView.getMeasuredWidth();
         height = drawingView.getMeasuredHeight();
 
         initPeriodicGraphics();
-        initInputControllerGraphics();
     }
 
     private void initPeriodicGraphics() {
@@ -89,16 +86,6 @@ public class Rainbow {
         if (width > 0 && height > 0) {
             graphics.setSize(width, height);
             rainbowDrawer.setGraphics(graphics);
-        }
-    }
-
-    private void initInputControllerGraphics() {
-        RainbowGraphics graphics = new RainbowGraphics2D();
-        graphics.setParent(Rainbow.this);
-        graphics.setPrimary(true);
-        if (width > 0 && height > 0) {
-            graphics.setSize(width, height);
-            rainbowInputController.getRainbowDrawer().setGraphics(graphics);
         }
     }
 
@@ -149,17 +136,24 @@ public class Rainbow {
     }
 
     void performStep() {
-        if (canDraw()) {
+        if (isSetup) {
             stepCount++;
-            onDrawingStep();
+            onStep();
         }
     }
 
-    private boolean canDraw() {
-        return rainbowDrawer != null && rainbowDrawer.hasGraphics() && surfaceReady && isSetup;
+    void performDraw() {
+        if (isSetup) {
+            rainbowDrawer.beginDraw();
+            onFrame();
+            rainbowDrawer.endDraw();
+        }
     }
 
-    public void onDrawingStep() {
+    public void onStep() {
+    }
+
+    public void onFrame() {
     }
 
     public void pause() {
@@ -232,7 +226,6 @@ public class Rainbow {
             height = newHeight;
             graphics.setSize(width, height);
         }
-        surfaceReady = true;
     }
 
     /**
@@ -281,6 +274,7 @@ public class Rainbow {
 
     /**
      * Sets the rate of steps per seconds to be performed. Default is 60
+     *
      * @param stepRate
      */
     protected void stepRate(int stepRate) {

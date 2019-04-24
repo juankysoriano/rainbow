@@ -1,12 +1,11 @@
 package com.juankysoriano.rainbow.demo.sketch.rainbow.forces;
 
-import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.matrix.RVector;
 
 class ParticleWorld {
 
-    private static final int NUMBER_PARTICLES = 200000;
+    private static final int NUMBER_PARTICLES = 250000;
     private static final int NUCLEUS_DIAMETER = 40;
     private static final float HALF = 0.5f;
 
@@ -31,20 +30,22 @@ class ParticleWorld {
     private static Particle[] generateParticles(Nucleus nucleus) {
         Particle[] particles = new Particle[ParticleWorld.NUMBER_PARTICLES];
         for (int i = 0; i < ParticleWorld.NUMBER_PARTICLES; i++) {
-            Particle particle = Particle.newInstance();
+            Particle particle = new Particle();
             particle.resetTo(nucleus);
             particles[i] = particle;
         }
         return particles;
     }
 
-    void updateAndDisplay(final Rainbow rainbow) {
+    void update() {
         for (int i = 0; i < NUMBER_PARTICLES; i++) {
             setPointFor(i);
             particles[i].updateWith(nucleus);
         }
+    }
 
-        RainbowDrawer rainbowDrawer = rainbow.getRainbowDrawer();
+    void display(RainbowDrawer rainbowDrawer) {
+        rainbowDrawer.background(0);
         rainbowDrawer.strokeWeight(0);
         rainbowDrawer.stroke(255, 70);
         rainbowDrawer.point(points);
