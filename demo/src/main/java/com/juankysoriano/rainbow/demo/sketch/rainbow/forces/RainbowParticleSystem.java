@@ -4,7 +4,6 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.core.Rainbow;
-import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.event.RainbowInputController;
 
 public class RainbowParticleSystem extends Rainbow implements RainbowInputController.RainbowInteractionListener {
@@ -57,17 +56,17 @@ public class RainbowParticleSystem extends Rainbow implements RainbowInputContro
     }
 
     @Override
-    public void onFingerDragged(MotionEvent event, RainbowDrawer rainbowDrawer) {
-        onSketchTouched(event, rainbowDrawer);
+    public void onFingerDragged(MotionEvent event) {
+        onSketchTouched(event);
     }
 
     @Override
-    public void onMotionEvent(MotionEvent event, RainbowDrawer rainbowDrawer) {
+    public void onMotionEvent(MotionEvent event) {
         //no-op
     }
 
     @Override
-    public void onSketchTouched(MotionEvent event, RainbowDrawer rainbowDrawer) {
+    public void onSketchTouched(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
         float px = getRainbowInputController().getPreviousX();
@@ -78,7 +77,7 @@ public class RainbowParticleSystem extends Rainbow implements RainbowInputContro
     }
 
     @Override
-    public void onSketchReleased(MotionEvent event, RainbowDrawer rainbowDrawer) {
+    public void onSketchReleased(MotionEvent event) {
         //no-op
     }
 }
