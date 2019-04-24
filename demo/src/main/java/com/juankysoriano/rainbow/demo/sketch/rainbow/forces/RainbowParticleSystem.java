@@ -5,7 +5,7 @@ import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
-import com.juankysoriano.rainbow.core.event.RainbowInputController;
+import com.juankysoriano.rainbow.core.touch.RainbowInputController;
 
 public class RainbowParticleSystem extends Rainbow implements RainbowInputController.RainbowInteractionListener {
     private ParticleWorld particleWorld;

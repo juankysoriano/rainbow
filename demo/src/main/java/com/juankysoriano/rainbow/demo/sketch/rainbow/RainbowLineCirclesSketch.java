@@ -7,7 +7,7 @@ import com.juankysoriano.rainbow.core.Rainbow;
 import com.juankysoriano.rainbow.core.drawing.Modes;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer.Precision;
-import com.juankysoriano.rainbow.core.event.RainbowInputController;
+import com.juankysoriano.rainbow.core.touch.RainbowInputController;
 
 public class RainbowLineCirclesSketch extends Rainbow implements RainbowInputController.RainbowInteractionListener {
 
