@@ -45,9 +45,8 @@ class RainbowTaskScheduler {
         scheduler().scheduleNow(new Runnable() {
             @Override
             public void run() {
-                rainbow.onStep();
                 rainbow.getRainbowDrawer().beginDraw();
-                rainbow.onFrame();
+                rainbow.onDrawingStep();
                 rainbow.getRainbowDrawer().endDraw();
             }
         });

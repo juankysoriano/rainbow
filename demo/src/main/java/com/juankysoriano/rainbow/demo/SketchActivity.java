@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.core.Rainbow;
-import com.juankysoriano.rainbow.demo.sketch.rainbow.oil.RainbowOilPainting;
+import com.juankysoriano.rainbow.demo.sketch.rainbow.forces.RainbowParticleSystem;
 
 public class SketchActivity extends Activity {
 
@@ -15,7 +15,7 @@ public class SketchActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sketch);
-        sketch = new RainbowOilPainting(getSketchView());
+        sketch = new RainbowParticleSystem(getSketchView());
     }
 
     private ViewGroup getSketchView() {

@@ -153,22 +153,18 @@ public class Rainbow {
     void performStep() {
         if (isSetup) {
             stepCount++;
-            onStep();
+            onDrawingStep();
         }
     }
 
     void performDraw() {
         if (isSetup) {
             rainbowDrawer.beginDraw();
-            onFrame();
             rainbowDrawer.endDraw();
         }
     }
 
-    public void onStep() {
-    }
-
-    public void onFrame() {
+    public void onDrawingStep() {
     }
 
     public void pause() {

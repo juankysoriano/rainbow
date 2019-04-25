@@ -35,7 +35,7 @@ class RainbowOilPainting(viewGroup: ViewGroup) : Rainbow(viewGroup) {
         }
     }
 
-    override fun onStep() {
+    override fun onDrawingStep() {
         if (!::rainbowImage.isInitialized) {
             return
         }

@@ -86,7 +86,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
     }
 
     @Override
-    public void onStep() {
+    public void onDrawingStep() {
         if (rainbowImage != null) {
             if (!isBackgroundPainted()) {
                 paintBackgroundLines();
