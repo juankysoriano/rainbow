@@ -22,7 +22,7 @@ import java.util.List;
 public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallback {
 
     private static final int RESIZE_FACTOR = 1;
-    private static final int[] ALPHAS = {70, 40, 20};
+    private static final int[] ALPHAS = {25, 30, 35};
     private static final int MAX_ITERATIONS = 3;
     private static final float[] THRESHOLD_STEP = {0.09f / RESIZE_FACTOR, 0.045f / RESIZE_FACTOR, 0.0225f / RESIZE_FACTOR};
     private static final float[] MIN_DISCARD_BLOB_THRESHOLD = {0.125f, 0.015625f, 0.00015f};
@@ -50,7 +50,7 @@ public class RainbowBlobDetection extends Rainbow implements OnBlobDetectedCallb
         getRainbowDrawer().noFill();
         getRainbowDrawer().background(0, 0, 0);
         getRainbowDrawer().loadImage(
-                R.drawable.gatito,
+                R.drawable.winnie,
                 (getWidth() / RESIZE_FACTOR),
                 (getHeight() / RESIZE_FACTOR),
                 Modes.LoadMode.LOAD_CENTER_CROP,
