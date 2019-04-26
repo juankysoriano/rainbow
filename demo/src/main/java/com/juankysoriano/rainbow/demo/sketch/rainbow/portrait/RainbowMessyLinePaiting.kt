@@ -70,7 +70,7 @@ class RainbowMessyLinePaiting(viewGroup: ViewGroup) : Rainbow(viewGroup) {
         var dropRate = 0.0001f
         var dropRange = 40
         var dropAlpha = 150f
-        var drawAlpha = 100f
+        var drawAlpha = 60f
         var drawColor = rainbowDrawer.color(0f, 0f, 0f, drawAlpha)
         var count = 0
         var maxCount = 100
@@ -170,7 +170,7 @@ class RainbowMessyLinePaiting(viewGroup: ViewGroup) : Rainbow(viewGroup) {
             }
             val index = floor(pos.x).toInt() + rainbowDrawer.width * floor(pos.y).toInt()
             drawColor = originalImage.pixels[index]
-            drawColor = rainbowDrawer.color(rainbowDrawer.brightness(drawColor) / 2f, drawAlpha)
+            drawColor = rainbowDrawer.color(rainbowDrawer.brightness(drawColor), drawAlpha)
             ppos = pos.copy()
             vel.mult(0f)
         }
@@ -188,7 +188,7 @@ class RainbowMessyLinePaiting(viewGroup: ViewGroup) : Rainbow(viewGroup) {
             }
             rainbowDrawer.strokeWeight(drawWeight)
             if (force.mag() > 0.1f && random(1f) < dropRate) {
-                drawColor = rainbowDrawer.color(brightness / 4f, dropAlpha)
+                drawColor = rainbowDrawer.color(brightness, dropAlpha)
                 rainbowDrawer.stroke(drawColor)
                 val boldWeight = 0f + random(3f, 12f)
                 rainbowDrawer.strokeWeight(boldWeight)

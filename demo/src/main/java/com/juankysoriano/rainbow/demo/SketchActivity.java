@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.core.Rainbow;
-import com.juankysoriano.rainbow.demo.sketch.rainbow.portrait.RainbowMessyLinePaiting;
+import com.juankysoriano.rainbow.demo.sketch.rainbow.portrait.RainbowBlobDetection;
 
 public class SketchActivity extends Activity {
 
@@ -15,7 +15,7 @@ public class SketchActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sketch);
-        sketch = new RainbowMessyLinePaiting(getSketchView());
+        sketch = new RainbowBlobDetection(getSketchView());
     }
 
     private ViewGroup getSketchView() {

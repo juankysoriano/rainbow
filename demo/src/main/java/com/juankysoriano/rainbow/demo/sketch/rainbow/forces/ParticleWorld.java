@@ -5,7 +5,7 @@ import com.juankysoriano.rainbow.core.matrix.RVector;
 
 class ParticleWorld {
 
-    private static final int NUMBER_PARTICLES = 250000;
+    private static final int NUMBER_PARTICLES = 100000;
     private static final int NUCLEUS_DIAMETER = 40;
     private static final float HALF = 0.5f;
 
