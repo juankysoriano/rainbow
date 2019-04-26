@@ -1,4 +1,4 @@
-package com.juankysoriano.rainbow.demo.sketch.rainbow.detection;
+package com.juankysoriano.rainbow.demo.sketch.rainbow.portrait;
 
 import android.media.MediaPlayer;
 import android.view.ViewGroup;

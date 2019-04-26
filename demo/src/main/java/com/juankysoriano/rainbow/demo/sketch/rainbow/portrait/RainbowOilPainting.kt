@@ -1,4 +1,4 @@
-package com.juankysoriano.rainbow.demo.sketch.rainbow.oil
+package com.juankysoriano.rainbow.demo.sketch.rainbow.portrait
 
 import android.view.ViewGroup
 import com.juankysoriano.rainbow.core.Rainbow

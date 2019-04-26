@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.ViewGroup;
 
 import com.juankysoriano.rainbow.core.Rainbow;
-import com.juankysoriano.rainbow.demo.sketch.rainbow.forces.RainbowParticleSystem;
+import com.juankysoriano.rainbow.demo.sketch.rainbow.portrait.RainbowMessyLinePaiting;
 
 public class SketchActivity extends Activity {
 
@@ -15,7 +15,7 @@ public class SketchActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sketch);
-        sketch = new RainbowParticleSystem(getSketchView());
+        sketch = new RainbowMessyLinePaiting(getSketchView());
     }
 
     private ViewGroup getSketchView() {
