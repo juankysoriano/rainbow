@@ -1,10 +1,11 @@
 package com.juankysoriano.rainbow.core.cv.edgedetector;
 
-import java.util.List;
-
 import com.juankysoriano.rainbow.core.graphics.RainbowImage;
 import com.juankysoriano.rainbow.core.matrix.RVector;
 import com.juankysoriano.rainbow.utils.RainbowMath;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /*
  An algorithm that uses a custom implementation of a Sobel/Scharr operator to get 
@@ -18,8 +19,8 @@ public class EdgeDetector {
             {{6, 10, 0}, {10, 0, -10}, {0, -10, -6}}}; // Scharr kernel
     // previous array
     private int op = SCHARR;
-    private int treshold = 140;
-    private int step = 4;
+    private int treshold = 350;
+    private int step = 3;
 
     public EdgeDetector() {
     }
@@ -33,25 +34,30 @@ public class EdgeDetector {
     }
 
     public void changeStep(int step) {
-        this.step = RainbowMath.constrain(step, 2, 20);
+        this.step = RainbowMath.constrain(step, 2, 40);
     }
 
     // This method add significant points of the given picture to a given list
-    public void extractPoints(List<RVector> vertices, RainbowImage img) {
+    public List<RVector> extractPoints(RainbowImage img) {
+        List<RVector> vertices = new ArrayList<>();
         int col = 0, colSum = 0, W = img.width - 1, H = img.height - 1;
 
         // For any pixel in the image excepting borders
-        for (int Y = 1; Y < H; Y += step)
+        for (int Y = 1; Y < H; Y += step) {
             for (int X = 1; X < W; X += step, colSum = 0) {
                 // Convolute surrounding pixels with desired operator
-                for (int y = -1; y <= 1; y++)
-                    for (int x = -1; x <= 1; x++, col = img.get((X + x), (Y + y)))
+                for (int y = -1; y <= 1; y++) {
+                    for (int x = -1; x <= 1; x++, col = img.get((X + x), (Y + y))) {
                         colSum += OPERATOR[op][x + 1][y + 1] * ((col >> 16 & 0xFF) + (col >> 8 & 0xFF) + (col & 0xFF));
+                    }
+                }
                 // And if the resulting sum is over the treshold add pixel
                 // position to the list
                 if (RainbowMath.abs(colSum) > treshold) {
                     vertices.add(new RVector(X, Y));
                 }
             }
+        }
+        return vertices;
     }
 }

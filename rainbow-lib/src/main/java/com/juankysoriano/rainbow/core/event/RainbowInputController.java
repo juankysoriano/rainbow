@@ -17,6 +17,7 @@ public class RainbowInputController {
     private RainbowInteractionListener rainbowInteractionListener;
     private boolean screenTouched;
     private boolean fingerMoving;
+    private float scaleFactor;
 
     public static RainbowInputController newInstance() {
         RainbowDrawer rainbowDrawer = new RainbowDrawer();
@@ -32,6 +33,10 @@ public class RainbowInputController {
         scheduler = rainbowScheduler;
         smoother = predictor;
         x = y = px = py = -1;
+    }
+
+    public void setScale(float scaleFactor) {
+        this.scaleFactor = scaleFactor;
     }
 
     public void postEvent(final MotionEvent motionEvent) {
@@ -56,9 +61,11 @@ public class RainbowInputController {
         };
     }
 
-    private void process(MotionEvent motionEvent) {
-        preHandleEvent(motionEvent);
-        handleSketchEvent(motionEvent);
+    private void process(@NonNull MotionEvent motionEvent) {
+        MotionEvent scaledEvent = MotionEvent.obtain(motionEvent);
+        scaledEvent.setLocation(motionEvent.getX() * scaleFactor, motionEvent.getY() * scaleFactor);
+        preHandleEvent(scaledEvent);
+        handleSketchEvent(scaledEvent);
         postHandleEvent();
     }
 

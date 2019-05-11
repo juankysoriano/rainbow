@@ -81,6 +81,8 @@ public class RainbowGraphics2D extends RainbowGraphics {
     private Bitmap bitmap;
 
     private Canvas canvas;
+    private Rect realRect;
+    private Rect scaledRect;
 
     public RainbowGraphics2D() {
         transform = new float[9];
@@ -93,6 +95,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
      * Convenience method to create graphics for an already created bitmap.
      * Useful in some situations, like when you want two separate drawers working on the same bitmap
      * For example a drawer for the input controller and one for the sketch
+     *
      * @param bitmap to be used for this graphics
      * @return the created RainbowGraphics2D
      */
@@ -114,9 +117,10 @@ public class RainbowGraphics2D extends RainbowGraphics {
      * Note that this will nuke any cameraMode() settings.
      */
     @Override
-    public void setSize(int iwidth, int iheight) { // ignore
+    public void setSize(int iwidth, int iheight, float scaleFactor) { // ignore
         width = iwidth;
         height = iheight;
+        this.scaleFactor = scaleFactor;
 
         allocate();
         reapplySettings();
@@ -130,7 +134,8 @@ public class RainbowGraphics2D extends RainbowGraphics {
 
     private void initBitmaps() {
         setBitmap(Bitmap.createBitmap(parent.getWidth(), parent.getHeight(), Config.ARGB_4444));
-
+        realRect = new Rect(0, 0, (int) (width / scaleFactor), (int) (height / scaleFactor));
+        scaledRect = new Rect(0, 0, width, height);
         if (primarySurface) {
             paintParentBackground();
             canvas = new Canvas(bitmap);
@@ -202,7 +207,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
             RainbowTextureView textureView = parent.getDrawingView();
             Canvas screen = textureView.lockCanvas();
             if (canPaint(screen)) {
-                screen.drawBitmap(bitmap, 0, 0, null);
+                screen.drawBitmap(bitmap, scaledRect, realRect, null);
                 textureView.unlockCanvasAndPost(screen);
             }
         } else {

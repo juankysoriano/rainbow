@@ -138,6 +138,7 @@ public abstract class RainbowGraphics extends RainbowImage {
      */
     public int backgroundColor = 0xffCCCCCC;
 
+    float scaleFactor;
     // ........................................................
 
     // Additional stroke properties
@@ -389,9 +390,10 @@ public abstract class RainbowGraphics extends RainbowImage {
      * the event thread (EDT), causing a nasty crash as it collides with the
      * animation thread.
      */
-    public void setSize(int w, int h) { // ignore
+    public void setSize(int w, int h, float scaleFactor) { // ignore
         width = w;
         height = h;
+        this.scaleFactor = scaleFactor;
 
         allocate();
         reapplySettings();

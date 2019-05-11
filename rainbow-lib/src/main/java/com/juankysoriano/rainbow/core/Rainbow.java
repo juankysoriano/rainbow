@@ -17,6 +17,7 @@ public class Rainbow {
     private int stepCount;
     private int width;
     private int height;
+    private float scaleFactor = 0.25f;
     private boolean stopped = true;
     private boolean started = false;
     private boolean paused = true;
@@ -77,10 +78,15 @@ public class Rainbow {
         }
     };
 
+    public float onScale() {
+        return 1f;
+    }
+
     void setupSketch() {
+        scaleFactor = onScale();
         isSetup = true;
-        width = drawingView.getMeasuredWidth();
-        height = drawingView.getMeasuredHeight();
+        width = (int) (drawingView.getMeasuredWidth() * scaleFactor);
+        height = (int) (drawingView.getMeasuredHeight() * scaleFactor);
 
         initPeriodicGraphics();
         initControllerGraphics();
@@ -91,7 +97,7 @@ public class Rainbow {
         graphics.setParent(Rainbow.this);
         graphics.setPrimary(true);
         if (width > 0 && height > 0) {
-            graphics.setSize(width, height);
+            graphics.setSize(width, height, scaleFactor);
             rainbowDrawer.setGraphics(graphics);
         }
     }
@@ -99,6 +105,7 @@ public class Rainbow {
     private void initControllerGraphics() {
         RainbowGraphics graphics = RainbowGraphics2D.createFor(rainbowDrawer.getGraphics().getBitmap());
         graphics.setParent(Rainbow.this);
+        rainbowInputController.setScale(scaleFactor);
         if (width > 0 && height > 0) {
             rainbowInputController.getRainbowDrawer().setGraphics(graphics);
         }
@@ -230,12 +237,12 @@ public class Rainbow {
     }
 
     private void setupDrawingSurface(RainbowGraphics graphics) {
-        final int newWidth = drawingView.getWidth();
-        final int newHeight = drawingView.getHeight();
+        final int newWidth = (int) (drawingView.getWidth() * scaleFactor);
+        final int newHeight = (int) (drawingView.getHeight() * scaleFactor);
         if ((newWidth != width) || (newHeight != height)) {
             width = newWidth;
             height = newHeight;
-            graphics.setSize(width, height);
+            graphics.setSize(width, height, scaleFactor);
         }
     }
 

@@ -72,15 +72,6 @@ public class RainbowDrawer {
         return graphics != null;
     }
 
-    public RainbowGraphics createGraphics(int iwidth, int iheight) {
-        RainbowGraphics pg = new RainbowGraphics2D();
-        pg.setParent(graphics.parent);
-        pg.setPrimary(false);
-        pg.setSize(iwidth, iheight);
-
-        return pg;
-    }
-
     public RainbowImage createImage(int wide, int high, Modes.Image format) {
         RainbowImage image = new RainbowImage(wide, high, format);
         image.parent = graphics.parent;

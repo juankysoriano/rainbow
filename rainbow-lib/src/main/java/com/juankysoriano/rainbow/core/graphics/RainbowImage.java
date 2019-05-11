@@ -860,7 +860,7 @@ public class RainbowImage implements Cloneable {
         if (pixels == null || pixels.length != width * height) {
             pixels = new int[width * height];
         }
-        if (bitmap != null) {
+        if (bitmap != null && !modified) {
             bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
         }
         setLoaded();
