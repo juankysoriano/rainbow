@@ -79,6 +79,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
     private Paint fillPaint;
 
     private Bitmap bitmap;
+    private Bitmap overlayBitmap;
 
     private Canvas canvas;
     private Rect realRect;
@@ -99,13 +100,15 @@ public class RainbowGraphics2D extends RainbowGraphics {
      * @param bitmap to be used for this graphics
      * @return the created RainbowGraphics2D
      */
-    public static RainbowGraphics2D createFor(Bitmap bitmap) {
+    public static RainbowGraphics2D createFor(Bitmap bitmap, float scaleFactor) {
         RainbowGraphics2D graphics2D = new RainbowGraphics2D();
         graphics2D.bitmap = bitmap;
         graphics2D.width = bitmap.getWidth();
         graphics2D.height = bitmap.getHeight();
         graphics2D.checkSettings();
         graphics2D.canvas = new Canvas(bitmap);
+        graphics2D.realRect = new Rect(0, 0, (int) (bitmap.getWidth() / scaleFactor), (int) (bitmap.getHeight() / scaleFactor));
+        graphics2D.scaledRect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
         return graphics2D;
     }
 
@@ -138,6 +141,7 @@ public class RainbowGraphics2D extends RainbowGraphics {
         scaledRect = new Rect(0, 0, width, height);
         if (primarySurface) {
             paintParentBackground();
+            bitmap.prepareToDraw();
             canvas = new Canvas(bitmap);
         } else {
             canvas = new Canvas(super.getBitmap());
@@ -196,6 +200,11 @@ public class RainbowGraphics2D extends RainbowGraphics {
     }
 
     @Override
+    public void setOverlay(RainbowImage rainbowImage) {
+        this.overlayBitmap = rainbowImage.getBitmap();
+    }
+
+    @Override
     public void beginDraw() {
         checkSettings();
         vertexCount = 0;
@@ -208,6 +217,9 @@ public class RainbowGraphics2D extends RainbowGraphics {
             Canvas screen = textureView.lockCanvas();
             if (canPaint(screen)) {
                 screen.drawBitmap(bitmap, scaledRect, realRect, null);
+                if (overlayBitmap != null) {
+                    screen.drawBitmap(overlayBitmap, scaledRect, realRect, null);
+                }
                 textureView.unlockCanvasAndPost(screen);
             }
         } else {

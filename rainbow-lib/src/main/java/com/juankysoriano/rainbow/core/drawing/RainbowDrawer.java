@@ -1631,6 +1631,10 @@ public class RainbowDrawer {
         graphics.set(x, y, img);
     }
 
+    public void setOverlay(RainbowImage rainbowImage) {
+        graphics.setOverlay(rainbowImage);
+    }
+
     /**
      * Set alpha channel for an image. Black colors in the source image will
      * make the destination image completely transparent, and white will make

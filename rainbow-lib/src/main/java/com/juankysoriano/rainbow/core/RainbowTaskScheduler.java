@@ -1,6 +1,5 @@
 package com.juankysoriano.rainbow.core;
 
-import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.utils.schedulers.RainbowScheduler;
 import com.juankysoriano.rainbow.utils.schedulers.RainbowSchedulers;
 
@@ -14,7 +13,6 @@ class RainbowTaskScheduler {
     private RainbowScheduler scheduler;
 
     static RainbowTaskScheduler newInstance(final Rainbow rainbow) {
-        final RainbowDrawer rainbowDrawer = rainbow.getRainbowDrawer();
         DrawingTask.Step stepTask = new DrawingTask.Step(rainbow);
         DrawingTask.Invalidate invalidateTask = new DrawingTask.Invalidate(rainbow);
         return new RainbowTaskScheduler(rainbow, stepTask, invalidateTask);

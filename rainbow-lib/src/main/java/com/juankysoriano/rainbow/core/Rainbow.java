@@ -103,7 +103,7 @@ public class Rainbow {
     }
 
     private void initControllerGraphics() {
-        RainbowGraphics graphics = RainbowGraphics2D.createFor(rainbowDrawer.getGraphics().getBitmap());
+        RainbowGraphics graphics = RainbowGraphics2D.createFor(rainbowDrawer.getGraphics().getBitmap(), scaleFactor);
         graphics.setParent(Rainbow.this);
         rainbowInputController.setScale(scaleFactor);
         if (width > 0 && height > 0) {
@@ -164,14 +164,14 @@ public class Rainbow {
         }
     }
 
+    public void onDrawingStep() {
+    }
+
     void performDraw() {
         if (isSetup) {
             rainbowDrawer.beginDraw();
             rainbowDrawer.endDraw();
         }
-    }
-
-    public void onDrawingStep() {
     }
 
     public void pause() {

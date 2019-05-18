@@ -19,7 +19,12 @@ public abstract class RainbowSchedulers {
 
     public static RainbowScheduler multiThreaded(String name, Priority priority) {
         ThreadFactory threadFactory = RainbowThreadFactory.newInstance(name, priority.threadPriority);
-        return new RainbowScheduler(Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory));
+        return new RainbowScheduler(Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() * 2, threadFactory));
+    }
+
+    public static RainbowScheduler multiThreaded(String name, Priority priority, int threads) {
+        ThreadFactory threadFactory = RainbowThreadFactory.newInstance(name, priority.threadPriority);
+        return new RainbowScheduler(Executors.newScheduledThreadPool(threads, threadFactory));
     }
 
     /**
@@ -27,7 +32,7 @@ public abstract class RainbowSchedulers {
      **/
     public static RainbowScheduler multiThreadedForRecursion(String name, Priority priority) {
         ThreadFactory threadFactory = RainbowThreadFactory.newInstanceForRecursion(name, priority.threadPriority);
-        return new RainbowScheduler(Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory));
+        return new RainbowScheduler(Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() * 2, threadFactory));
     }
 
     public enum Priority {

@@ -3403,6 +3403,8 @@ public abstract class RainbowGraphics extends RainbowImage {
         rawGraphics.beginDraw();
     }
 
+    public abstract void setOverlay(RainbowImage rainbowImage);
+
     /**
      * Prepares the PGraphics for drawing.
      * <p/>

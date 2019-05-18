@@ -583,6 +583,9 @@ public class RainbowImage implements Cloneable {
 
     public void setModified() { // ignore
         modified = true;
+        if (loaded) {
+            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+        }
     }
 
     /**
@@ -696,13 +699,14 @@ public class RainbowImage implements Cloneable {
         if (this.bitmap == null) {
             this.bitmap = Bitmap.createBitmap(pixels, w, h, Config.ARGB_4444);
         } else {
-            Bitmap newBitmap = Bitmap.createScaledBitmap(this.bitmap, w, h, false);
+            Bitmap newBitmap = Bitmap.createScaledBitmap(this.bitmap, w, h, true);
             this.bitmap.recycle();
             this.bitmap = newBitmap;
         }
         this.width = w;
         this.height = h;
 
+        loadPixels();
         updatePixels();
         return this;
     }
