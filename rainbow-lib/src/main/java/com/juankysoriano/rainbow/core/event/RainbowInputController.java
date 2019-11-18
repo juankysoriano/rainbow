@@ -7,15 +7,11 @@ import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
 import com.juankysoriano.rainbow.utils.schedulers.RainbowScheduler;
 import com.juankysoriano.rainbow.utils.schedulers.RainbowSchedulers;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
-import java.util.concurrent.TimeUnit;
-
 public class RainbowInputController {
     private static final int DIVISIONS = 2;
     private final RainbowDrawer rainbowDrawer;
     private final FingerPositionSmoother smoother;
-    private RainbowScheduler scheduler;
+    private final RainbowScheduler scheduler;
     private float x, y;
     private float px, py;
     private RainbowInteractionListener rainbowInteractionListener;
@@ -23,17 +19,18 @@ public class RainbowInputController {
     private boolean fingerMoving;
     private float scaleFactor;
 
-    private Queue<MotionEvent> motionEvents = new ArrayDeque<>();
-
     public static RainbowInputController newInstance() {
         RainbowDrawer rainbowDrawer = new RainbowDrawer();
+        RainbowScheduler scheduler = RainbowSchedulers.single("InputController", RainbowSchedulers.Priority.NORMAL);
         FingerPositionSmoother positionSmoother = new FingerPositionSmoother();
-        return new RainbowInputController(rainbowDrawer, positionSmoother);
+        return new RainbowInputController(rainbowDrawer, scheduler, positionSmoother);
     }
 
     private RainbowInputController(RainbowDrawer rainbowDrawer,
+                                   RainbowScheduler rainbowScheduler,
                                    FingerPositionSmoother predictor) {
         this.rainbowDrawer = rainbowDrawer;
+        scheduler = rainbowScheduler;
         smoother = predictor;
         x = y = px = py = -1;
     }
@@ -43,7 +40,25 @@ public class RainbowInputController {
     }
 
     public void postEvent(final MotionEvent motionEvent) {
-        motionEvents.add(motionEvent);
+        scheduler.scheduleNow(inputEventFor(MotionEvent.obtain(motionEvent)));
+    }
+
+    private Runnable inputEventFor(final MotionEvent motionEvent) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_DOWN:
+                        process(motionEvent);
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        splitIntoMultipleEvents(motionEvent);
+                        break;
+                    default://no-op
+                }
+            }
+        };
     }
 
     private void process(@NonNull MotionEvent motionEvent) {
@@ -149,7 +164,10 @@ public class RainbowInputController {
      */
     public void attach(RainbowInteractionListener rainbowInteractionListener) {
         this.rainbowInteractionListener = rainbowInteractionListener;
-        scheduler().scheduleAtRate(inputTask, TimeUnit.SECONDS.toNanos(1) / 60, TimeUnit.NANOSECONDS);
+    }
+
+    public RainbowDrawer getRainbowDrawer() {
+        return rainbowDrawer;
     }
 
     /**
@@ -158,38 +176,7 @@ public class RainbowInputController {
      */
     public void detach() {
         this.rainbowInteractionListener = null;
-        motionEvents.clear();
-        scheduler().shutdown();
-    }
-
-    private RainbowScheduler scheduler() {
-        if (scheduler == null || scheduler.isTerminated()) {
-            scheduler = RainbowSchedulers.single("Input", RainbowSchedulers.Priority.MAX);
-        }
-        return scheduler;
-    }
-
-    private final Runnable inputTask = new Runnable() {
-        @Override
-        public void run() {
-            if (!motionEvents.isEmpty()) {
-                MotionEvent event = motionEvents.remove();
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_DOWN:
-                        process(event);
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        splitIntoMultipleEvents(event);
-                        break;
-                    default://no-op
-                }
-            }
-        }
-    };
-
-    public RainbowDrawer getRainbowDrawer() {
-        return rainbowDrawer;
+        this.scheduler.shutdown();
     }
 
     public float getX() {
