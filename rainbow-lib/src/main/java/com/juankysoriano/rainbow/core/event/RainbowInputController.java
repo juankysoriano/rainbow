@@ -4,33 +4,28 @@ import android.support.annotation.NonNull;
 import android.view.MotionEvent;
 
 import com.juankysoriano.rainbow.core.drawing.RainbowDrawer;
-import com.juankysoriano.rainbow.utils.schedulers.RainbowScheduler;
-import com.juankysoriano.rainbow.utils.schedulers.RainbowSchedulers;
 
 public class RainbowInputController {
-    private static final int DIVISIONS = 2;
+    private static final int DIVISIONS = 3;
     private final RainbowDrawer rainbowDrawer;
     private final FingerPositionSmoother smoother;
-    private final RainbowScheduler scheduler;
     private float x, y;
     private float px, py;
     private RainbowInteractionListener rainbowInteractionListener;
     private boolean screenTouched;
     private boolean fingerMoving;
     private float scaleFactor;
+    private MotionEvent nextEvent;
 
     public static RainbowInputController newInstance() {
         RainbowDrawer rainbowDrawer = new RainbowDrawer();
-        RainbowScheduler scheduler = RainbowSchedulers.single("InputController", RainbowSchedulers.Priority.NORMAL);
         FingerPositionSmoother positionSmoother = new FingerPositionSmoother();
-        return new RainbowInputController(rainbowDrawer, scheduler, positionSmoother);
+        return new RainbowInputController(rainbowDrawer, positionSmoother);
     }
 
     private RainbowInputController(RainbowDrawer rainbowDrawer,
-                                   RainbowScheduler rainbowScheduler,
                                    FingerPositionSmoother predictor) {
         this.rainbowDrawer = rainbowDrawer;
-        scheduler = rainbowScheduler;
         smoother = predictor;
         x = y = px = py = -1;
     }
@@ -40,25 +35,29 @@ public class RainbowInputController {
     }
 
     public void postEvent(final MotionEvent motionEvent) {
-        scheduler.scheduleNow(inputEventFor(MotionEvent.obtain(motionEvent)));
+        nextEvent = motionEvent;
     }
 
-    private Runnable inputEventFor(final MotionEvent motionEvent) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_DOWN:
-                        process(motionEvent);
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        splitIntoMultipleEvents(motionEvent);
-                        break;
-                    default://no-op
-                }
-            }
-        };
+    public void dispatchEvent() {
+        if (nextEvent == null) {
+            return;
+        }
+
+        switch (nextEvent.getAction()) {
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_DOWN:
+                process(nextEvent);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                splitIntoMultipleEvents(nextEvent);
+                break;
+            default://no-op
+        }
+        nextEvent = null;
+    }
+
+    public void clearEvents() {
+        nextEvent = null;
     }
 
     private void process(@NonNull MotionEvent motionEvent) {
@@ -176,7 +175,7 @@ public class RainbowInputController {
      */
     public void detach() {
         this.rainbowInteractionListener = null;
-        this.scheduler.shutdown();
+        clearEvents();
     }
 
     public float getX() {

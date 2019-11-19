@@ -14,6 +14,7 @@ import com.juankysoriano.rainbow.core.graphics.RainbowGraphics2D;
 public class Rainbow {
     private int frameRate = 60;
     private int stepRate = 60;
+    private int inputRate = 60;
     private int stepCount;
     private int width;
     private int height;
@@ -46,7 +47,7 @@ public class Rainbow {
     }
 
     public void injectInto(ViewGroup viewGroup) {
-        drawingView = new RainbowTextureView(viewGroup, this);
+        drawingView = new RainbowTextureView(viewGroup, rainbowInputController);
         addSurfaceTextureListener();
     }
 
@@ -146,7 +147,7 @@ public class Rainbow {
             onDrawingResume();
             resumed = true;
             paused = false;
-            rainbowTaskScheduler.scheduleDrawing(stepRate, frameRate);
+            rainbowTaskScheduler.scheduleDrawing(stepRate, frameRate, inputRate);
         }
     }
 
@@ -304,6 +305,24 @@ public class Rainbow {
         return stepRate;
     }
 
+    /**
+     * Sets the input rate (number of input events processed per second. Default is 60
+     * @param inputRate
+     */
+    protected void inputRate(int inputRate) {
+        this.inputRate = inputRate;
+        restart();
+    }
+
+    public float inputRate() {
+        return stepRate;
+    }
+
+    /**
+     * Sets the rate of frames per seconds to be performed. Default is 60
+     *
+     * @param frameRate
+     */
     protected void frameRate(int frameRate) {
         this.frameRate = frameRate;
         restart();
