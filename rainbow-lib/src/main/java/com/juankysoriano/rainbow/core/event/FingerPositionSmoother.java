@@ -3,8 +3,8 @@ package com.juankysoriano.rainbow.core.event;
 import com.juankysoriano.rainbow.utils.RainbowMath;
 
 class FingerPositionSmoother {
-    private static final float SPRING = 0.15f;
-    private static final float DAMP = 0.625f;
+    private static final float SPRING = 0.1f;
+    private static final float DAMP = 0.6f;
     private float x;
     private float y;
     private float xOld;
