@@ -18,7 +18,7 @@ public class RainbowTextureView extends TextureView {
         super(parent.getContext());
         this.inputController = inputController;
         parent.addView(this, 0, MATCH_PARENT_PARAMS);
-        parent.requestDisallowInterceptTouchEvent(true);
+        getParent().requestDisallowInterceptTouchEvent(true);
     }
 
     @SuppressLint("ClickableViewAccessibility")
