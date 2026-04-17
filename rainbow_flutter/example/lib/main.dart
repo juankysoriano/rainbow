@@ -428,7 +428,9 @@ class BlackHoleSketch extends RainbowSketch {
 
   @override
   void setup() {
-    drawer.background(Colors.black);
+    drawer
+      ..background(Colors.black)
+      ..ellipseMode(RainbowDrawMode.center);
     for (final star in _sourceStars) {
       final angle = RainbowMath.random(RainbowMath.twoPi);
       final radius = RainbowMath.random(0.08, 1.18);
@@ -443,12 +445,12 @@ class BlackHoleSketch extends RainbowSketch {
   @override
   void draw() {
     final centerX = width / 2;
-    final centerY = height * 0.54;
+    final centerY = height * 0.51;
     final shortSide = width < height ? width.toDouble() : height.toDouble();
-    final shadow = shortSide * 0.155;
-    final photonRing = shadow * 1.18;
-    final diskHalfWidth = shortSide * 0.64;
-    final diskThickness = shadow * 0.35;
+    final shadow = shortSide * 0.17;
+    final photonRing = shadow * 1.12;
+    final diskHalfWidth = shortSide * 0.76;
+    final diskThickness = shadow * 0.28;
     final spin = frameCount * 0.008;
 
     for (var i = 0; i < _sourceStars.length; i++) {
@@ -478,8 +480,8 @@ class BlackHoleSketch extends RainbowSketch {
 
     drawer
       ..background(Colors.black)
-      ..stroke(const Color(0xFFCFDEFF), 82)
-      ..strokeWeight(0.72)
+      ..stroke(const Color(0xFFCFDEFF), 58)
+      ..strokeWeight(0.62)
       ..points(_stars)
       ..noFill();
 
@@ -490,7 +492,7 @@ class BlackHoleSketch extends RainbowSketch {
       diskThickness,
       shadow,
       BlackHoleDiskImage.upperLensed,
-      alphaScale: 0.54,
+      alphaScale: 0.78,
     );
 
     _drawDiskImage(
@@ -500,7 +502,7 @@ class BlackHoleSketch extends RainbowSketch {
       diskThickness,
       shadow,
       BlackHoleDiskImage.lowerLensed,
-      alphaScale: 0.2,
+      alphaScale: 0.26,
     );
 
     _drawDiskImage(
@@ -510,12 +512,12 @@ class BlackHoleSketch extends RainbowSketch {
       diskThickness,
       shadow,
       BlackHoleDiskImage.direct,
-      alphaScale: 1,
+      alphaScale: 1.35,
     );
 
     drawer
-      ..stroke(const Color(0xFFFFD28C), 58)
-      ..strokeWeight(0.78)
+      ..stroke(const Color(0xFFFFDDA6), 70)
+      ..strokeWeight(0.72)
       ..points(_dust);
 
     _drawShadow(centerX, centerY, shadow);
@@ -536,8 +538,8 @@ class BlackHoleSketch extends RainbowSketch {
       final lane = (bandT - 0.5) * diskThickness;
       final radiusEase = 1 - (bandT - 0.5).abs() * 0.82;
       final halfWidth = diskHalfWidth * (0.72 + radiusEase * 0.28);
-      final hue = 34 + bandT * 18;
-      final baseAlpha = (10 + radiusEase * 46) * alphaScale;
+      final hue = 31 + bandT * 14;
+      final baseAlpha = (14 + radiusEase * 58) * alphaScale;
       var previous = _diskPoint(
         centerX,
         centerY,
@@ -561,7 +563,7 @@ class BlackHoleSketch extends RainbowSketch {
         final color = HSVColor.fromAHSV(
           1,
           hue + RainbowMath.sin(nx * 4 + frameCount * 0.01 + band) * 6,
-          0.48 + _beamForX(nx) * 0.18,
+          0.22 + _beamForX(nx) * 0.11,
           1,
         ).toColor();
         final alpha =
@@ -569,8 +571,8 @@ class BlackHoleSketch extends RainbowSketch {
             _beamForX(nx) *
             (image == BlackHoleDiskImage.direct ? 1 : 0.75);
         drawer
-          ..stroke(color, alpha.clamp(2, 76).toDouble())
-          ..strokeWeight(0.34 + radiusEase * 0.32)
+          ..stroke(color, alpha.clamp(4, 118).toDouble())
+          ..strokeWeight(0.44 + radiusEase * 0.44)
           ..line(previous.dx, previous.dy, point.dx, point.dy);
         previous = point;
       }
@@ -592,13 +594,17 @@ class BlackHoleSketch extends RainbowSketch {
     if (image == BlackHoleDiskImage.upperLensed) {
       return Offset(
         centerX + x * 0.94,
-        centerY - shadow * 0.9 - curve * shadow * 1.12 + lane * 0.1 + softWave,
+        centerY -
+            shadow * 0.34 -
+            curve * shadow * 1.28 +
+            lane * 0.08 +
+            softWave,
       );
     }
     if (image == BlackHoleDiskImage.lowerLensed) {
       return Offset(
         centerX + x * 0.92,
-        centerY + shadow * 0.78 + curve * shadow * 0.32 + lane * 0.06,
+        centerY + shadow * 0.38 + curve * shadow * 0.44 + lane * 0.05,
       );
     }
     return Offset(
@@ -616,8 +622,8 @@ class BlackHoleSketch extends RainbowSketch {
         ..ellipse(
           centerX,
           centerY,
-          shadow * (2.08 + i * 0.012),
           shadow * (2.02 + i * 0.012),
+          shadow * (2.0 + i * 0.012),
         );
     }
   }
@@ -628,15 +634,15 @@ class BlackHoleSketch extends RainbowSketch {
       final radius = photonRing * (0.94 + i * 0.014);
       final alpha = (74 - i * 3.2).clamp(6, 74).toDouble();
       drawer
-        ..stroke(const Color(0xFFFFF1C7), alpha)
-        ..strokeWeight(0.55)
-        ..ellipse(centerX, centerY, radius * 2.04, radius * 1.94);
+        ..stroke(const Color(0xFFFFF2D6), alpha)
+        ..strokeWeight(0.72)
+        ..ellipse(centerX, centerY, radius * 2.02, radius * 1.98);
     }
   }
 
   double _beamForX(double nx) {
-    final leftSide = ((-nx + 1) * 0.5).clamp(0, 1).toDouble();
-    return 0.48 + RainbowMath.pow(leftSide, 2.6) * 1.35;
+    final rightSide = ((nx + 1) * 0.5).clamp(0, 1).toDouble();
+    return 0.5 + RainbowMath.pow(rightSide, 2.2) * 1.55;
   }
 }
 
