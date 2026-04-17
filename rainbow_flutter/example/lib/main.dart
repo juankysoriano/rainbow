@@ -410,20 +410,20 @@ class LissajousBloomSketch extends RainbowSketch {
 }
 
 class BlackHoleSketch extends RainbowSketch {
-  static const int starCount = 5200;
-  static const int diskDustCount = 5200;
-  static const int diskBands = 96;
-  static const int bandSegments = 132;
+  static const int starCount = 3600;
+  static const int dustCount = 3600;
+  static const int diskBands = 74;
+  static const int diskSegments = 144;
 
   final Float32List _stars = Float32List(starCount * 2);
-  final Float32List _ringStars = Float32List(starCount);
-  final Float32List _diskDustPoints = Float32List(diskDustCount * 2);
+  final Float32List _dust = Float32List(dustCount * 2);
   final List<RVector> _sourceStars = List.generate(starCount, (_) => RVector());
-  final List<RVector> _diskDust = List.generate(diskDustCount, (_) {
-    final radius = RainbowMath.random(0.42, 2.18);
-    final angle = RainbowMath.random(RainbowMath.twoPi);
-    final lane = RainbowMath.random(-1.4, 1.4);
-    return RVector(angle, radius, lane);
+  final List<RVector> _sourceDust = List.generate(dustCount, (_) {
+    return RVector(
+      RainbowMath.random(-1, 1),
+      RainbowMath.random(-1, 1),
+      RainbowMath.random(),
+    );
   });
 
   @override
@@ -431,7 +431,7 @@ class BlackHoleSketch extends RainbowSketch {
     drawer.background(Colors.black);
     for (final star in _sourceStars) {
       final angle = RainbowMath.random(RainbowMath.twoPi);
-      final radius = RainbowMath.random(0.06, 1.24);
+      final radius = RainbowMath.random(0.08, 1.18);
       star.set(
         RainbowMath.cos(angle) * radius,
         RainbowMath.sin(angle) * radius,
@@ -443,275 +443,204 @@ class BlackHoleSketch extends RainbowSketch {
   @override
   void draw() {
     final centerX = width / 2;
-    final centerY = height / 2;
+    final centerY = height * 0.54;
     final shortSide = width < height ? width.toDouble() : height.toDouble();
-    final horizon = shortSide * 0.118;
-    final shadow = horizon * 1.42;
-    final photonRing = horizon * 1.92;
-    final lensRadius = shortSide * 0.46;
-    final diskRadius = shortSide * 0.34;
-    final tilt = 0.155;
-    final spin = frameCount * 0.0048;
+    final shadow = shortSide * 0.155;
+    final photonRing = shadow * 1.18;
+    final diskHalfWidth = shortSide * 0.64;
+    final diskThickness = shadow * 0.35;
+    final spin = frameCount * 0.008;
 
     for (var i = 0; i < _sourceStars.length; i++) {
       final source = _sourceStars[i];
-      final sx = source.x * width * 0.7;
-      final sy = source.y * height * 0.65;
+      final sx = source.x * width * 0.72;
+      final sy = source.y * height * 0.7;
       final distance = RainbowMath.sqrt(sx * sx + sy * sy).clamp(1, 99999);
-      final ringPull = RainbowMath.sin(
-        distance / lensRadius * RainbowMath.pi,
-      ).clamp(0, 1);
-      final bend = (lensRadius * lensRadius) / (distance * 5.25);
-      final caustic = RainbowMath.pow(ringPull.toDouble(), 4);
-      final warpedDistance = distance + bend * (0.52 + caustic * 1.35);
-      final squeeze = 0.92 - caustic * 0.34;
-      final x = centerX + sx / distance * warpedDistance;
-      final y = centerY + sy / distance * warpedDistance * squeeze;
-      _stars[i * 2] = x;
-      _stars[i * 2 + 1] = y;
-      _ringStars[i] = caustic;
+      final bend = (shadow * shadow * 2.0) / (distance + shadow * 0.75);
+      _stars[i * 2] = centerX + sx / distance * (distance + bend);
+      _stars[i * 2 + 1] = centerY + sy / distance * (distance + bend * 0.72);
     }
 
-    for (var i = 0; i < _diskDust.length; i++) {
-      final particle = _diskDust[i];
-      final point = _diskImagePoint(
-        centerX,
-        centerY,
-        diskRadius,
-        horizon,
-        particle.y,
-        particle.x + spin / (particle.y * particle.y * 0.8),
-        particle.z * horizon * 0.06,
-        DiskImage.direct,
-      );
-      _diskDustPoints[i * 2] = point.dx;
-      _diskDustPoints[i * 2 + 1] = point.dy;
+    for (var i = 0; i < _sourceDust.length; i++) {
+      final particle = _sourceDust[i];
+      final x = particle.x * diskHalfWidth;
+      final lane = particle.y * diskThickness * 0.78;
+      final phase = particle.z * RainbowMath.twoPi + spin;
+      final beam = _beamForX(x / diskHalfWidth);
+      _dust[i * 2] =
+          centerX + x + RainbowMath.sin(phase + particle.x * 8) * shadow * 0.03;
+      _dust[i * 2 + 1] =
+          centerY +
+          lane * 0.22 +
+          RainbowMath.sin(phase + particle.x * 5) * shadow * 0.018 -
+          beam * shadow * 0.018;
     }
 
     drawer
       ..background(Colors.black)
-      ..stroke(const Color(0xFFC7DBFF), 105)
-      ..strokeWeight(0.78)
+      ..stroke(const Color(0xFFCFDEFF), 82)
+      ..strokeWeight(0.72)
       ..points(_stars)
       ..noFill();
 
-    _drawStarCaustics(centerX, centerY, photonRing);
-
-    _drawLensedDiskImage(
+    _drawDiskImage(
       centerX,
       centerY,
-      diskRadius,
-      horizon,
-      DiskImage.secondaryTop,
-      alphaScale: 0.42,
-      verticalScale: 1.08,
+      diskHalfWidth,
+      diskThickness,
+      shadow,
+      BlackHoleDiskImage.upperLensed,
+      alphaScale: 0.54,
     );
 
-    _drawLensedDiskImage(
+    _drawDiskImage(
       centerX,
       centerY,
-      diskRadius,
-      horizon,
-      DiskImage.secondaryBottom,
-      alphaScale: 0.22,
-      verticalScale: 0.72,
+      diskHalfWidth,
+      diskThickness,
+      shadow,
+      BlackHoleDiskImage.lowerLensed,
+      alphaScale: 0.2,
     );
 
-    drawer
-      ..fill(Colors.black)
-      ..stroke(Colors.black, 255)
-      ..strokeWeight(5)
-      ..ellipse(centerX, centerY, shadow * 2.18, shadow * 2.02)
-      ..noFill();
-
-    for (var i = 0; i < 26; i++) {
-      final radius = photonRing * (0.82 + i * 0.014);
-      final alpha = (92 - i * 3.0).clamp(8, 92).toDouble();
-      drawer
-        ..stroke(const Color(0xFFFFF7E2), alpha)
-        ..strokeWeight(0.56)
-        ..ellipse(centerX, centerY, radius * 2.08, radius * 1.9);
-    }
-
-    _drawLensedDiskImage(
+    _drawDiskImage(
       centerX,
       centerY,
-      diskRadius,
-      horizon,
-      DiskImage.direct,
+      diskHalfWidth,
+      diskThickness,
+      shadow,
+      BlackHoleDiskImage.direct,
       alphaScale: 1,
-      verticalScale: tilt,
     );
 
     drawer
-      ..stroke(const Color(0xFFFFD088), 100)
-      ..strokeWeight(0.9)
-      ..points(_diskDustPoints)
-      ..fill(Colors.black)
-      ..stroke(Colors.black, 255)
-      ..strokeWeight(6)
-      ..ellipse(centerX, centerY, shadow * 2.04, shadow * 1.92)
-      ..noFill()
-      ..stroke(const Color(0xFFFFFFFF), 128)
-      ..strokeWeight(0.72)
-      ..ellipse(centerX, centerY, photonRing * 2.04, photonRing * 1.88)
-      ..stroke(const Color(0xFF98C9FF), 36)
-      ..strokeWeight(0.55)
-      ..ellipse(centerX, centerY, photonRing * 2.42, photonRing * 2.16)
-      ..stroke(const Color(0xFFFFE3A1), 42)
-      ..strokeWeight(0.5)
-      ..line(
-        centerX - diskRadius * 2.12,
-        centerY,
-        centerX + diskRadius * 2.12,
-        centerY,
-      );
+      ..stroke(const Color(0xFFFFD28C), 58)
+      ..strokeWeight(0.78)
+      ..points(_dust);
+
+    _drawShadow(centerX, centerY, shadow);
+    _drawPhotonRing(centerX, centerY, photonRing);
   }
 
-  void _drawStarCaustics(double centerX, double centerY, double photonRing) {
-    for (var i = 0; i < _sourceStars.length; i += 37) {
-      final strength = _ringStars[i];
-      if (strength < 0.45) {
-        continue;
-      }
-      final source = _sourceStars[i];
-      final angle = RainbowMath.atan2(source.y, source.x);
-      final radius = photonRing * (1.05 + strength * 0.24);
-      final x = centerX + RainbowMath.cos(angle) * radius;
-      final y = centerY + RainbowMath.sin(angle) * radius * 0.92;
-      drawer
-        ..stroke(const Color(0xFFFFFFFF), 28 + strength * 58)
-        ..strokeWeight(0.45)
-        ..line(
-          x - RainbowMath.sin(angle) * photonRing * 0.04,
-          y + RainbowMath.cos(angle) * photonRing * 0.04,
-          x + RainbowMath.sin(angle) * photonRing * 0.04,
-          y - RainbowMath.cos(angle) * photonRing * 0.04,
-        );
-    }
-  }
-
-  void _drawLensedDiskImage(
+  void _drawDiskImage(
     double centerX,
     double centerY,
-    double diskRadius,
-    double horizon,
-    DiskImage image, {
+    double diskHalfWidth,
+    double diskThickness,
+    double shadow,
+    BlackHoleDiskImage image, {
     required double alphaScale,
-    required double verticalScale,
   }) {
     for (var band = 0; band < diskBands; band++) {
       final bandT = band / (diskBands - 1);
-      final radius = 0.54 + bandT * 1.64;
-      final turbulence =
-          RainbowMath.sin(frameCount * 0.008 + band * 0.37) * 0.5 +
-          RainbowMath.sin(frameCount * 0.013 + band * 1.23) * 0.5;
-      final hue = 27 + bandT * 25;
-      final alpha = (14 + (1 - bandT) * 58 + turbulence * 9) * alphaScale;
-      final start = image == DiskImage.direct ? 0.0 : RainbowMath.pi;
-      final end = image == DiskImage.direct
-          ? RainbowMath.twoPi
-          : RainbowMath.twoPi;
-      var previous = _diskImagePoint(
+      final lane = (bandT - 0.5) * diskThickness;
+      final radiusEase = 1 - (bandT - 0.5).abs() * 0.82;
+      final halfWidth = diskHalfWidth * (0.72 + radiusEase * 0.28);
+      final hue = 34 + bandT * 18;
+      final baseAlpha = (10 + radiusEase * 46) * alphaScale;
+      var previous = _diskPoint(
         centerX,
         centerY,
-        diskRadius,
-        horizon,
-        radius,
-        start,
-        turbulence * horizon * 0.024,
+        halfWidth,
+        lane,
+        shadow,
+        -1,
         image,
-        verticalScale: verticalScale,
       );
-      for (var segment = 1; segment <= bandSegments; segment++) {
-        final t = segment / bandSegments;
-        final angle = start + (end - start) * t;
-        final point = _diskImagePoint(
+      for (var segment = 1; segment <= diskSegments; segment++) {
+        final nx = -1 + segment / diskSegments * 2;
+        final point = _diskPoint(
           centerX,
           centerY,
-          diskRadius,
-          horizon,
-          radius,
-          angle + frameCount * 0.0015 / (bandT + 0.08),
-          turbulence * horizon * 0.024,
+          halfWidth,
+          lane,
+          shadow,
+          nx,
           image,
-          verticalScale: verticalScale,
         );
-        final beam = _dopplerBeam(angle, image);
         final color = HSVColor.fromAHSV(
           1,
-          hue + RainbowMath.sin(angle * 2 + frameCount * 0.01) * 8,
-          0.5 + beam * 0.22,
+          hue + RainbowMath.sin(nx * 4 + frameCount * 0.01 + band) * 6,
+          0.48 + _beamForX(nx) * 0.18,
           1,
         ).toColor();
+        final alpha =
+            baseAlpha *
+            _beamForX(nx) *
+            (image == BlackHoleDiskImage.direct ? 1 : 0.75);
         drawer
-          ..stroke(color, (alpha * beam).clamp(3, 92).toDouble())
-          ..strokeWeight(0.36 + (1 - bandT) * 0.46)
+          ..stroke(color, alpha.clamp(2, 76).toDouble())
+          ..strokeWeight(0.34 + radiusEase * 0.32)
           ..line(previous.dx, previous.dy, point.dx, point.dy);
         previous = point;
       }
     }
   }
 
-  Offset _diskImagePoint(
+  Offset _diskPoint(
     double centerX,
     double centerY,
-    double diskRadius,
-    double horizon,
-    double radius,
-    double angle,
-    double laneOffset,
-    DiskImage image, {
-    double verticalScale = 0.155,
-  }) {
-    final rawX = RainbowMath.cos(angle) * radius * diskRadius;
-    final orbitalY = RainbowMath.sin(angle) * radius * diskRadius;
-    final distance = RainbowMath.sqrt(
-      rawX * rawX + orbitalY * orbitalY,
-    ).clamp(1, 9999);
-    final lensBoost = (horizon * horizon * 3.4) / (distance + horizon * 0.42);
-    final frameDrag =
-        horizon * 0.075 * RainbowMath.sin(angle + frameCount * 0.006);
-    if (image == DiskImage.secondaryTop) {
-      final arcHeight =
-          -horizon * 1.1 -
-          RainbowMath.sin(angle).abs() * horizon * 1.35 -
-          lensBoost * 0.22;
+    double halfWidth,
+    double lane,
+    double shadow,
+    double nx,
+    BlackHoleDiskImage image,
+  ) {
+    final x = nx * halfWidth;
+    final curve = 1 - nx * nx;
+    final softWave = RainbowMath.sin(nx * 8 + frameCount * 0.015 + lane * 0.1);
+    if (image == BlackHoleDiskImage.upperLensed) {
       return Offset(
-        centerX + rawX * 0.92 + frameDrag,
-        centerY + arcHeight * verticalScale + laneOffset,
+        centerX + x * 0.94,
+        centerY - shadow * 0.9 - curve * shadow * 1.12 + lane * 0.1 + softWave,
       );
     }
-    if (image == DiskImage.secondaryBottom) {
-      final arcHeight =
-          horizon * 1.1 +
-          RainbowMath.sin(angle).abs() * horizon * 0.92 +
-          lensBoost * 0.16;
+    if (image == BlackHoleDiskImage.lowerLensed) {
       return Offset(
-        centerX + rawX * 0.88 + frameDrag * 0.6,
-        centerY + arcHeight * verticalScale + laneOffset,
+        centerX + x * 0.92,
+        centerY + shadow * 0.78 + curve * shadow * 0.32 + lane * 0.06,
       );
     }
-    final directY = orbitalY * verticalScale;
-    final lightBend =
-        -RainbowMath.sin(angle) * lensBoost * 0.52 +
-        RainbowMath.cos(angle).abs() * lensBoost * 0.08;
-    final beaming =
-        RainbowMath.cos(angle - frameCount * 0.009) * horizon * 0.06;
     return Offset(
-      centerX + rawX + beaming + frameDrag,
-      centerY + directY + lightBend + laneOffset,
+      centerX + x,
+      centerY + lane * 0.24 - curve * shadow * 0.04 + softWave * 0.8,
     );
   }
 
-  double _dopplerBeam(double angle, DiskImage image) {
-    final approaching = (RainbowMath.cos(angle - 0.34) + 1) * 0.5;
-    final base = image == DiskImage.direct ? 0.62 : 0.42;
-    return base + RainbowMath.pow(approaching, 3) * 1.24;
+  void _drawShadow(double centerX, double centerY, double shadow) {
+    for (var i = 0; i < 7; i++) {
+      drawer
+        ..fill(Colors.black, 255)
+        ..stroke(Colors.black, 255)
+        ..strokeWeight(2)
+        ..ellipse(
+          centerX,
+          centerY,
+          shadow * (2.08 + i * 0.012),
+          shadow * (2.02 + i * 0.012),
+        );
+    }
+  }
+
+  void _drawPhotonRing(double centerX, double centerY, double photonRing) {
+    drawer.noFill();
+    for (var i = 0; i < 18; i++) {
+      final radius = photonRing * (0.94 + i * 0.014);
+      final alpha = (74 - i * 3.2).clamp(6, 74).toDouble();
+      drawer
+        ..stroke(const Color(0xFFFFF1C7), alpha)
+        ..strokeWeight(0.55)
+        ..ellipse(centerX, centerY, radius * 2.04, radius * 1.94);
+    }
+  }
+
+  double _beamForX(double nx) {
+    final leftSide = ((-nx + 1) * 0.5).clamp(0, 1).toDouble();
+    return 0.48 + RainbowMath.pow(leftSide, 2.6) * 1.35;
   }
 }
 
-enum DiskImage { direct, secondaryTop, secondaryBottom }
+enum BlackHoleDiskImage { direct, upperLensed, lowerLensed }
 
 class LorenzAttractorSketch extends RainbowSketch {
   static const int orbitCount = 9;
