@@ -41,4 +41,6 @@ class RainbowMath {
   static double pow(double value, double exponent) {
     return math.pow(value, exponent).toDouble();
   }
+
+  static double sqrt(double value) => math.sqrt(value);
 }
