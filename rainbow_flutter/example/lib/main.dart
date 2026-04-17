@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -34,11 +35,14 @@ class _RainbowExampleAppState extends State<RainbowExampleApp> {
           fit: StackFit.expand,
           children: [
             const ColoredBox(color: Colors.black),
-            RainbowCanvas(
-              key: ValueKey('${_selectedDemo.name}-$_particleCount'),
-              sketch: _sketch,
-              frameRate: _selectedDemo == DemoKind.lineCircles ? 120 : 60,
-            ),
+            if (_selectedDemo == DemoKind.blackHole)
+              const BlackHoleShaderCanvas()
+            else
+              RainbowCanvas(
+                key: ValueKey('${_selectedDemo.name}-$_particleCount'),
+                sketch: _sketch,
+                frameRate: _selectedDemo == DemoKind.lineCircles ? 120 : 60,
+              ),
             Positioned(
               left: 16,
               top: 16,
@@ -179,6 +183,88 @@ enum DemoKind {
   const DemoKind(this.label);
 
   final String label;
+}
+
+class BlackHoleShaderCanvas extends StatefulWidget {
+  const BlackHoleShaderCanvas({super.key});
+
+  @override
+  State<BlackHoleShaderCanvas> createState() => _BlackHoleShaderCanvasState();
+}
+
+class _BlackHoleShaderCanvasState extends State<BlackHoleShaderCanvas>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  ui.FragmentProgram? _program;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 24),
+    )..repeat();
+    _loadShader();
+  }
+
+  Future<void> _loadShader() async {
+    final program = await ui.FragmentProgram.fromAsset(
+      'assets/shaders/gargantua.frag',
+    );
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _program = program;
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final program = _program;
+    if (program == null) {
+      return const ColoredBox(color: Colors.black);
+    }
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return CustomPaint(
+          painter: _BlackHoleShaderPainter(
+            program: program,
+            time: _controller.value * _controller.duration!.inSeconds,
+          ),
+          child: const SizedBox.expand(),
+        );
+      },
+    );
+  }
+}
+
+class _BlackHoleShaderPainter extends CustomPainter {
+  const _BlackHoleShaderPainter({required this.program, required this.time});
+
+  final ui.FragmentProgram program;
+  final double time;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final shader = program.fragmentShader()
+      ..setFloat(0, size.width)
+      ..setFloat(1, size.height)
+      ..setFloat(2, time);
+    canvas.drawRect(Offset.zero & size, Paint()..shader = shader);
+  }
+
+  @override
+  bool shouldRepaint(covariant _BlackHoleShaderPainter oldDelegate) {
+    return oldDelegate.program != program || oldDelegate.time != time;
+  }
 }
 
 class LineCirclesSketch extends RainbowSketch {
