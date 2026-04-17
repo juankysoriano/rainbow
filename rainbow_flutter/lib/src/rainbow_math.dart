@@ -38,6 +38,7 @@ class RainbowMath {
   static double radians(double degrees) => degrees * pi / 180;
   static double sin(double value) => math.sin(value);
   static double cos(double value) => math.cos(value);
+  static double atan2(double y, double x) => math.atan2(y, x);
   static double pow(double value, double exponent) {
     return math.pow(value, exponent).toDouble();
   }
