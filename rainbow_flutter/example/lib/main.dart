@@ -329,9 +329,9 @@ class ParticleSystemSketch extends RainbowSketch {
 }
 
 class FlowFieldSketch extends RainbowSketch {
-  static const int agentCount = 900;
-  static const double speed = 1.6;
-  static const double noiseScale = 0.008;
+  static const int agentCount = 1800;
+  static const double speed = 1.22;
+  static const double noiseScale = 0.0065;
 
   final List<RVector> _agents = List.generate(agentCount, (_) => RVector());
 
@@ -367,8 +367,8 @@ class FlowFieldSketch extends RainbowSketch {
               .round()
               .clamp(0, 360);
       drawer
-        ..stroke(HSVColor.fromAHSV(0.28, hue.toDouble(), 0.55, 1).toColor())
-        ..strokeWeight(0.7)
+        ..stroke(HSVColor.fromAHSV(0.18, hue.toDouble(), 0.48, 1).toColor())
+        ..strokeWeight(0.5)
         ..line(previousX, previousY, agent.x, agent.y);
     }
   }
@@ -382,45 +382,47 @@ class LissajousBloomSketch extends RainbowSketch {
 
   @override
   void draw() {
-    if (frameCount % 240 == 1) {
+    if (frameCount % 360 == 1) {
       drawer.background(const Color(0xFF06040A));
     }
     final centerX = width / 2;
     final centerY = height / 2;
     final scale = width < height ? width * 0.32 : height * 0.36;
     final t = frameCount * 0.018;
-    for (var i = 0; i < 34; i++) {
-      final phase = i * RainbowMath.twoPi / 34;
+    for (var i = 0; i < 72; i++) {
+      final phase = i * RainbowMath.twoPi / 72;
       final x1 = centerX + RainbowMath.sin(t * 3 + phase) * scale;
       final y1 = centerY + RainbowMath.sin(t * 4 + phase * 1.7) * scale * 0.74;
       final x2 = centerX + RainbowMath.sin(t * 5 + phase + 0.7) * scale;
       final y2 = centerY + RainbowMath.cos(t * 2 + phase * 1.3) * scale * 0.74;
       final color = HSVColor.fromAHSV(
-        0.18,
-        (i * 11 + frameCount) % 360,
-        0.75,
+        0.1,
+        (i * 5 + frameCount) % 360,
+        0.62,
         1,
       ).toColor();
       drawer
         ..stroke(color)
-        ..strokeWeight(1.1)
+        ..strokeWeight(0.72)
         ..line(x1, y1, x2, y2);
     }
   }
 }
 
 class BlackHoleSketch extends RainbowSketch {
-  static const int starCount = 1600;
-  static const int diskDustCount = 900;
+  static const int starCount = 3600;
+  static const int diskDustCount = 4200;
+  static const int diskBands = 86;
+  static const int bandSegments = 120;
 
   final Float32List _stars = Float32List(starCount * 2);
-  final Float32List _blueDisk = Float32List(diskDustCount * 2);
-  final Float32List _goldDisk = Float32List(diskDustCount * 2);
+  final Float32List _diskDustPoints = Float32List(diskDustCount * 2);
   final List<RVector> _sourceStars = List.generate(starCount, (_) => RVector());
   final List<RVector> _diskDust = List.generate(diskDustCount, (_) {
-    final radius = RainbowMath.random(0.62, 1.82);
+    final radius = RainbowMath.random(0.5, 2.08);
     final angle = RainbowMath.random(RainbowMath.twoPi);
-    return RVector(angle, radius, RainbowMath.random());
+    final lane = RainbowMath.random(-1, 1);
+    return RVector(angle, radius, lane);
   });
 
   @override
@@ -428,7 +430,7 @@ class BlackHoleSketch extends RainbowSketch {
     drawer.background(Colors.black);
     for (final star in _sourceStars) {
       final angle = RainbowMath.random(RainbowMath.twoPi);
-      final radius = RainbowMath.random(0.18, 1.05);
+      final radius = RainbowMath.random(0.08, 1.18);
       star.set(
         RainbowMath.cos(angle) * radius,
         RainbowMath.sin(angle) * radius,
@@ -442,74 +444,188 @@ class BlackHoleSketch extends RainbowSketch {
     final centerX = width / 2;
     final centerY = height / 2;
     final shortSide = width < height ? width.toDouble() : height.toDouble();
-    final horizon = shortSide * 0.105;
-    final lensRadius = shortSide * 0.36;
-    final diskRadius = shortSide * 0.43;
-    final tilt = 0.34;
-    final spin = frameCount * 0.012;
+    final horizon = shortSide * 0.118;
+    final photonRing = horizon * 1.7;
+    final lensRadius = shortSide * 0.42;
+    final diskRadius = shortSide * 0.37;
+    final tilt = 0.19;
+    final spin = frameCount * 0.006;
 
     for (var i = 0; i < _sourceStars.length; i++) {
       final source = _sourceStars[i];
-      final sx = source.x * width * 0.62;
-      final sy = source.y * height * 0.58;
+      final sx = source.x * width * 0.7;
+      final sy = source.y * height * 0.65;
       final distance = RainbowMath.sqrt(sx * sx + sy * sy).clamp(1, 99999);
-      final bend = (lensRadius * lensRadius) / (distance * 8.5);
       final ringPull = RainbowMath.sin(
         distance / lensRadius * RainbowMath.pi,
-      ).clamp(0, 1).toDouble();
-      final warpedDistance = distance + bend * (0.45 + ringPull);
-      _stars[i * 2] = centerX + sx / distance * warpedDistance;
-      _stars[i * 2 + 1] = centerY + sy / distance * warpedDistance;
+      ).clamp(0, 1);
+      final bend = (lensRadius * lensRadius) / (distance * 6.2);
+      final warpedDistance = distance + bend * (0.55 + ringPull * 0.75);
+      final arcBias = (photonRing * photonRing) / (distance + photonRing * 0.9);
+      _stars[i * 2] = centerX + sx / distance * (warpedDistance + arcBias);
+      _stars[i * 2 + 1] =
+          centerY + sy / distance * (warpedDistance + arcBias * 0.48);
     }
 
     for (var i = 0; i < _diskDust.length; i++) {
       final particle = _diskDust[i];
-      final angle = particle.x + spin / (particle.y * particle.y);
-      final radius = particle.y * diskRadius;
-      final x = RainbowMath.cos(angle) * radius;
-      final y = RainbowMath.sin(angle) * radius * tilt;
-      final shear = RainbowMath.sin(angle + spin) * horizon * 0.32;
-      final index = i * 2;
-      final target = particle.z < 0.5 ? _blueDisk : _goldDisk;
-      target[index] = centerX + x + shear;
-      target[index + 1] = centerY + y;
+      final point = _diskPoint(
+        centerX,
+        centerY,
+        diskRadius,
+        horizon,
+        tilt,
+        particle.y,
+        particle.x + spin / (particle.y * particle.y * 0.8),
+        particle.z * horizon * 0.06,
+      );
+      _diskDustPoints[i * 2] = point.dx;
+      _diskDustPoints[i * 2 + 1] = point.dy;
     }
 
     drawer
       ..background(Colors.black)
-      ..stroke(const Color(0xFFBFD8FF), 150)
-      ..strokeWeight(1)
+      ..stroke(const Color(0xFFC7DBFF), 105)
+      ..strokeWeight(0.78)
       ..points(_stars)
-      ..noFill()
-      ..stroke(const Color(0xFF405B88), 95)
-      ..strokeWeight(1.2);
+      ..noFill();
 
-    for (var i = 0; i < 7; i++) {
-      final radius = horizon * (1.32 + i * 0.18);
-      drawer.ellipse(centerX, centerY, radius * 2.1, radius * 2.1);
-    }
+    _drawAccretionDisk(
+      centerX,
+      centerY,
+      diskRadius,
+      horizon,
+      tilt,
+      upperHalf: true,
+      alphaScale: 0.38,
+    );
 
     drawer
-      ..stroke(const Color(0xFF8FCBFF), 190)
-      ..strokeWeight(1.45)
-      ..points(_blueDisk)
-      ..stroke(const Color(0xFFFFD07A), 210)
-      ..strokeWeight(1.55)
-      ..points(_goldDisk)
       ..fill(Colors.black)
-      ..stroke(const Color(0xFF060606), 255)
-      ..strokeWeight(2)
-      ..ellipse(centerX, centerY, horizon * 2.15, horizon * 2.15)
+      ..stroke(Colors.black, 255)
+      ..strokeWeight(3)
+      ..ellipse(centerX, centerY, horizon * 2.28, horizon * 2.28)
+      ..noFill();
+
+    for (var i = 0; i < 18; i++) {
+      final radius = photonRing * (0.8 + i * 0.018);
+      final alpha = (70 - i * 2.7).clamp(9, 70).toDouble();
+      drawer
+        ..stroke(const Color(0xFFFFF7E2), alpha)
+        ..strokeWeight(0.7)
+        ..ellipse(centerX, centerY, radius * 2.06, radius * 1.96);
+    }
+
+    _drawAccretionDisk(
+      centerX,
+      centerY,
+      diskRadius,
+      horizon,
+      tilt,
+      upperHalf: false,
+      alphaScale: 1,
+    );
+
+    drawer
+      ..stroke(const Color(0xFFFFD088), 100)
+      ..strokeWeight(1.05)
+      ..points(_diskDustPoints)
+      ..fill(Colors.black)
+      ..stroke(Colors.black, 255)
+      ..strokeWeight(4)
+      ..ellipse(centerX, centerY, horizon * 2.06, horizon * 2.06)
       ..noFill()
-      ..stroke(const Color(0xFFFFFFFF), 160)
-      ..strokeWeight(1.4)
-      ..ellipse(centerX, centerY, horizon * 3.08, horizon * 3.08);
+      ..stroke(const Color(0xFFFFFFFF), 115)
+      ..strokeWeight(0.9)
+      ..ellipse(centerX, centerY, photonRing * 2.02, photonRing * 1.94)
+      ..stroke(const Color(0xFF98C9FF), 42)
+      ..strokeWeight(0.55)
+      ..ellipse(centerX, centerY, photonRing * 2.34, photonRing * 2.2);
+  }
+
+  void _drawAccretionDisk(
+    double centerX,
+    double centerY,
+    double diskRadius,
+    double horizon,
+    double tilt, {
+    required bool upperHalf,
+    required double alphaScale,
+  }) {
+    final start = upperHalf ? RainbowMath.pi : 0.0;
+    final end = upperHalf ? RainbowMath.twoPi : RainbowMath.pi;
+    for (var band = 0; band < diskBands; band++) {
+      final bandT = band / (diskBands - 1);
+      final radius = diskRadius * (0.62 + bandT * 1.28);
+      final thicknessJitter = RainbowMath.sin(frameCount * 0.01 + band * 0.37);
+      final hue = 28 + bandT * 26;
+      final alpha = (18 + (1 - bandT) * 54 + thicknessJitter * 9) * alphaScale;
+      var previous = _diskPoint(
+        centerX,
+        centerY,
+        diskRadius,
+        horizon,
+        tilt,
+        radius / diskRadius,
+        start,
+        thicknessJitter * horizon * 0.025,
+      );
+      for (var segment = 1; segment <= bandSegments; segment++) {
+        final t = segment / bandSegments;
+        final angle = start + (end - start) * t;
+        final point = _diskPoint(
+          centerX,
+          centerY,
+          diskRadius,
+          horizon,
+          tilt,
+          radius / diskRadius,
+          angle + frameCount * 0.0015 / (bandT + 0.08),
+          thicknessJitter * horizon * 0.025,
+        );
+        final color = HSVColor.fromAHSV(
+          1,
+          hue + RainbowMath.sin(angle * 2 + frameCount * 0.01) * 11,
+          0.58,
+          1,
+        ).toColor();
+        drawer
+          ..stroke(color, alpha.clamp(4, 82).toDouble())
+          ..strokeWeight(0.48 + (1 - bandT) * 0.42)
+          ..line(previous.dx, previous.dy, point.dx, point.dy);
+        previous = point;
+      }
+    }
+  }
+
+  Offset _diskPoint(
+    double centerX,
+    double centerY,
+    double diskRadius,
+    double horizon,
+    double tilt,
+    double radius,
+    double angle,
+    double laneOffset,
+  ) {
+    final rawX = RainbowMath.cos(angle) * radius * diskRadius;
+    final rawY = RainbowMath.sin(angle) * radius * diskRadius * tilt;
+    final distance = RainbowMath.sqrt(rawX * rawX + rawY * rawY).clamp(1, 9999);
+    final lensBoost = (horizon * horizon * 2.5) / (distance + horizon * 0.36);
+    final verticalLift =
+        RainbowMath.cos(angle).abs() * lensBoost * 0.12 -
+        RainbowMath.sin(angle) * lensBoost * 0.5;
+    final beaming = RainbowMath.cos(angle - frameCount * 0.01) * horizon * 0.05;
+    return Offset(
+      centerX + rawX + beaming,
+      centerY + rawY + verticalLift + laneOffset,
+    );
   }
 }
 
 class LorenzAttractorSketch extends RainbowSketch {
-  static const int orbitCount = 5;
-  static const int stepsPerFrame = 10;
+  static const int orbitCount = 9;
+  static const int stepsPerFrame = 16;
   static const double sigma = 10;
   static const double rho = 28;
   static const double beta = 8 / 3;
@@ -539,13 +655,13 @@ class LorenzAttractorSketch extends RainbowSketch {
         drawer
           ..stroke(
             HSVColor.fromAHSV(
-              0.22,
+              0.14,
               (200 + i * 28 + frameCount) % 360,
-              0.75,
+              0.62,
               1,
             ).toColor(),
           )
-          ..strokeWeight(1.1)
+          ..strokeWeight(0.72)
           ..line(before.dx, before.dy, after.dx, after.dy);
       }
     }
@@ -664,7 +780,7 @@ class _ProjectedPoint {
 }
 
 class TorusKnotSketch extends RainbowSketch {
-  static const int pointCount = 420;
+  static const int pointCount = 820;
 
   final List<RVector> _points = List.generate(pointCount, (index) {
     final t = index / pointCount * RainbowMath.twoPi * 2;
@@ -691,24 +807,31 @@ class TorusKnotSketch extends RainbowSketch {
     for (var i = 0; i < pointCount; i++) {
       final a = projected[i];
       final b = projected[(i + 1) % pointCount];
-      final c = projected[(i + 19) % pointCount];
+      final c = projected[(i + 31) % pointCount];
+      final d = projected[(i + 73) % pointCount];
       final alpha = ((a.depth + b.depth) * 0.42).clamp(0.16, 1).toDouble();
       drawer
         ..stroke(
           HSVColor.fromAHSV(
-            alpha * 0.72,
+            alpha * 0.52,
             (180 + i * 0.8) % 360,
-            0.82,
+            0.64,
             1,
           ).toColor(),
         )
-        ..strokeWeight(1.8)
+        ..strokeWeight(1.0)
         ..line(a.x, a.y, b.x, b.y);
-      if (i % 3 == 0) {
+      if (i % 2 == 0) {
         drawer
-          ..stroke(const Color(0xFFFAF7FF), 26)
-          ..strokeWeight(0.55)
+          ..stroke(const Color(0xFFFAF7FF), 18)
+          ..strokeWeight(0.42)
           ..line(a.x, a.y, c.x, c.y);
+      }
+      if (i % 5 == 0) {
+        drawer
+          ..stroke(const Color(0xFF9FDFFF), 12)
+          ..strokeWeight(0.35)
+          ..line(a.x, a.y, d.x, d.y);
       }
     }
   }
@@ -745,7 +868,7 @@ class TorusKnotSketch extends RainbowSketch {
 }
 
 class StarTunnelSketch extends RainbowSketch {
-  static const int starCount = 2200;
+  static const int starCount = 5200;
   final Float32List _points = Float32List(starCount * 2);
   final List<RVector> _stars = List.generate(starCount, (_) => RVector());
 
@@ -773,8 +896,8 @@ class StarTunnelSketch extends RainbowSketch {
     }
     drawer
       ..background(Colors.black)
-      ..stroke(const Color(0xFFE9F7FF), 180)
-      ..strokeWeight(1.15)
+      ..stroke(const Color(0xFFE9F7FF), 118)
+      ..strokeWeight(0.82)
       ..points(_points);
   }
 
