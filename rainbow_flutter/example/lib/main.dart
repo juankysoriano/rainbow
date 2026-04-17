@@ -1,4 +1,5 @@
 import 'dart:ui' as ui;
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -194,7 +195,10 @@ class BlackHoleShaderCanvas extends StatefulWidget {
 
 class _BlackHoleShaderCanvasState extends State<BlackHoleShaderCanvas>
     with SingleTickerProviderStateMixin {
+  static const int _particleCount = 9000;
+
   late final AnimationController _controller;
+  late final List<_BlackHoleParticle> _particles;
   ui.FragmentProgram? _program;
   Offset _camera = Offset.zero;
 
@@ -205,6 +209,11 @@ class _BlackHoleShaderCanvasState extends State<BlackHoleShaderCanvas>
       vsync: this,
       duration: const Duration(seconds: 24),
     )..repeat();
+    final random = math.Random(8);
+    _particles = List.generate(
+      _particleCount,
+      (_) => _BlackHoleParticle.random(random),
+    );
     _loadShader();
   }
 
@@ -257,11 +266,121 @@ class _BlackHoleShaderCanvasState extends State<BlackHoleShaderCanvas>
               time: _controller.value * _controller.duration!.inSeconds,
               camera: _camera,
             ),
+            foregroundPainter: _BlackHoleParticlePainter(
+              particles: _particles,
+              time: _controller.value * _controller.duration!.inSeconds,
+              camera: _camera,
+            ),
             child: const SizedBox.expand(),
           ),
         );
       },
     );
+  }
+}
+
+class _BlackHoleParticle {
+  _BlackHoleParticle({
+    required this.radius,
+    required this.angle,
+    required this.speed,
+    required this.lane,
+    required this.size,
+    required this.temperature,
+  });
+
+  factory _BlackHoleParticle.random(math.Random random) {
+    final radius = math.pow(random.nextDouble(), 0.54).toDouble();
+    final diskRadius = 0.23 + radius * 0.92;
+    return _BlackHoleParticle(
+      radius: diskRadius,
+      angle: random.nextDouble() * math.pi * 2,
+      speed: (0.38 + (1.16 - diskRadius) * 0.64) * (random.nextBool() ? 1 : -1),
+      lane: (random.nextDouble() - 0.5) * 0.035,
+      size: 0.55 + random.nextDouble() * 1.15,
+      temperature: random.nextDouble(),
+    );
+  }
+
+  final double radius;
+  final double angle;
+  final double speed;
+  final double lane;
+  final double size;
+  final double temperature;
+}
+
+class _BlackHoleParticlePainter extends CustomPainter {
+  const _BlackHoleParticlePainter({
+    required this.particles,
+    required this.time,
+    required this.camera,
+  });
+
+  final List<_BlackHoleParticle> particles;
+  final double time;
+  final Offset camera;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final shortSide = size.shortestSide;
+    final center = Offset(size.width / 2, size.height / 2 + shortSide * 0.02);
+    final yaw = camera.dx * 0.55;
+    final tilt = 0.13 + camera.dy * 0.08;
+    final cosYaw = math.cos(yaw);
+    final sinYaw = math.sin(yaw);
+    final shadow = shortSide * 0.185;
+    final diskScale = shortSide * 0.58;
+
+    final glowPaint = Paint()
+      ..strokeCap = StrokeCap.round
+      ..blendMode = BlendMode.plus;
+
+    for (final particle in particles) {
+      final angle = particle.angle + time * particle.speed / particle.radius;
+      final orbitX = math.cos(angle) * particle.radius;
+      final orbitZ = math.sin(angle) * particle.radius;
+      final orbitY = particle.lane;
+      final rotatedX = orbitX * cosYaw - orbitZ * sinYaw;
+      final rotatedZ = orbitX * sinYaw + orbitZ * cosYaw;
+      final perspective = 1.0 / (1.0 + rotatedZ * 0.23);
+      final projected = Offset(
+        center.dx + rotatedX * diskScale * perspective,
+        center.dy + (orbitY + orbitZ * tilt) * diskScale * perspective,
+      );
+      final distanceFromCenter = (projected - center).distance;
+      if (distanceFromCenter < shadow * 0.9 && rotatedZ > -0.14) {
+        continue;
+      }
+
+      final sideBeam = math.pow(((rotatedX / particle.radius) + 1) * 0.5, 2.5);
+      final depthAlpha = (0.26 + perspective * 0.38 + sideBeam * 0.72).clamp(
+        0.0,
+        1.0,
+      );
+      final color = Color.lerp(
+        const Color(0xFFFF8E2A),
+        const Color(0xFFFFF3D2),
+        (particle.temperature * 0.55 + sideBeam * 0.55).clamp(0.0, 1.0),
+      )!.withValues(alpha: depthAlpha * 0.62);
+
+      final tangent = Offset(
+        -math.sin(angle) * cosYaw - math.cos(angle) * sinYaw,
+        math.cos(angle) * tilt,
+      );
+      final trail = tangent * (particle.size * shortSide * 0.0042);
+      glowPaint
+        ..color = color
+        ..strokeWidth = particle.size * perspective;
+      canvas.drawLine(projected - trail, projected + trail * 1.9, glowPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _BlackHoleParticlePainter oldDelegate) {
+    return oldDelegate.time != time ||
+        oldDelegate.camera != camera ||
+        oldDelegate.particles != particles;
   }
 }
 
