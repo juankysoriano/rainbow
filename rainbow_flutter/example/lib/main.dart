@@ -196,6 +196,7 @@ class _BlackHoleShaderCanvasState extends State<BlackHoleShaderCanvas>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   ui.FragmentProgram? _program;
+  Offset _camera = Offset.zero;
 
   @override
   void initState() {
@@ -234,12 +235,30 @@ class _BlackHoleShaderCanvasState extends State<BlackHoleShaderCanvas>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        return CustomPaint(
-          painter: _BlackHoleShaderPainter(
-            program: program,
-            time: _controller.value * _controller.duration!.inSeconds,
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onPanUpdate: (details) {
+            setState(() {
+              _camera += details.delta * 0.006;
+              _camera = Offset(
+                _camera.dx.clamp(-1.4, 1.4),
+                _camera.dy.clamp(-1.0, 1.0),
+              );
+            });
+          },
+          onDoubleTap: () {
+            setState(() {
+              _camera = Offset.zero;
+            });
+          },
+          child: CustomPaint(
+            painter: _BlackHoleShaderPainter(
+              program: program,
+              time: _controller.value * _controller.duration!.inSeconds,
+              camera: _camera,
+            ),
+            child: const SizedBox.expand(),
           ),
-          child: const SizedBox.expand(),
         );
       },
     );
@@ -247,23 +266,32 @@ class _BlackHoleShaderCanvasState extends State<BlackHoleShaderCanvas>
 }
 
 class _BlackHoleShaderPainter extends CustomPainter {
-  const _BlackHoleShaderPainter({required this.program, required this.time});
+  const _BlackHoleShaderPainter({
+    required this.program,
+    required this.time,
+    required this.camera,
+  });
 
   final ui.FragmentProgram program;
   final double time;
+  final Offset camera;
 
   @override
   void paint(Canvas canvas, Size size) {
     final shader = program.fragmentShader()
       ..setFloat(0, size.width)
       ..setFloat(1, size.height)
-      ..setFloat(2, time);
+      ..setFloat(2, time)
+      ..setFloat(3, camera.dx)
+      ..setFloat(4, camera.dy);
     canvas.drawRect(Offset.zero & size, Paint()..shader = shader);
   }
 
   @override
   bool shouldRepaint(covariant _BlackHoleShaderPainter oldDelegate) {
-    return oldDelegate.program != program || oldDelegate.time != time;
+    return oldDelegate.program != program ||
+        oldDelegate.time != time ||
+        oldDelegate.camera != camera;
   }
 }
 

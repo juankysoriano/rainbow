@@ -4,6 +4,7 @@ precision highp float;
 
 uniform vec2 uResolution;
 uniform float uTime;
+uniform vec2 uCamera;
 
 out vec4 fragColor;
 
@@ -111,26 +112,39 @@ void main() {
   uv.y += 0.02;
 
   float time = uTime;
-  float shadow = 0.185;
+  float orbit = uCamera.x;
+  float tilt = uCamera.y;
+  float yaw = orbit * 0.55;
+  float pitch = tilt * 0.32;
+  float cy = cos(yaw);
+  float sy = sin(yaw);
+  float cp = cos(pitch);
+  float sp = sin(pitch);
+  uv = mat2(cy, -sy, sy, cy) * uv;
+  uv.y = uv.y * (1.0 + abs(tilt) * 0.28) + pitch * 0.22;
+
+  float shadow = 0.185 * (1.0 - abs(tilt) * 0.08);
   float ringRadius = shadow * 1.12;
 
   float r = length(uv);
   vec2 lensDir = uv / max(r, 0.001);
   float lensAmount = 0.028 / (r * r + 0.035);
   vec2 lensedUv = uv + lensDir * lensAmount;
+  lensedUv.y = lensedUv.y * cp + sp * 0.12;
 
   vec3 color = vec3(0.0);
   float stars = starField(lensedUv + vec2(time * 0.0015, 0.0));
   color += vec3(0.55, 0.68, 1.0) * stars * smoothstep(shadow * 0.95, shadow * 2.4, r);
 
   float beam = 1.0;
-  float upper = upperLensedDisk(uv, shadow, time, beam);
-  color += temperature(min(1.0, upper * 0.75 + beam * 0.22)) * upper * 0.78;
+  vec2 diskUv = vec2(uv.x, uv.y * (1.0 + tilt * 0.42));
+  float upper = upperLensedDisk(diskUv, shadow, time, beam);
+  color += temperature(min(1.0, upper * 0.75 + beam * 0.22)) * upper * (0.78 + tilt * 0.12);
 
-  float lower = lowerLensedDisk(uv, shadow, time, beam);
-  color += temperature(0.55 + beam * 0.16) * lower * 0.32;
+  float lower = lowerLensedDisk(diskUv, shadow, time, beam);
+  color += temperature(0.55 + beam * 0.16) * lower * (0.32 - tilt * 0.08);
 
-  float direct = directDisk(uv, shadow, time, beam);
+  float direct = directDisk(diskUv, shadow, time, beam);
   color += temperature(min(1.0, direct * 0.35 + beam * 0.22)) * direct;
 
   float ring = photonRing(uv, ringRadius);
